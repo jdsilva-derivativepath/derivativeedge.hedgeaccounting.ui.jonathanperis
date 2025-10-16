@@ -1,5 +1,6 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
+using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
@@ -60,6 +61,20 @@ public sealed class DeDesignateHedgeRelationship
                 var currentHedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
+
+                // Validate dedesignation requirements
+                var validationErrors = DeDesignateValidator.Validate(
+                    currentHedgeRelationship, 
+                    request.DedesignationDate, 
+                    request.DedesignationReason);
+                    
+                if (validationErrors.Any())
+                {
+                    var errorMessage = string.Join("; ", validationErrors);
+                    _logger.LogWarning("De-designation validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 
+                        request.HedgeRelationshipId, errorMessage);
+                    return new Response(true, errorMessage);
+                }
 
                 // Map to entity and update dedesignation properties
                 var hedgeRelationshipEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);

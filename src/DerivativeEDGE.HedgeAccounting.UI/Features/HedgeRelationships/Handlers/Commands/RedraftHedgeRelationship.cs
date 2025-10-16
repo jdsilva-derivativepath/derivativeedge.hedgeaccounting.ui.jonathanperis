@@ -1,5 +1,6 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
+using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
@@ -50,6 +51,16 @@ public sealed class RedraftHedgeRelationship
                 var currentHedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId, 
                     cancellationToken);
+
+                // Validate redraft requirements
+                var validationErrors = RedraftValidator.Validate(currentHedgeRelationship);
+                if (validationErrors.Any())
+                {
+                    var errorMessage = string.Join("; ", validationErrors);
+                    _logger.LogWarning("Redraft validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 
+                        request.HedgeRelationshipId, errorMessage);
+                    return new Response(true, errorMessage);
+                }
 
                 // Map to entity for API call
                 var hedgeRelationshipEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);
