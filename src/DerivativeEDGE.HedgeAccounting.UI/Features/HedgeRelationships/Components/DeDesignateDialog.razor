@@ -1,0 +1,274 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Inputs
+@using DerivativeEdge.HedgeAccounting.Api.Client
+
+<SfDialog Width="600px"
+          Height="auto"
+          CssClass="dp-dialog"
+          IsModal="true"
+          AllowDragging="false"
+          EnableResize="false"
+          ShowCloseIcon="true"
+          @bind-Visible="Visible">
+    <DialogTemplates>
+        <Header>
+            <div class="custom-dialog-header">
+                <div class="header-text">
+                    <span class="header-title">De-Designation Workflow</span>
+                </div>
+                <i class="header-icon fa-solid fa-xmark" @onclick="HandleClose"></i>
+            </div>
+        </Header>
+        <Content>
+            <div class="overflow-auto" style="max-height: 70vh;">
+                @if (!string.IsNullOrEmpty(UserMessage))
+                {
+                    <div class="px-2.5 py-2">
+                        <SfMessage Severity="@(IsError ? MessageSeverity.Error : MessageSeverity.Warning)">
+                            @UserMessage
+                        </SfMessage>
+                    </div>
+                }
+
+                <div class="p-4">
+                    <!-- Dedesignation Reason Section -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Dedesignation Reason</label>
+                        <div class="flex gap-4">
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="termination" 
+                                       name="reason" 
+                                       checked="@(DedesignationReason == 0)"
+                                       @onchange="@(() => HandleReasonChange(0))"
+                                       class="mr-2" />
+                                <label for="termination" class="text-sm text-gray-700">Termination</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="ineffectiveness" 
+                                       name="reason" 
+                                       checked="@(DedesignationReason == 1)"
+                                       @onchange="@(() => HandleReasonChange(1))"
+                                       class="mr-2" />
+                                <label for="ineffectiveness" class="text-sm text-gray-700">Ineffectiveness</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dedesignation Date -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Dedesignation Date</label>
+                        <SfDatePicker CssClass="calendar-datepicker"
+                                      TValue="DateTime?"
+                                      @bind-Value="DedesignationDate"
+                                      Format="MM/dd/yyyy"
+                                      Placeholder="mm/dd/yyyy"
+                                      Enabled="true" />
+                    </div>
+
+                    <!-- Cash Payment Type Section -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Cash Payment Type</label>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="fullPayment" 
+                                       name="cashPayment" 
+                                       checked="@(CashPaymentType == 0)"
+                                       @onchange="@(() => HandleCashPaymentTypeChange(0))"
+                                       class="mr-2" />
+                                <label for="fullPayment" class="text-sm text-gray-700">Full Cash Payment</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="partialPayment" 
+                                       name="cashPayment" 
+                                       checked="@(CashPaymentType == 1)"
+                                       @onchange="@(() => HandleCashPaymentTypeChange(1))"
+                                       class="mr-2" />
+                                <label for="partialPayment" class="text-sm text-gray-700">Partial Cash Payment</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="noPayment" 
+                                       name="cashPayment" 
+                                       checked="@(CashPaymentType == 2)"
+                                       @onchange="@(() => HandleCashPaymentTypeChange(2))"
+                                       class="mr-2" />
+                                <label for="noPayment" class="text-sm text-gray-700">No Cash Payment</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Amount -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Payment Amount</label>
+                        <SfNumericTextBox CssClass="input-textbox"
+                                          TValue="decimal?"
+                                          @bind-Value="Payment"
+                                          Format="C2"
+                                          Placeholder="0.00"
+                                          Enabled="@PaymentFieldsEnabled" />
+                    </div>
+
+                    <!-- Time Values Date Range -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-normal text-gray-700 mb-2">Start Date</label>
+                            <SfDatePicker CssClass="calendar-datepicker"
+                                          TValue="DateTime?"
+                                          @bind-Value="TimeValuesStartDate"
+                                          Format="MM/dd/yyyy"
+                                          Placeholder="mm/dd/yyyy"
+                                          Enabled="@DateFieldsEnabled" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-normal text-gray-700 mb-2">End Date</label>
+                            <SfDatePicker CssClass="calendar-datepicker"
+                                          TValue="DateTime?"
+                                          @bind-Value="TimeValuesEndDate"
+                                          Format="MM/dd/yyyy"
+                                          Placeholder="mm/dd/yyyy"
+                                          Enabled="@DateFieldsEnabled" />
+                        </div>
+                    </div>
+
+                    <!-- Accrual (Read-only) -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Accrual</label>
+                        <SfTextBox CssClass="input-textbox"
+                                   Value="@Accrual?.ToString("C2")"
+                                   Enabled="false" />
+                    </div>
+
+                    <!-- Basis Adjustment Section (if applicable) -->
+                    @if (ShowBasisAdjustmentBalance)
+                    {
+                        <div class="mb-4">
+                            <label class="block text-sm font-normal text-gray-700 mb-2">Basis Adjustment</label>
+                            <SfNumericTextBox CssClass="input-textbox"
+                                              TValue="decimal?"
+                                              @bind-Value="BasisAdjustment"
+                                              Format="C2"
+                                              Enabled="false" />
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-normal text-gray-700 mb-2">Basis Adjustment Balance</label>
+                            <SfNumericTextBox CssClass="input-textbox"
+                                              TValue="decimal?"
+                                              @bind-Value="BasisAdjustmentBalance"
+                                              Format="C2"
+                                              Enabled="false" />
+                        </div>
+                    }
+
+                    <!-- Hedged Exposure Existence -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Hedged Exposure</label>
+                        <div class="flex gap-4">
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="exposureExists" 
+                                       name="exposure" 
+                                       checked="@HedgedExposureExist"
+                                       @onchange="@(() => HandleHedgedExposureChange(true))"
+                                       class="mr-2" />
+                                <label for="exposureExists" class="text-sm text-gray-700">Exists</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" 
+                                       id="exposureNotExists" 
+                                       name="exposure" 
+                                       checked="@(!HedgedExposureExist)"
+                                       @onchange="@(() => HandleHedgedExposureChange(false))"
+                                       class="mr-2" />
+                                <label for="exposureNotExists" class="text-sm text-gray-700">Does Not Exist</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton CssClass="button-link button-default"
+                      Content="Cancel"
+                      IsPrimary="false"
+                      OnClick="@HandleClose" />
+        <DialogButton CssClass="button-primary button-default"
+                      Content="De-Designate"
+                      IsPrimary="true"
+                      Disabled="@IsDeDesignateDisabled"
+                      OnClick="@HandleDeDesignate" />
+    </DialogButtons>
+    <DialogPositionData X="center" Y="center" />
+</SfDialog>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public EventCallback OnDeDesignated { get; set; }
+
+    // Model properties
+    [Parameter] public int DedesignationReason { get; set; } = 0;
+    [Parameter] public DateTime? DedesignationDate { get; set; }
+    [Parameter] public int CashPaymentType { get; set; } = 0;
+    [Parameter] public decimal? Payment { get; set; } = 0;
+    [Parameter] public decimal? Accrual { get; set; } = 0;
+    [Parameter] public decimal? BasisAdjustment { get; set; } = 0;
+    [Parameter] public decimal? BasisAdjustmentBalance { get; set; } = 0;
+    [Parameter] public bool ShowBasisAdjustmentBalance { get; set; }
+    [Parameter] public DateTime? TimeValuesStartDate { get; set; }
+    [Parameter] public DateTime? TimeValuesEndDate { get; set; }
+    [Parameter] public bool HedgedExposureExist { get; set; } = true;
+
+    // UI State
+    [Parameter] public string UserMessage { get; set; } = string.Empty;
+    [Parameter] public bool IsError { get; set; }
+    [Parameter] public bool IsDeDesignateDisabled { get; set; }
+
+    // Computed properties for field states
+    private bool PaymentFieldsEnabled => true; // Per DE-3277, always enabled
+    private bool DateFieldsEnabled => HedgedExposureExist;
+
+    private async Task HandleClose()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    private async Task HandleDeDesignate()
+    {
+        if (OnDeDesignated.HasDelegate)
+        {
+            await OnDeDesignated.InvokeAsync();
+        }
+        await HandleClose();
+    }
+
+    private async Task HandleReasonChange(int reason)
+    {
+        DedesignationReason = reason;
+        
+        // API Call: Load de-designation data for the selected reason
+        // await Mediator.Send(new GetDedesignateData.Query(HedgeId, reason));
+        // Update model properties based on response
+        
+        StateHasChanged();
+    }
+
+    private void HandleCashPaymentTypeChange(int cashPaymentType)
+    {
+        CashPaymentType = cashPaymentType;
+        StateHasChanged();
+    }
+
+    private void HandleHedgedExposureChange(bool exists)
+    {
+        HedgedExposureExist = exists;
+        StateHasChanged();
+    }
+}

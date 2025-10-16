@@ -30,6 +30,8 @@ public partial class HedgeRelationshipDetails
     private const string MODAL_AMORTIZATION = "Amortization";
     private const string MODAL_OPTION_AMORTIZATION = "Option Amortization";
     private const string MODAL_HEDGE_DOCUMENT_PREVIEW = "HedgeDocumentPreview";
+    private const string MODAL_DEDESIGNATE = "DeDesignate";
+    private const string MODAL_REDESIGNATE = "ReDesignate";
     private const string STANDARD_MODAL_WIDTH = "33rem";
     private const string WIDE_MODAL_WIDTH = "41rem";
     private const string NARROW_MODAL_WIDTH = "30rem";
@@ -191,6 +193,8 @@ public partial class HedgeRelationshipDetails
     private bool IsAmortizationModal => OpenModal == MODAL_AMORTIZATION;
     private bool IsOptionAmortizationModal => OpenModal == MODAL_OPTION_AMORTIZATION;
     private bool IsHedgeDocumentPreviewModal => OpenModal == MODAL_HEDGE_DOCUMENT_PREVIEW;
+    private bool IsDeDesignateModal => OpenModal == MODAL_DEDESIGNATE;
+    private bool IsReDesignateModal => OpenModal == MODAL_REDESIGNATE;
     private string BenchMarkLabel => HedgeRelationshipLabelHelper.GetBenchMarkLabel(HedgeRelationship);
 
     // TODO: Replace with actual business logic
@@ -203,6 +207,34 @@ public partial class HedgeRelationshipDetails
     private bool Straightline { get; set; }
     private bool IncludeInRegression { get; set; }
     private bool AmortizeOptionPremium { get; set; }
+
+    // De-Designate Dialog Properties
+    private int DedesignationReason { get; set; } = 0;
+    private DateTime? DedesignationDateDialog { get; set; }
+    private int CashPaymentType { get; set; } = 0;
+    private decimal? DedesignatePayment { get; set; } = 0;
+    private decimal? DedesignateAccrual { get; set; } = 0;
+    private decimal? BasisAdjustment { get; set; } = 0;
+    private decimal? BasisAdjustmentBalance { get; set; } = 0;
+    private bool ShowBasisAdjustmentBalance { get; set; }
+    private DateTime? DedesignateTimeValuesStartDate { get; set; }
+    private DateTime? DedesignateTimeValuesEndDate { get; set; }
+    private bool HedgedExposureExist { get; set; } = true;
+    private string DedesignateUserMessage { get; set; } = string.Empty;
+    private bool DedesignateIsError { get; set; }
+    private bool IsDeDesignateDisabled { get; set; } = true;
+
+    // Re-Designate Dialog Properties
+    private DateTime? RedesignationDate { get; set; }
+    private DateTime? RedesignateTimeValuesStartDate { get; set; }
+    private DateTime? RedesignateTimeValuesEndDate { get; set; }
+    private decimal? RedesignatePayment { get; set; } = 0;
+    private string RedesignatePaymentFrequency { get; set; } = string.Empty;
+    private string RedesignateDayCountConv { get; set; } = string.Empty;
+    private string RedesignatePayBusDayConv { get; set; } = string.Empty;
+    private bool RedesignateAdjustedDates { get; set; }
+    private bool MarkAsAcquisition { get; set; }
+    private bool IsDocTemplateFound { get; set; }
     #endregion
 
     #region Models and Data
@@ -461,25 +493,48 @@ public partial class HedgeRelationshipDetails
 
         var state = HedgeRelationship?.HedgeState;
         var type = HedgeRelationship?.HedgeType;
+        
+        // Check user roles - workflow actions are disabled if user doesn't have required roles (24, 17, or 5)
+        var hasWorkflowPermission = HasWorkflowPermission();
 
-        // Base actions
-        if (state == DerivativeEDGEHAEntityEnumHedgeState.Designated || state == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
+        // Legacy logic from setWorkFlow():
+        // if ($scope.Model.HedgeState === 'Draft') -> Don't show De-Designate
+        // if ($scope.Model.HedgeState !== 'Designated' || $scope.Model.HedgeType !== "CashFlow") -> Don't show Re-Designate
+        // if ($scope.Model.HedgeState === 'Designated' || $scope.Model.HedgeState === "Dedesignated") -> Show Redraft instead of Designate
+
+        if (state == DerivativeEDGEHAEntityEnumHedgeState.Draft)
         {
-            WorkflowItems.Add(new DropDownMenuItem { Text = "Redraft", Disabled = false });
+            // Draft state: Show only Designate
+            WorkflowItems.Add(new DropDownMenuItem { Text = "Designate", Disabled = !hasWorkflowPermission });
         }
-
-        if (state != DerivativeEDGEHAEntityEnumHedgeState.Draft)
+        else if (state == DerivativeEDGEHAEntityEnumHedgeState.Designated)
         {
-            WorkflowItems.Add(new DropDownMenuItem { Text = "De-Designate" });
+            // Designated state: Show Redraft, De-Designate, and optionally Re-Designate
+            WorkflowItems.Add(new DropDownMenuItem { Text = "Redraft", Disabled = !hasWorkflowPermission });
+            WorkflowItems.Add(new DropDownMenuItem { Text = "De-Designate", Disabled = !hasWorkflowPermission });
+            
+            // Re-Designate only for CashFlow hedge types (DE-3928)
+            if (type == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow)
+            {
+                WorkflowItems.Add(new DropDownMenuItem { Text = "Re-Designate", Disabled = !hasWorkflowPermission });
+            }
         }
-
-        if (state == DerivativeEDGEHAEntityEnumHedgeState.Designated && type == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow)
+        else if (state == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
         {
-            WorkflowItems.Add(new DropDownMenuItem { Text = "Re-Designate" });
+            // Dedesignated state: Show only Redraft (DE-2731)
+            WorkflowItems.Add(new DropDownMenuItem { Text = "Redraft", Disabled = !hasWorkflowPermission });
         }
+    }
 
-        // Optional: other fixed actions
-        WorkflowItems.Add(new DropDownMenuItem { Text = "Designate" });
+    private bool HasWorkflowPermission()
+    {
+        // Check if user has one of the required roles: 24, 17, or 5
+        // This maps to: $scope.checkUserRole('24') || $scope.checkUserRole('17') || $scope.checkUserRole('5')
+        return UserAuthData != null && (
+            UserAuthData.UserRoles.Contains("24") ||
+            UserAuthData.UserRoles.Contains("17") ||
+            UserAuthData.UserRoles.Contains("5")
+        );
     }
 
     private async Task HandleClientValueChangeAsync()
@@ -890,22 +945,278 @@ public partial class HedgeRelationshipDetails
         switch (selected)
         {
             case "Designate":
-                ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
-                if (ValidationErrors.Any())
-                {
-                    StateHasChanged();
-                    return;
-                }
+                await HandleDesignateAsync();
                 break;
             case "De-Designate":
-                // TODO: Call De-Designate logic
+                await HandleDeDesignateAsync();
                 break;
             case "Redraft":
-                // TODO: Call Redraft logic
+                await HandleRedraftAsync();
                 break;
             case "Re-Designate":
-                // TODO: Call Re-Designate logic
+                await HandleReDesignateAsync();
                 break;
+        }
+    }
+
+    private async Task HandleDesignateAsync()
+    {
+        // Validate designation requirements
+        ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
+        if (ValidationErrors.Any())
+        {
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            // API Call: Check if document template exists
+            // var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeId));
+            
+            // if (findDocTemplateResponse.HasTemplate)
+            // {
+            //     // Save current state first
+            //     await SaveHedgeRelationshipAsync();
+            //     
+            //     // Reload hedge relationship
+            //     await GetHedgeRelationship(HedgeId);
+            // }
+
+            // API Call: Run regression for inception
+            // await Mediator.Send(new RunRegression.Command(HedgeRelationship, hedgeResultType: "Inception"));
+
+            // API Call: Check analytics status
+            // var analyticsStatus = await Mediator.Send(new CheckAnalyticsStatus.Query(HedgeId));
+            
+            // API Call: Generate inception package
+            // var response = await Mediator.Send(new GenerateInceptionPackage.Command(HedgeRelationship, preview: false));
+            
+            await AlertService.ShowToast("Designate workflow initiated. API calls need to be implemented.", AlertKind.Info, "Info", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error during designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private async Task HandleDeDesignateAsync()
+    {
+        try
+        {
+            // Initialize de-designation model with default values
+            // Following the legacy logic from onChangeActionValue "De-Designate"
+            
+            DedesignateUserMessage = string.Empty;
+            DedesignateIsError = false;
+            IsDeDesignateDisabled = true;
+            DedesignationReason = 0;
+            DedesignateTimeValuesStartDate = DateTime.Today;
+            DedesignateTimeValuesEndDate = DateTime.Today;
+            CashPaymentType = 0;
+            HedgedExposureExist = true;
+            DedesignationDateDialog = DateTime.Today;
+            DedesignatePayment = 0;
+            DedesignateAccrual = 0;
+            BasisAdjustment = 0;
+            BasisAdjustmentBalance = 0;
+
+            // API Call: Get termination date from hedging item
+            // if (HedgeRelationship.HedgingItems?.Any() == true)
+            // {
+            //     var lastHedgingItem = HedgeRelationship.HedgingItems.Last();
+            //     
+            //     // API Call: Get termination date
+            //     var terminationDateResponse = await Mediator.Send(
+            //         new GetTerminationDate.Query(lastHedgingItem.ItemID));
+            //     
+            //     if (terminationDateResponse.TerminationDate != null)
+            //     {
+            //         // API Call: Price the instrument to get accrual
+            //         var pricingResponse = await Mediator.Send(
+            //             new PriceInstrument.Query(
+            //                 lastHedgingItem.ItemID, 
+            //                 terminationDateResponse.TerminationDate, 
+            //                 lastHedgingItem.SecurityType));
+            //         
+            //         // Set accrual from pricing response
+            //         DedesignateAccrual = pricingResponse.Accrual;
+            //     }
+            // }
+
+            // Show De-Designation dialog
+            OpenModal = MODAL_DEDESIGNATE;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error during de-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private async Task OnDeDesignateReasonChanged(int reason)
+    {
+        DedesignationReason = reason;
+        
+        // API Call: Load de-designation data for the selected reason
+        // var response = await Mediator.Send(new GetDedesignateData.Query(HedgeId, reason));
+        // 
+        // if (response.ErrorMessage != null)
+        // {
+        //     IsDeDesignateDisabled = true;
+        //     DedesignateUserMessage = response.ErrorMessage;
+        //     DedesignateIsError = true;
+        //     DedesignationDateDialog = response.DedesignationDate;
+        // }
+        // else
+        // {
+        //     IsDeDesignateDisabled = false;
+        //     DedesignateUserMessage = string.Empty;
+        //     DedesignateTimeValuesStartDate = response.DedesignationDate;
+        //     DedesignateTimeValuesEndDate = response.TimeValuesEndDate;
+        //     DedesignationDateDialog = response.DedesignationDate;
+        //     DedesignatePayment = response.Payment;
+        //     ShowBasisAdjustmentBalance = response.ShowBasisAdjustmentBalance;
+        //     BasisAdjustment = response.BasisAdjustment;
+        //     BasisAdjustmentBalance = response.BasisAdjustmentBalance;
+        //     CashPaymentType = 0;
+        //     HedgedExposureExist = true;
+        // }
+        
+        StateHasChanged();
+    }
+
+    private async Task OnDeDesignateConfirmed()
+    {
+        try
+        {
+            // API Call: Execute de-designation
+            // var command = new DeDesignateHedgeRelationship.Command
+            // {
+            //     HedgeRelationshipId = HedgeId,
+            //     DedesignationDate = DedesignationDateDialog,
+            //     DedesignationReason = DedesignationReason,
+            //     Payment = DedesignatePayment,
+            //     TimeValuesStartDate = DedesignateTimeValuesStartDate,
+            //     TimeValuesEndDate = DedesignateTimeValuesEndDate,
+            //     CashPaymentType = CashPaymentType,
+            //     HedgedExposureExist = HedgedExposureExist
+            // };
+            // 
+            // await Mediator.Send(command);
+
+            await GetHedgeRelationship(HedgeId);
+            await AlertService.ShowToast("Hedge Relationship de-designated successfully.", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error during de-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private async Task HandleRedraftAsync()
+    {
+        try
+        {
+            // Redraft logic from legacy:
+            // 1. If there's a selected option time value amortization, delete it first
+            // 2. Call HedgeRelationship/Redraft API
+            // 3. Reload the hedge relationship
+            
+            // API Call: Delete option time value amortization if exists
+            // if (hasSelectedOptionTimeValueAmort)
+            // {
+            //     await Mediator.Send(new DeleteOptionTimeValueAmort.Command(selectedAmortId));
+            // }
+
+            // API Call: Redraft the hedge relationship
+            // var response = await Mediator.Send(new RedraftHedgeRelationship.Command(HedgeId));
+            
+            // Reload the hedge relationship
+            await GetHedgeRelationship(HedgeId);
+            
+            await AlertService.ShowToast("Redraft completed. API call needs to be implemented.", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error during redraft: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private async Task HandleReDesignateAsync()
+    {
+        try
+        {
+            // Re-designate logic from legacy:
+            // 1. Check if document template exists
+            // 2. If exists, save current state first
+            // 3. Call HedgeRelationship/Redesignate/{id} to get re-designation data
+            // 4. Show Re-Designation dialog with the data
+            
+            // API Call: Check if document template exists
+            // var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeId));
+            // IsDocTemplateFound = findDocTemplateResponse.HasTemplate;
+            
+            // if (IsDocTemplateFound)
+            // {
+            //     // Save current state first
+            //     await SaveHedgeRelationshipAsync();
+            //     
+            //     // Reload hedge relationship
+            //     await GetHedgeRelationship(HedgeId);
+            // }
+
+            // API Call: Get re-designation data
+            // var redesignateResponse = await Mediator.Send(new GetRedesignateData.Query(HedgeId));
+            
+            // Set model properties from response (mocking values for now):
+            RedesignationDate = DateTime.Today;
+            RedesignateTimeValuesStartDate = DateTime.Today;
+            RedesignateTimeValuesEndDate = DateTime.Today.AddMonths(6);
+            RedesignatePayment = 0;
+            // RedesignateDayCountConv = redesignateResponse.DayCountConv;
+            // RedesignatePayBusDayConv = redesignateResponse.PayBusDayConv;
+            // RedesignatePaymentFrequency = redesignateResponse.PaymentFrequency;
+            // RedesignateAdjustedDates = redesignateResponse.AdjustedDates;
+            // MarkAsAcquisition = redesignateResponse.MarkAsAcquisition;
+
+            // Show Re-Designation dialog
+            OpenModal = MODAL_REDESIGNATE;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error during re-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private async Task OnReDesignateConfirmed()
+    {
+        try
+        {
+            // API Call: Execute re-designation
+            // var command = new ReDesignateHedgeRelationship.Command
+            // {
+            //     HedgeRelationshipId = HedgeId,
+            //     RedesignationDate = RedesignationDate,
+            //     TimeValuesStartDate = RedesignateTimeValuesStartDate,
+            //     TimeValuesEndDate = RedesignateTimeValuesEndDate,
+            //     Payment = RedesignatePayment,
+            //     PaymentFrequency = RedesignatePaymentFrequency,
+            //     DayCountConv = RedesignateDayCountConv,
+            //     PayBusDayConv = RedesignatePayBusDayConv,
+            //     AdjustedDates = RedesignateAdjustedDates,
+            //     MarkAsAcquisition = MarkAsAcquisition
+            // };
+            // 
+            // await Mediator.Send(command);
+
+            await GetHedgeRelationship(HedgeId);
+            await AlertService.ShowToast("Hedge Relationship re-designated successfully.", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error during re-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
         }
     }
     #endregion

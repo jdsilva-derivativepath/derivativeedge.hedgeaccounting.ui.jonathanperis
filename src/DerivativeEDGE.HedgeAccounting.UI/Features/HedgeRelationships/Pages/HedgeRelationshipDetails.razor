@@ -23,6 +23,7 @@
 @using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
 @using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs
 @using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components
 
 @using DerivativeEDGE.Identity.API.Client
 
@@ -983,6 +984,49 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                 </DialogTemplates>
                 <DialogPositionData X="center" Y="center"></DialogPositionData>
             </SfDialog>
+        }
+
+        <!-- De-Designate Dialog -->
+        @if (IsDeDesignateModal)
+        {
+            <DeDesignateDialog Visible="@IsDeDesignateModal"
+                               VisibleChanged="@((value) => OpenModal = value ? MODAL_DEDESIGNATE : string.Empty)"
+                               DedesignationReason="@DedesignationReason"
+                               DedesignationDate="@DedesignationDateDialog"
+                               CashPaymentType="@CashPaymentType"
+                               Payment="@DedesignatePayment"
+                               Accrual="@DedesignateAccrual"
+                               BasisAdjustment="@BasisAdjustment"
+                               BasisAdjustmentBalance="@BasisAdjustmentBalance"
+                               ShowBasisAdjustmentBalance="@ShowBasisAdjustmentBalance"
+                               TimeValuesStartDate="@DedesignateTimeValuesStartDate"
+                               TimeValuesEndDate="@DedesignateTimeValuesEndDate"
+                               HedgedExposureExist="@HedgedExposureExist"
+                               UserMessage="@DedesignateUserMessage"
+                               IsError="@DedesignateIsError"
+                               IsDeDesignateDisabled="@IsDeDesignateDisabled"
+                               OnDeDesignated="@OnDeDesignateConfirmed" />
+        }
+
+        <!-- Re-Designate Dialog -->
+        @if (IsReDesignateModal)
+        {
+            <ReDesignateDialog Visible="@IsReDesignateModal"
+                               VisibleChanged="@((value) => OpenModal = value ? MODAL_REDESIGNATE : string.Empty)"
+                               RedesignationDate="@RedesignationDate"
+                               TimeValuesStartDate="@RedesignateTimeValuesStartDate"
+                               TimeValuesEndDate="@RedesignateTimeValuesEndDate"
+                               Payment="@RedesignatePayment"
+                               PaymentFrequency="@RedesignatePaymentFrequency"
+                               DayCountConv="@RedesignateDayCountConv"
+                               PayBusDayConv="@RedesignatePayBusDayConv"
+                               AdjustedDates="@RedesignateAdjustedDates"
+                               MarkAsAcquisition="@MarkAsAcquisition"
+                               IsDocTemplateFound="@IsDocTemplateFound"
+                               AvailablePaymentFrequencies="@AvailablePaymentFrequencies"
+                               AvailableDayCountConventions="@AvailableDayCountConventions"
+                               AvailablePayBusDayConventions="@AvailablePayBusDayConventions"
+                               OnReDesignated="@OnReDesignateConfirmed" />
         }
     </EditForm>
 }
