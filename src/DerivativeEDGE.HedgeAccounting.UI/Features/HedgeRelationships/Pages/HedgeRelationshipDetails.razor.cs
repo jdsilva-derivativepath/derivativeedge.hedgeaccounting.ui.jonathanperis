@@ -493,9 +493,9 @@ public partial class HedgeRelationshipDetails
 
         var state = HedgeRelationship?.HedgeState;
         var type = HedgeRelationship?.HedgeType;
-        
+
         // Check user roles - workflow actions are disabled if user doesn't have required roles (24, 17, or 5)
-        var hasWorkflowPermission = HasWorkflowPermission();
+        var hasWorkflowPermission = HasRequiredRole();
 
         // Legacy logic from setWorkFlow():
         // if ($scope.Model.HedgeState === 'Draft') -> Don't show De-Designate
@@ -524,17 +524,6 @@ public partial class HedgeRelationshipDetails
             // Dedesignated state: Show only Redraft (DE-2731)
             WorkflowItems.Add(new DropDownMenuItem { Text = "Redraft", Disabled = !hasWorkflowPermission });
         }
-    }
-
-    private bool HasWorkflowPermission()
-    {
-        // Check if user has one of the required roles: 24, 17, or 5
-        // This maps to: $scope.checkUserRole('24') || $scope.checkUserRole('17') || $scope.checkUserRole('5')
-        return UserAuthData != null && (
-            UserAuthData.UserRoles.Contains("24") ||
-            UserAuthData.UserRoles.Contains("17") ||
-            UserAuthData.UserRoles.Contains("5")
-        );
     }
 
     private async Task HandleClientValueChangeAsync()

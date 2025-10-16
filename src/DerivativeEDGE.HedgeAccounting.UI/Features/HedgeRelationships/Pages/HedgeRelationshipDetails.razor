@@ -986,7 +986,6 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
             </SfDialog>
         }
 
-        <!-- De-Designate Dialog -->
         @if (IsDeDesignateModal)
         {
             <DeDesignateDialog Visible="@IsDeDesignateModal"
@@ -1008,7 +1007,6 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                OnDeDesignated="@OnDeDesignateConfirmed" />
         }
 
-        <!-- Re-Designate Dialog -->
         @if (IsReDesignateModal)
         {
             <ReDesignateDialog Visible="@IsReDesignateModal"
