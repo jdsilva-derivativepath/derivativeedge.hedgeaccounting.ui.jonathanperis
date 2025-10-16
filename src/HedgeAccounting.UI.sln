@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.0.11010.61 d18.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DerivativeEDGE.HedgeAccounting.UI", "DerivativeEDGE.HedgeAccounting.UI\DerivativeEDGE.HedgeAccounting.UI.csproj", "{3DE4122D-9F5E-4B0C-915F-9938558FAEF2}"
 EndProject

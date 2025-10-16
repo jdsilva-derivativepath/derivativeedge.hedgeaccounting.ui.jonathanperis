@@ -576,7 +576,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                 </div>
             </div>
         </div>
-        
+
         <SfTab @ref="hedgerelationshiptabRef" CssClass="dp-tabs default-tab">
             <TabAnimationSettings>
                 <TabEvents></TabEvents>
@@ -598,9 +598,34 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <TabHeader Text="Test Results"></TabHeader>
                     </ChildContent>
                     <ContentTemplate>
-                        <TestResultsTab @ref="testResultsTabRef" 
-                        @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches"
-                        LatestHedgeRegressionBatch="@HedgeRelationship.LatestHedgeRegressionBatch" />
+                        <TestResultsTab @ref="testResultsTabRef"
+                                        @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches"
+                                        LatestHedgeRegressionBatch="@HedgeRelationship.LatestHedgeRegressionBatch" />
+                    </ContentTemplate>
+                </TabItem>
+                @* Accounting Details Tab? *@
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Amortization"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <AmortizationTab @bind-HedgeRelationshipOptionTimeValueAmorts="@HedgeRelationship.HedgeRelationshipOptionTimeValueAmorts" />
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="History"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <HedgeRelationshipHistoryTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches" />
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Log"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <HedgeRelationshipLogsTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches" />
                     </ContentTemplate>
                 </TabItem>
                 @* <TabItem Visible="@HedgeRelationship.IsAnOptionHedge">
@@ -617,30 +642,6 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                     </ChildContent>
                     <ContentTemplate>
                         <OptionAmortizationTab @bind-HedgeRelationshipOptionTimeValues="@HedgeRelationship.HedgeRelationshipOptionTimeValues" />
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    <ChildContent>
-                        <TabHeader Text="Amortization"></TabHeader>
-                    </ChildContent>
-                    <ContentTemplate>
-                        <AmortizationTab @bind-HedgeRelationshipOptionTimeValueAmorts="@HedgeRelationship.HedgeRelationshipOptionTimeValueAmorts" />
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    <ChildContent>
-                        <TabHeader Text="History"></TabHeader>
-                    </ChildContent>
-                    <ContentTemplate>
-                        <HedgeRelationshipHistoryTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches"/>
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    <ChildContent>
-                        <TabHeader Text="Log"></TabHeader>
-                    </ChildContent>
-                    <ContentTemplate>
-                        <HedgeRelationshipLogsTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches" />
                     </ContentTemplate>
                 </TabItem>
             </TabItems>
