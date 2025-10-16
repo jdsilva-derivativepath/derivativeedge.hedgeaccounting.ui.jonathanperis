@@ -461,25 +461,54 @@ public partial class HedgeRelationshipDetails
 
         var state = HedgeRelationship?.HedgeState;
         var type = HedgeRelationship?.HedgeType;
+        
+        // Check if user has required roles for workflow actions
+        bool hasWorkflowPermission = HasRequiredRole();
 
-        // Base actions
-        if (state == DerivativeEDGEHAEntityEnumHedgeState.Designated || state == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
+        // Build workflow actions based on current state (matching legacy logic from lines 1339-1357)
+        if (state == DerivativeEDGEHAEntityEnumHedgeState.Draft)
         {
-            WorkflowItems.Add(new DropDownMenuItem { Text = "Redraft", Disabled = false });
+            // Draft state: Show Designate only
+            WorkflowItems.Add(new DropDownMenuItem 
+            { 
+                Text = "Designate", 
+                Disabled = !hasWorkflowPermission 
+            });
         }
-
-        if (state != DerivativeEDGEHAEntityEnumHedgeState.Draft)
+        else if (state == DerivativeEDGEHAEntityEnumHedgeState.Designated)
         {
-            WorkflowItems.Add(new DropDownMenuItem { Text = "De-Designate" });
-        }
+            // Designated state: Show Redraft, De-Designate, and Re-Designate (for CashFlow only)
+            WorkflowItems.Add(new DropDownMenuItem 
+            { 
+                Text = "Redraft", 
+                Disabled = !hasWorkflowPermission 
+            });
+            
+            WorkflowItems.Add(new DropDownMenuItem 
+            { 
+                Text = "De-Designate", 
+                Disabled = !hasWorkflowPermission 
+            });
 
-        if (state == DerivativeEDGEHAEntityEnumHedgeState.Designated && type == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow)
+            // Re-Designate is only for CashFlow hedge types (legacy: DE-3928)
+            if (type == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow)
+            {
+                WorkflowItems.Add(new DropDownMenuItem 
+                { 
+                    Text = "Re-Designate", 
+                    Disabled = !hasWorkflowPermission 
+                });
+            }
+        }
+        else if (state == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
         {
-            WorkflowItems.Add(new DropDownMenuItem { Text = "Re-Designate" });
+            // Dedesignated state: Show Redraft only (legacy: DE-2731)
+            WorkflowItems.Add(new DropDownMenuItem 
+            { 
+                Text = "Redraft", 
+                Disabled = !hasWorkflowPermission 
+            });
         }
-
-        // Optional: other fixed actions
-        WorkflowItems.Add(new DropDownMenuItem { Text = "Designate" });
     }
 
     private async Task HandleClientValueChangeAsync()
@@ -890,22 +919,305 @@ public partial class HedgeRelationshipDetails
         switch (selected)
         {
             case "Designate":
-                ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
-                if (ValidationErrors.Any())
-                {
-                    StateHasChanged();
-                    return;
-                }
+                await HandleDesignateAsync();
                 break;
             case "De-Designate":
-                // TODO: Call De-Designate logic
+                await HandleDeDesignateAsync();
                 break;
             case "Redraft":
-                // TODO: Call Redraft logic
+                await HandleRedraftAsync();
                 break;
             case "Re-Designate":
-                // TODO: Call Re-Designate logic
+                await HandleReDesignateAsync();
                 break;
+        }
+    }
+
+    private async Task HandleDesignateAsync()
+    {
+        ValidationErrors.Clear();
+        
+        // Validate designation requirements
+        ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
+        if (ValidationErrors.Any())
+        {
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            // Save the hedge relationship before checking for document template
+            IsSavingHedgeRelationship = true;
+            StateHasChanged();
+
+            var saveResult = await Mediator.Send(new UpdateHedgeRelationship.Command(HedgeRelationship));
+            if (saveResult.HasError)
+            {
+                await AlertService.ShowToast(saveResult.Message, AlertKind.Error, "Failed", showButton: true);
+                return;
+            }
+
+            // Reload to get updated data
+            await GetHedgeRelationship(HedgeId);
+
+            // TODO: Check if document template exists via API call
+            // API: GET /HedgeRelationship/FindDocumentTemplate/{id}
+            // For now, proceed with designation
+            bool documentTemplateExists = false; // Placeholder
+
+            if (documentTemplateExists)
+            {
+                // If document template exists, need to handle keywords check after designation
+                // This would trigger a different flow
+                await AlertService.ShowToast("Document template found. Additional processing required.", AlertKind.Info, "Info", showButton: true);
+            }
+
+            // Proceed with designation
+            await ExecuteDesignationAsync();
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Failed to initiate designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            IsSavingHedgeRelationship = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ExecuteDesignationAsync()
+    {
+        try
+        {
+            IsRunningRegression = true;
+            StateHasChanged();
+
+            // Check analytics status first
+            var analyticsStatusQuery = new CheckAnalyticsStatus.Query();
+            var analyticsResponse = await Mediator.Send(analyticsStatusQuery);
+
+            if (!analyticsResponse.IsAnalyticsAvailable)
+            {
+                var proceed = await JSRuntime.InvokeAsync<bool>("confirm",
+                    "Analytics service is currently unavailable. Are you sure you want to continue?");
+
+                if (!proceed)
+                {
+                    return;
+                }
+            }
+
+            // Run regression with Inception type (equivalent to Regress?hedgeResultType=Inception)
+            // TODO: Update RunRegression.Command to accept HedgeResultType parameter
+            // For now, this would call: POST /HedgeRelationship/Regress?hedgeResultType=Inception
+            var regressionCommand = new RunRegression.Command(HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Inception);
+            var regressionResponse = await Mediator.Send(regressionCommand);
+
+            if (regressionResponse.HasError)
+            {
+                if (regressionResponse.ValidationErrors?.Any() == true)
+                {
+                    var errorMessage = string.Join("; ", regressionResponse.ValidationErrors);
+                    await AlertService.ShowToast($"Designation failed: {errorMessage}", AlertKind.Error, "Designation Error", showButton: true);
+                }
+                else
+                {
+                    await AlertService.ShowToast(regressionResponse.ErrorMessage ?? "Failed to complete designation", AlertKind.Error, "Error", showButton: true);
+                }
+                return;
+            }
+
+            // Update the hedge relationship with the new data
+            if (regressionResponse.Data != null)
+            {
+                HedgeRelationship = regressionResponse.Data;
+                GenerateEffectivenessChartData();
+
+                // Refresh tabs
+                if (instrumentAnalysisTabRef != null)
+                {
+                    await instrumentAnalysisTabRef.RefreshGridData();
+                }
+
+                if (testResultsTabRef != null)
+                {
+                    await testResultsTabRef.RefreshTestResultsData();
+                }
+
+                await AlertService.ShowToast("Designation completed successfully!", AlertKind.Success, "Success", showButton: true);
+
+                // TODO: Generate inception package automatically after designation
+                // This would call the inception package generation logic
+                // await GenerateInceptionPackageAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Failed to complete designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            IsRunningRegression = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleDeDesignateAsync()
+    {
+        ValidationErrors.Clear();
+
+        // Validate de-designation requirements
+        ValidationErrors = DeDesignateRequirementsValidator.Validate(HedgeRelationship);
+        if (ValidationErrors.Any())
+        {
+            StateHasChanged();
+            return;
+        }
+
+        // TODO: Open De-Designation modal
+        // The modal would collect:
+        // - DedesignationDate
+        // - DedesignationReason
+        // - Termination flag
+        // - Ineffectiveness flag
+        // - TimeValuesStartDate
+        // - TimeValuesEndDate
+        // - Cash payment type (Full/Partial/None)
+        // - HedgedExposureNotExist flag
+        // - Payment, Accrual, BasisAdjustment amounts
+        //
+        // After modal submission, call API:
+        // POST /HedgeRelationship/Dedesignate
+        // with the collected data
+        
+        await AlertService.ShowToast("De-Designation modal would open here. API integration pending.", AlertKind.Info, "De-Designate", showButton: true);
+        
+        // Placeholder for the actual implementation:
+        // OpenModal = "DeDesignate";
+        // StateHasChanged();
+    }
+
+    private async Task HandleRedraftAsync()
+    {
+        ValidationErrors.Clear();
+
+        // Validate redraft requirements
+        ValidationErrors = RedraftRequirementsValidator.Validate(HedgeRelationship);
+        if (ValidationErrors.Any())
+        {
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            // Confirm with user
+            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
+                "Are you sure you want to redraft this hedge relationship? This will change the state back to Draft.");
+
+            if (!confirmed)
+            {
+                return;
+            }
+
+            // TODO: If there are option time value amortizations, handle cleanup
+            // Legacy code deletes selected option amortization before redraft
+            // For now, proceed with redraft
+
+            // Call Redraft API
+            // TODO: POST /HedgeRelationship/Redraft
+            // This should update the HedgeState to Draft and handle any necessary cleanup
+            
+            await AlertService.ShowToast("Redraft API call would be made here. The hedge relationship would be changed to Draft state.", AlertKind.Info, "Redraft", showButton: true);
+
+            // After successful API call, reload the hedge relationship
+            // await GetHedgeRelationship(HedgeId);
+            
+            // Placeholder response handling:
+            // HedgeRelationship.HedgeState = DerivativeEDGEHAEntityEnumHedgeState.Draft;
+            // BuildWorkflowItems();
+            // StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Failed to redraft hedge relationship: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private async Task HandleReDesignateAsync()
+    {
+        ValidationErrors.Clear();
+
+        // Validate re-designation requirements
+        ValidationErrors = ReDesignateRequirementsValidator.Validate(HedgeRelationship);
+        if (ValidationErrors.Any())
+        {
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            // Save the hedge relationship first
+            IsSavingHedgeRelationship = true;
+            StateHasChanged();
+
+            var saveResult = await Mediator.Send(new UpdateHedgeRelationship.Command(HedgeRelationship));
+            if (saveResult.HasError)
+            {
+                await AlertService.ShowToast(saveResult.Message, AlertKind.Error, "Failed", showButton: true);
+                return;
+            }
+
+            // Reload to get updated data
+            await GetHedgeRelationship(HedgeId);
+
+            // Check analytics status first
+            var analyticsStatusQuery = new CheckAnalyticsStatus.Query();
+            var analyticsResponse = await Mediator.Send(analyticsStatusQuery);
+
+            if (!analyticsResponse.IsAnalyticsAvailable)
+            {
+                var proceed = await JSRuntime.InvokeAsync<bool>("confirm",
+                    "Analytics service is currently unavailable. Are you sure you want to continue?");
+
+                if (!proceed)
+                {
+                    return;
+                }
+            }
+
+            // TODO: Get re-designation data from API
+            // GET /HedgeRelationship/Redesignate/{id}
+            // This returns:
+            // - RedesignationDate
+            // - TimeValuesStartDate
+            // - TimeValuesEndDate
+            // - DayCountConv
+            // - PayBusDayConv
+            // - PaymentFrequency
+            // - AdjustedDates
+            // - MarkAsAcquisition
+            
+            await AlertService.ShowToast("Re-Designation modal would open here with pre-filled data. API integration pending.", AlertKind.Info, "Re-Designate", showButton: true);
+
+            // After getting data, open modal with the information
+            // The modal would allow editing and then submit via POST API
+            
+            // Placeholder for the actual implementation:
+            // OpenModal = "ReDesignate";
+            // StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Failed to initiate re-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            IsSavingHedgeRelationship = false;
+            StateHasChanged();
         }
     }
     #endregion
