@@ -1,0 +1,32 @@
+﻿::deep .dp-dialog .e-dlg-header-content {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #BBB;
+    height: 3.25rem;
+}
+
+::deep .dp-dialog .e-dlg-header {
+    flex: 1 0 0;
+    color: #3E3F46;
+    font-size: 1.125rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.75rem; 
+}
+
+::deep .dp-dialog .e-dlg-content {
+    padding: 1.5rem;
+    align-self: stretch;
+}
+
+::deep .dp-dialog .e-dlg-content .message {
+    color: #3E3F46;
+    font-family: "Proxima Nova", sans-serif;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5rem;
+}
+
+::deep .dp-dialog .dp-buttons {
+    padding-top: 2.5rem;
+}

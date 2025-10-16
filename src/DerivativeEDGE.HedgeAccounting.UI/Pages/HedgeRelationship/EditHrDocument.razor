@@ -1,0 +1,139 @@
+﻿@page "/edit-hrdocument/{templateId:guid?}"
+@layout EmptyLayout
+
+<PageTitle>Edit Hedge Document</PageTitle>
+
+<div class="page-header">
+    <div class="content-container">
+        <div class="title">
+            <span class="page-title">@EditHrDocumentForm.Name</span>
+            @if (!IsPreviewMode && !string.IsNullOrWhiteSpace(EditHrDocumentForm.Name))
+            {
+                <a onclick="@(() => DlgRenameOpen())" style="cursor: pointer;">
+
+                    <i class="fa-kit fa-pencil-line fa-sm"></i>
+                </a>
+            }
+        </div>
+        <div class="action-buttons">
+            @if (!IsPreviewMode)
+            {
+                <SfButton Type="Button" OnClick="OnCancelClick" CssClass="action-btn-link">Cancel</SfButton>
+                <SfButton CssClass="button-secondary button-default" OnClick="(() => EnablePreviewMode())" Content="Preview"></SfButton>
+                <SfButton Type="Submit" CssClass="action-btn-primary" OnClick="(() => FormSubmit())">Save Document</SfButton>
+                <DpActionMenu Items="actionItems" OnItemSelected="OnActionItemSelected" />
+            }
+            else
+            {
+                <SfButton CssClass="button-secondary button-default" OnClick="(() => DisablePreviewMode())" Content="Cancel Preview"></SfButton>
+                <SfButton Type="Submit" CssClass="action-btn-primary" OnClick="(() => FormSubmit())">Save Document</SfButton>
+                <DpActionMenu Items="actionItems" OnItemSelected="OnActionItemSelected" />
+            }
+        </div>
+    </div>
+</div>
+<div class="page-container">
+    @if (EditHrDocumentForm != null && EditHrDocumentForm.HedgeDocumentContents.Any())
+    {
+        @if (!IsPreviewMode)
+        {
+            <div class="editor-area mt-2">
+                <EditForm EditContext="@EditContext" OnSubmit="FormSubmit">
+                    <ObjectGraphDataAnnotationsValidator />
+                    <div class="msg-with-header">
+                        <div class="content-section">
+                            <SfMessage Visible="@IsErrorMessageVisible" Severity="MessageSeverity.Error">
+                                <h1>@ErrorMsg?.Title</h1>
+                                <p>@ErrorMsg?.Message</p>
+                            </SfMessage>
+                        </div>
+                    </div>
+                    <DerivativeEDGE.HedgeAccounting.UI.Components.HedgeRelationship.DocumentRichTextEditor 
+                        ErrorMsg="@ErrorMsg"
+                        IsErrorMessageVisible="@IsErrorMessageVisible"
+                        HedgeDocumentContents="@EditHrDocumentForm.HedgeDocumentContents" />
+
+                </EditForm>
+            </div>
+            <div class="side-panel mr-2">
+                <SfTab CssClass="dp-tabs default-tab side-panel-tab">
+                    <TabAnimationSettings>
+                        <TabEvents></TabEvents>
+                        <TabAnimationPrevious Effect="@AnimationEffect.None" />
+                        <TabAnimationNext Effect="@AnimationEffect.None" />
+                    </TabAnimationSettings>
+                    <TabItems>
+                        <TabItem>
+                            <ChildContent>
+                                <TabHeader Text="Editor"></TabHeader>
+                            </ChildContent>
+                            <ContentTemplate>
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <h4>Document Contents</h4>
+                                    <a href="/"><i class="fa-solid fa-plus-circle btn-icon" hidden></i></a>
+                                </div>
+                                @foreach (var contentDetail in EditHrDocumentForm.HedgeDocumentContents.OrderBy(x => x.Order))
+                                {
+                                    <div class="space-y-4">
+                                        @if (contentDetail.Required)
+                                        {
+                                            <SfButton CssClass="button-show-hide button-default e-active btn-active"
+                                                      IconPosition="IconPosition.Right" IconCss="fa-solid fa-lock fa-sm"
+                                                      Content="@contentDetail.Name"></SfButton>
+                                        }
+                                        else
+                                        {
+                                            <SfButton CssClass="@(contentDetail.Hidden ?
+                                                                                                          "button-show-hide button-default btn-display" :
+                                                                                                           "button-show-hide button-default btn-display btn-active")"
+                                      IconPosition="IconPosition.Right" IconCss="@(contentDetail.Hidden ?
+                                                                                                                                "fa-solid fa-eye-slash fa-sm" : "fa-solid fa-eye fa-sm")"
+                                      IsToggle="true"
+                                      @onclick="@(e => OnToggleClick(@contentDetail))" Content="@contentDetail.Name"></SfButton>
+                                                        }
+
+                                    </div>
+                                }
+                            </ContentTemplate>
+                        </TabItem>
+                    </TabItems>
+                </SfTab>
+            </div>
+        }
+        else
+        {
+            <div class="editor-area mt-2">
+                <div class="msg-with-header">
+                    <div class="content-section">
+                        <SfMessage Visible="@IsErrorMessageVisible" Severity="MessageSeverity.Error">
+                            <h1>@ErrorMsg?.Title</h1>
+                            <p>@ErrorMsg?.Message</p>
+                        </SfMessage>
+                    </div>
+                </div>
+                <SfRichTextEditor ID="preview-box" @bind-Value="HtmlBody" Readonly="true" Width="98%">
+                    <RichTextEditorToolbarSettings Enable="false"></RichTextEditorToolbarSettings>
+                </SfRichTextEditor>
+            </div>
+        }
+    }
+    else
+    {
+        <SfSpinner Visible="true" Size="40" ZIndex="999999" Type="SpinnerType.Material" />
+    }
+</div>
+<DerivativeEDGE.HedgeAccounting.UI.Components.HedgeRelationship.EditHrDocumentDialog EditHrDocumentForm="@EditHrDocumentForm"
+                                                                                  OnSave="@UpdateHrDocumentName"
+                                                                                  @ref="@_editHrContentDialogComponent"
+                                                                                  SelectedClientId="@ClientId">
+</DerivativeEDGE.HedgeAccounting.UI.Components.HedgeRelationship.EditHrDocumentDialog>
+<DerivativeEDGE.HedgeAccounting.UI.Components.HedgeRelationship.ConfirmationContentDialog @ref="@_confirmationContentDialogComponent"
+                                                                                          EditContext="EditContext"
+                                                                                          HedgeRelationshipId="HedgeRelationshipId"
+                                                                                          ConfirmedSmartagsCount="ConfirmedSmartagsCount"
+                                                                                          IncompleteSmartTagsCount="IncompleteSmartTagsCount">
+</DerivativeEDGE.HedgeAccounting.UI.Components.HedgeRelationship.ConfirmationContentDialog>
+<FilledHiddenSectionsDialog @ref="@_filledHiddenSectionsDialog" Visible="@IsFilledHiddenSectionsDialogVisible"
+                            OnClose="@CloseFilledHiddenSectionsDialog" />
+<NavigationConfirmation _editContext="EditContext">
+</NavigationConfirmation>

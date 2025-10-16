@@ -1,0 +1,18 @@
+﻿@code {
+    [CascadingParameter(Name = "Layout")]
+    public MainLayout Layout { get; set; } = null!;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (Layout is null)
+        {
+            return;
+        }
+        Layout.Title = Title;
+        await Layout.Refresh();
+    }
+}

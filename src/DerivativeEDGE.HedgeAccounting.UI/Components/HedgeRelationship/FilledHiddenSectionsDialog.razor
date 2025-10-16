@@ -1,0 +1,22 @@
+﻿<div id="filledHiddenSectionsDialogTarget">
+    <SfDialog Width="31.25rem" Height="auto" Target="#filledHiddenSectionsDialogTarget" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false" ShowCloseIcon="false" @bind-Visible="Visible">
+        <DialogTemplates>
+            <Header>Unable to save</Header>
+            <Content>
+                <p class="subheader">You need to remove the documentation from all hidden section(s) prior to saving the template. 
+                    To resolve this error, you will need to show the content setting, remove the documentation, and then hide the content setting again. 
+                    The content section(s) in error are:</p>
+                <ul>
+                    @foreach(var name in FilledContents)
+                    {
+                        <li>@name</li>
+                    }
+                </ul>
+                <div id="dialogButtons" class="dp-buttons text-right space-x-4">
+                    <SfButton CssClass="button-link button-default" Content="Close" OnClick="@CloseButtonClicked" />
+                </div>
+            </Content>
+        </DialogTemplates>
+        <DialogPositionData X="center" Y="center" />
+    </SfDialog>
+</div>

@@ -1,0 +1,178 @@
+﻿<div class="all-templates" style="height: calc(100vh - 18.75rem)">
+    @if (SelectedClientId.GetValueOrDefault() > 0)
+    {
+        if (IsVisibleGridCover)
+        {
+            <GridCover Icon="fa-solid fa-file" Header="You do not have any Hedge Document Templates." Content="Click 'Create Template' to create a Hedge Document Template."></GridCover>
+        }
+        else
+        {
+            <div class="data-grid-action-header">
+                <SfTextBox ID="toolbar-search-box" @ref="SearchBox" Placeholder="Search" @bind-Value="@SearchString" FloatLabelType="FloatLabelType.Never" Width="257px" ValueChange="@DoSearchHandler" />
+                <div class="controls">
+                    <SfButtonGroup Mode="Syncfusion.Blazor.SplitButtons.SelectionMode.Single">
+                        <ButtonGroupButton @onclick="@(() => ChangeListView("list"))" @bind-Selected="@listViewSelected">List View</ButtonGroupButton>
+                        <ButtonGroupButton @onclick="@(() => ChangeListView("gallery"))" @bind-Selected="@galleryViewSelected">Gallery View</ButtonGroupButton>
+                        <ButtonGroupButton @onclick="@(() => ChangeListView("matrix"))" @bind-Selected="@matrixViewSelected">Matrix View</ButtonGroupButton>
+                    </SfButtonGroup>
+                </div>
+            </div>
+            @switch (ActiveView)
+            {
+                case "list":
+                    <div class="grid-container">
+                        <DefaultGrid @ref="@TemplatesGrid"
+                                     DataSource="@TemplatesList"
+                                     TRowItem="DocumentTemplate"
+                                     AllowPaging="true"
+                                     AllowSorting="false"
+                                     AllowGrouping="false"
+                                     AllowSelection="false"
+                                     ShowColumnMenu="false"
+                                     ShowToolBar="false"
+                                     AllowFiltering="false"
+                                     EnableGlobalSearch="true"
+                                     ShowExcelExportButton="false"
+                                     ShowColumnPickerButton="false">
+                            <GridColumns>
+                                <GridColumn Field="@nameof(DocumentTemplate.Name)" HeaderText="Template Name" />
+                                <GridColumn Field="@nameof(DocumentTemplate.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
+                                <GridColumn Field="@nameof(DocumentTemplate.Enabled)" HeaderText="Active" FilterSettings="@(new FilterSettings { Type = Syncfusion.Blazor.Grids.FilterType.CheckBox })" TextAlign="TextAlign.Center">
+                                    <Template>
+                                        @{
+                                            var model = (DocumentTemplate)context;
+
+                                            if (model.Enabled)
+                                            {
+                                                <span>Yes</span>
+                                            }
+                                            else
+                                            {
+                                                <span>No</span>
+                                            }
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="@nameof(DocumentTemplate.ModifiedOn)" HeaderText="Last Updated" Format="yyyy/MM/dd HH:mm:ss" Type="ColumnType.DateTime" />
+                                <GridColumn Field="@nameof(DocumentTemplate.ModifiedBy)" HeaderText="Updated By" />
+                                <GridColumn HeaderText="Action" TextAlign="TextAlign.Center" Freeze="FreezeDirection.Left" Width="70">
+                                    <Template>
+                                        @{
+                                            var model = (DocumentTemplate)context;
+                                            <SfDropDownButton CssClass="dp-menu-style">
+                                                <DropDownButtonEvents ItemSelected="@((args) => OnActionSelected(args, model))" />
+                                                <DropDownMenuItems>
+                                                    <DropDownMenuItem Text="Edit" />
+                                                    <DropDownMenuItem Text="Preview" />
+                                                    <DropDownMenuItem Text="Duplicate" />
+                                                    <DropDownMenuItem Text="@(model.Enabled ? "Deactivate" : "Activate")" />
+                                                    <DropDownMenuItem Separator=true />
+                                                    <DropDownMenuItem Text="Delete" class="dp-menu-delete" />
+                                                </DropDownMenuItems>
+                                            </SfDropDownButton>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                        </DefaultGrid>
+                    </div>
+                    break;
+                case "gallery":
+                    <div class="custom-card-list">
+                        <DpCard Items="@FilteredItems"
+                                OnIconClick="OnCardIconClickHandler"
+                                OnButtonClick="OnCardButtonClickHandler">
+                        </DpCard>
+                    </div>
+                    break;
+                case "matrix":
+                    <div class="grid-container">
+                        <DefaultGrid @ref="@TemplatesGrid"
+                                     DataSource="@TemplatesList"
+                                     TRowItem="DocumentTemplate"
+                                     AllowPaging="true"
+                                     AllowSorting="false"
+                                     AllowGrouping="false"
+                                     AllowSelection="false"
+                                     ShowColumnMenu="false"
+                                     ShowToolBar="false"
+                                     AllowFiltering="false"
+                                     EnableGlobalSearch="true"
+                                     ShowExcelExportButton="false"
+                                     ShowColumnPickerButton="false">
+                            <GridColumns>
+                                <GridColumn Field="@nameof(DocumentTemplate.Name)" HeaderText="Template Name" />
+                                @foreach (var content in ContentsList)
+                                {
+                                    <GridColumn Field="@content.Name" HeaderText="@content.Name" FilterSettings="@(new FilterSettings { Type = Syncfusion.Blazor.Grids.FilterType.CheckBox })" TextAlign="TextAlign.Center">
+                                        <Template>
+                                            @{
+                                                var model = (DocumentTemplate)context;
+
+                                                var haveContentDefined = model.HedgeDocumentTemplateDetails.Any(x => x.HedgeDocumentContentId == content.Id && !x.Hidden);
+
+                                                if (haveContentDefined)
+                                                {
+                                                    <i class="fa-solid fa-check" @onclick="() => OnMatrixItemSelected(model, content.Id)" style="color:green"></i>
+                                                }
+                                                else
+                                                {
+                                                    <span>-</span>
+                                                }
+                                            }
+                                        </Template>
+                                    </GridColumn>
+                                }
+                                <GridColumn Field="@nameof(DocumentTemplate.Enabled)" HeaderText="Active" FilterSettings="@(new FilterSettings { Type = Syncfusion.Blazor.Grids.FilterType.CheckBox })" TextAlign="TextAlign.Center">
+                                    <Template>
+                                        @{
+                                            var model = (DocumentTemplate)context;
+
+                                            if (model.Enabled)
+                                            {
+                                                <span>Yes</span>
+                                            }
+                                            else
+                                            {
+                                                <span>No</span>
+                                            }
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="@nameof(DocumentTemplate.ModifiedOn)" HeaderText="Last Updated" Format="yyyy/MM/dd HH:mm:ss" Type="ColumnType.DateTime" />
+                                <GridColumn Field="@nameof(DocumentTemplate.ModifiedBy)" HeaderText="Updated By" />
+                                <GridColumn HeaderText="Action" TextAlign="TextAlign.Center" Freeze="FreezeDirection.Left" Width="70">
+                                    <Template>
+                                        @{
+                                            var model = (DocumentTemplate)context;
+                                            <SfDropDownButton CssClass="dp-menu-style">
+                                                <DropDownButtonEvents ItemSelected="@((args) => OnActionSelected(args, model))" />
+                                                <DropDownMenuItems>
+                                                    <DropDownMenuItem Text="Edit" />
+                                                    <DropDownMenuItem Text="Preview" />
+                                                    <DropDownMenuItem Text="Duplicate" />
+                                                    <DropDownMenuItem Text="@(model.Enabled ? "Deactivate" : "Activate")" />
+                                                    <DropDownMenuItem Separator=true />
+                                                    <DropDownMenuItem Text="Delete" class="dp-menu-delete" />
+                                                </DropDownMenuItems>
+                                            </SfDropDownButton>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                        </DefaultGrid>
+                    </div>
+                    break;
+            }
+        }
+    }
+    else
+    {
+        <GridCover Icon="fa-regular fa-building-magnifying-glass fa-6x" Header="Select a Client."
+                   Content="First, select a Client to manage their Hedge Document Templates."></GridCover>
+    }
+</div>
+<DeleteTemplateDialog @ref="@_deleteTemplateDialogComponent" Visible="@IsDeleteDialogVisible"
+              OnCancel="@CancelDelete" OnDelete="@UpdatePage" />
+<PreviewTemplateDialog @ref="@_previewTemplateDialogComponent" Visible="@IsPreviewDialogVisible"
+              OnClose="@ClosePreview" />

@@ -1,0 +1,97 @@
+﻿::deep #regression-grid.e-grid .e-gridheader .e-stackedheadercelldiv {
+    padding: 0 20px 0 5px !important;
+    text-align: center !important;
+    color: var(--primary-font-color) !important;
+    font-family: "Proximanova-semibold", sans-serif !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+}
+
+.details-section-header h5 {
+    font-family: 'proximanova-semibold';
+    font-size: 1rem;
+    color: white;
+    padding: 0.75rem;
+    margin: 0;
+    background-color: #66666e;
+}
+
+.details-section-body {
+    display: flex;
+    background-color: #ffffff;
+    padding: 0.625rem;
+}
+
+.regression-container {
+    display: flex;
+    flex-direction: row;
+    gap: 0.625rem;
+}
+
+.left-panel {
+    width: 40%;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+}
+
+.right-panel {
+    width: 60%;
+}
+
+.grid-container {
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .regression-container {
+        flex-direction: column;
+    }
+
+    .left-panel, .right-panel {
+        width: 100%;
+        border-right: none;
+    }
+}
+/* regression statistic details - start */
+.custom-stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    color: #333;
+    padding: 1.25rem;
+    width: 100%;
+    max-width: 50rem;
+}
+
+.stats-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 43.75rem;
+    margin-bottom: 0.938rem;
+}
+
+.stat-box {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: gray;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.125rem;
+    font-weight: bold;
+}
+
+.stat-pass {
+    color: green;
+    font-weight: bold;
+}
+/* regression statistic details - end */
+

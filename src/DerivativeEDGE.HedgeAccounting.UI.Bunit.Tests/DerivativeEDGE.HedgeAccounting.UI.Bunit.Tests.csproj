@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Bunit" />
+    <Using Include="Bunit.TestDoubles" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="bunit" Version="1.38.5" />
+    <PackageReference Include="bunit.web" Version="1.38.5" />
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="DerivativeEdge.Blazor.ComponentLibrary" Version="1.0.2259" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Polly" Version="8.5.2" />
+    <PackageReference Include="Verify.Blazor" Version="11.0.0" />
+    <PackageReference Include="Verify.Bunit" Version="12.0.0" />
+    <PackageReference Include="Verify.Xunit" Version="28.14.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DerivativeEDGE.HedgeAccounting.UI\DerivativeEDGE.HedgeAccounting.UI.csproj" />
+  </ItemGroup>
+</Project>

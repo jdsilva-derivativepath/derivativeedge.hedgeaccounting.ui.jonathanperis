@@ -1,0 +1,65 @@
+﻿@page "/hrhedgedocumenttemplate"
+
+<PageTitle>Hedge Document Template</PageTitle>
+<div class="flex grid">
+    <div class="breadcrumb-div">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-icons">
+                <a href="/"><i class="fa fa-home linkColor" style="padding-right:.6rem;"></i><i class="fa fa-chevron-right linkColor"></i></a>
+            </li>
+            <li class="breadcrumb-last">Hedge Document Template</li>
+        </ul>
+    </div>
+    @if (AllowedBehavior != null)
+    {
+        <div class="view-container-next-gen">
+            @if (IsErrorMessageVisible)
+            {
+                <div class="msg-with-header">
+                    <div class="content-section">
+                        <SfMessage Severity="MessageSeverity.Error">
+                            <h1>@ErrorTitle</h1>
+                            <p>@ErrorMessage</p>
+                        </SfMessage>
+                    </div>
+                </div>
+            }
+            <div class="index-header">
+                <div class="client-filter">
+                    @if (AllowedBehavior.IsDpiUser)
+                    {
+                        <div class="col-2">
+                            <div class="dp-inputs">
+                                <span class="input-label">Client</span>
+                                <SfComboBox TValue="long?" CssClass="dropdown-input" Enabled="true" TItem="ClientName" Width="28.125rem" PopupHeight="14.375rem" Placeholder="Select" @bind-Value="SelectedClientId" DataSource="Clients">
+                                    <ComboBoxEvents TValue="long?" TItem="ClientName" ValueChange="ClientComboboxValueChange" Created="ClientComboboxCreated" />
+                                    <ComboBoxFieldSettings Value="@nameof(ClientName.Id)" Text="@nameof(ClientName.Name)" />
+                                </SfComboBox>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="dp-inputs">
+                            <div class="all-templates">
+                                <span>All Templates</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if (IsCreateTemplateButtonVisible)
+                {
+                    <div class="new-template-btn text-right space-x-4 dp-buttons" text-al>
+                        <SfButton CssClass="button-secondary button-default" Content="Create Template" OnClick="@CreateTemplateButtonClicked"></SfButton>
+                        <DpActionMenu Items="actionItems" OnItemSelected="OnActionItemSelected" />
+                    </div>
+                }
+            </div>
+            @if (_clientDropdownInitialized || AllowedBehavior?.IsDpiUser == false)
+            {
+                <Templates @ref="@_templatesComponent" SelectedClientId="@SelectedClientId" AllowedBehavior="@AllowedBehavior"
+                           OnActionTriggerred="@HideErrorMessages" OnActionFailed="@ShowActionFailed" />
+            }
+        </div>
+    }
+</div>

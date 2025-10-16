@@ -1,0 +1,217 @@
+image:
+  name: 765057520137.dkr.ecr.us-west-2.amazonaws.com/bitbucket/dotnet:v8
+  aws:
+    oidc-role: $AWS_ROLE_ECR
+  oidc: true
+
+definitions:
+  services:
+    docker:
+      memory: 3027
+  steps:
+    - step: &build-test
+        name: "Build and Test"
+        caches:
+          - dotnetcore
+        oidc: true
+        script:
+          - cd src
+          - chmod +x codeartifact.sh && ./codeartifact.sh
+          - dotnet restore
+          - dotnet build
+          - cd DerivativeEDGE.HedgeAccounting.UI.Tests
+          - export ASPNETCORE_URLS=http://localhost:5000
+          - dotnet tool update --global PowerShell --version 7.3.10
+          - pwsh bin/Debug/net8.0/playwright.ps1 install-deps
+          - pwsh bin/Debug/net8.0/playwright.ps1 install
+          - dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
+          # Publish coverage reports to Codacy
+          - bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r TestResults/coverage.cobertura.xml
+
+    - step: &deploy-dev
+        name: "Deployment to Development"
+        image:
+          name: 765057520137.dkr.ecr.us-west-2.amazonaws.com/bitbucket/cdk-typescript:latest-cli
+          aws:
+            oidc-role: $AWS_ROLE_ECR
+        oidc: true
+        deployment: Development
+        trigger: manual
+        script:
+          - source /opt/stack/deploy-dev.sh
+          - cdk deploy dev-hedge-accounting-ui --parameters imageTag=${TAG} --force --require-approval never
+
+    - step: &deploy-stg
+        name: "Deployment to Staging"
+        image:
+          name: 765057520137.dkr.ecr.us-west-2.amazonaws.com/bitbucket/cdk-typescript:latest-cli
+          aws:
+            oidc-role: $AWS_ROLE_ECR
+        oidc: true
+        deployment: Staging
+        trigger: manual
+        script:
+          - source /opt/stack/deploy-stg.sh
+          - cdk deploy stg-hedge-accounting-ui --parameters imageTag=${TAG} --force --require-approval never
+
+    - step: &deploy-prd
+        name: "Deployment to Production"
+        image:
+          name: 765057520137.dkr.ecr.us-west-2.amazonaws.com/bitbucket/cdk-typescript:latest-cli
+          aws:
+            oidc-role: $AWS_ROLE_ECR
+        oidc: true
+        deployment: Production
+        trigger: manual
+        script:
+          - source /opt/stack/deploy-prd.sh
+          - /bin/bash /opt/stack/jellyfish-start.sh
+          - cd cdk
+          - npm ci
+          - cdk deploy prod-hedge-accounting-ui --parameters imageTag=${TAG} --force --require-approval never
+          - cd ..
+          - /bin/bash /opt/stack/jellyfish-end.sh
+
+    - step: &deploy-dr-prd
+        name: "Deployment to Production DR "
+        image:
+          name: 765057520137.dkr.ecr.us-east-1.amazonaws.com/bitbucket/cdk-typescript:latest-cli
+          aws:
+            oidc-role: $AWS_ROLE_ECR
+        oidc: true
+        deployment: Production-DR
+        trigger: manual
+        script:
+          - source /opt/stack/deploy-dr.sh
+          - cdk deploy dr-prod-hedge-accounting-ui --parameters imageTag=${TAG} --force --require-approval never
+
+    - step: &ecr
+        name: "ECR Creation"
+        image:
+          name: 765057520137.dkr.ecr.us-west-2.amazonaws.com/bitbucket/cdk-typescript:latest-cli
+          aws:
+            oidc-role: $AWS_ROLE_ECR
+        oidc: true
+        script:
+          - source /opt/stack/deploy-ecr.sh
+          - cdk deploy hedge-accounting-ui-ecr --force --require-approval never
+
+pipelines:
+  branches:
+    feature/*:
+      - step: *build-test
+      - step:
+          name: "Create image and push to ECR"
+          services:
+            - docker
+          caches:
+            - docker
+          oidc: true
+          script:
+            - cd src
+            - chmod +x codeartifact.sh && ./codeartifact.sh
+            - export FEATURE=${BITBUCKET_BRANCH////-}
+            - export TAG=${FEATURE}-${BITBUCKET_BUILD_NUMBER}
+            - export IMAGE_BLAZOR="derivativeedge/hedgeaccountingui/app"
+            - docker-compose build
+
+            #DEV
+            - pipe: atlassian/aws-ecr-push-image:2.5.0
+              variables:
+                AWS_DEFAULT_REGION: us-west-2
+                AWS_OIDC_ROLE_ARN: $AWS_ROLE_ECR
+                IMAGE_NAME: $IMAGE_BLAZOR
+                TAGS: "$TAG"
+
+      - step: *deploy-dev
+
+    develop:
+      - step: *build-test
+      - step:
+          name: "Create image and push to ECR"
+          services:
+            - docker
+          caches:
+            - docker
+          oidc: true
+          script:
+            - cd src
+            - chmod +x codeartifact.sh && ./codeartifact.sh
+            - export FEATURE=${BITBUCKET_BRANCH////-}
+            - export TAG=${FEATURE}-${BITBUCKET_BUILD_NUMBER}
+            - export IMAGE_BLAZOR="derivativeedge/hedgeaccountingui/app"
+            - docker-compose build
+            - docker tag $IMAGE_BLAZOR:$TAG $IMAGE_BLAZOR:latest
+
+            #DEV  #STG
+            - pipe: atlassian/aws-ecr-push-image:2.5.0
+              variables:
+                AWS_DEFAULT_REGION: us-west-2
+                AWS_OIDC_ROLE_ARN: $AWS_ROLE_ECR
+                IMAGE_NAME: $IMAGE_BLAZOR
+                TAGS: "$TAG latest"
+
+      - step: *deploy-dev
+      - step: *deploy-stg
+
+    "{release/*,hotfix/*}":
+      - step: *build-test
+      - step:
+          name: "Create image and push to ECR"
+          services:
+            - docker
+          caches:
+            - docker
+          oidc: true
+          script:
+            - cd src
+            - chmod +x codeartifact.sh && ./codeartifact.sh
+            - export FEATURE=${BITBUCKET_BRANCH////-}
+            - export TAG=${FEATURE}-${BITBUCKET_BUILD_NUMBER}
+            - export IMAGE_BLAZOR="derivativeedge/hedgeaccountingui/app"
+            - docker-compose build
+
+            #STG
+            - pipe: atlassian/aws-ecr-push-image:2.5.0
+              variables:
+                AWS_DEFAULT_REGION: us-west-2
+                AWS_OIDC_ROLE_ARN: $AWS_ROLE_ECR
+                IMAGE_NAME: $IMAGE_BLAZOR
+                TAGS: "$TAG"
+
+      - step: *deploy-stg
+
+    master:
+      - step: *build-test
+      - step:
+          name: "Create image and push to ECR"
+          services:
+            - docker
+          caches:
+            - docker
+          oidc: true
+          script:
+            - cd src
+            - chmod +x codeartifact.sh && ./codeartifact.sh
+            - export FEATURE=${BITBUCKET_BRANCH////-}
+            - export TAG=${FEATURE}-${BITBUCKET_BUILD_NUMBER}
+            - export IMAGE_BLAZOR="derivativeedge/hedgeaccountingui/app"
+            - docker-compose build
+
+            #STG  #PROD
+            - pipe: atlassian/aws-ecr-push-image:2.5.0
+              variables:
+                AWS_DEFAULT_REGION: us-west-2
+                AWS_OIDC_ROLE_ARN: $AWS_ROLE_ECR
+                IMAGE_NAME: $IMAGE_BLAZOR
+                TAGS: "$TAG"
+
+      - step: *deploy-stg
+
+      - step: *deploy-prd
+
+      - step: *deploy-dr-prd
+
+  custom: # Pipelines that are triggered manually for ECR and AWS Secrets
+    ECR Creation:
+      - step: *ecr

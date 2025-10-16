@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  derivativeedge.hedgeaccounting.ui:
+    image: ${IMAGE_BLAZOR}:${TAG}
+    build:
+      context: .
+      dockerfile: DerivativeEDGE.HedgeAccounting.UI/Dockerfile
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.122.1
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317" # gRPC
+    command: ["--config", "/etc/otelcol-contrib/config.yaml"]
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.50
+    ports:
+      - "16686:16686"   # Web UI
+      - "14250:14250"   # gRPC for receiving traces
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true

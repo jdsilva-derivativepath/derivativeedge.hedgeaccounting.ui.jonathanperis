@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager;
+
+<PageTitle>@Title</PageTitle>
+    <CascadingValue Name="Layout" Value="@this">
+        <DpToast XPosition="Right" YPosition="Top" />
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    <NavigationHeader ThisApp="MidGenAppKind.HedgeAccounting" />
+                    <div class="view-container">
+                        @Body
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                @{
+                    NavigationManager.NavigateTo("/login", forceLoad: true);
+                }
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+</CascadingValue>
+<Spinner />
+@code {
+
+    public string Title { get; set; } = string.Empty;
+
+    public async Task Refresh()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+}

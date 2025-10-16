@@ -1,0 +1,45 @@
+﻿@page "/gallery-hrdocument"
+@inject NavigationManager _navigation
+@layout EmptyLayout
+
+<PageTitle>Template Gallery</PageTitle>
+
+<div class="page-header">
+    <div class="content-container">
+        <div class="title">
+            <span class="page-title">Template Gallery</span>
+        </div>
+        <div class="action-buttons">
+            <SfButton Type="Button" OnClick="@(() => OnButtonClick("cancel"))" CssClass="action-btn-link">Cancel</SfButton>
+            <SfButton Type="Button" OnClick="@(() => OnButtonClick("continue"))" CssClass="action-btn-primary">Continue</SfButton>
+        </div>
+    </div>
+</div>
+
+<div class="error-container">
+    <SfMessage Visible="@NoCardSelected" Severity="MessageSeverity.Error">
+        <h1>Select a Hedge Document Template</h1>
+        <p>You need to select a Hedge Document Template before moving to the next step.</p>
+    </SfMessage>
+</div>
+
+<div class="page-container">
+    <span> Start from Scratch</span>
+    <DpCard Items="@CardItemsListScratch" OnButtonClick="OnButtonClickHandler" />
+    <div class="divider"></div>
+
+    @if (RetrievedClientTemplates.Count != 0)
+    {
+        <span> Your Templates</span>
+        <DpCard Items="@CardItemsListClient" OnButtonClick="OnButtonClickHandler" OnHyperLinkClick="OnHyperLinkClickHandler" />
+        <div class="divider"></div>
+    }
+
+    <span> Derivative Path Provided</span>
+    <DpCard Items="@CardItemsListDp" OnButtonClick="OnButtonClickHandler" OnHyperLinkClick="OnHyperLinkClickHandler" />
+</div>
+<DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate.PreviewTemplateDialog 
+    @ref="@_previewTemplateDialogComponent" 
+    Visible="@IsPreviewDialogVisible"                                                                                   
+    OnClose="@ClosePreview">
+</DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate.PreviewTemplateDialog>

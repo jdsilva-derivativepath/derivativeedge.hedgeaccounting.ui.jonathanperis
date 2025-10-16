@@ -1,0 +1,17 @@
+﻿<div id="deleteTemplateDialogTarget">
+    <SfDialog Width="33rem" Height="auto" Target="#deleteTemplateDialogTarget" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false" ShowCloseIcon="false" @bind-Visible="Visible">
+        <DialogTemplates>
+            <Header>Would you like to delete @ToDelete?.Name?</Header>
+            <Content>
+                <div class="message">
+                    <p>Once deleted, the Hedge Document Template will no longer be accessible.</p>
+                </div>
+                <div class="dp-buttons text-right space-x-4">
+                    <SfButton id="cancelButton" CssClass="button-link button-default" Content="Cancel" OnClick="@CancelButtonClicked" />
+                    <SfButton id="deleteButton" CssClass="button-danger button-default" Content="Permanently Delete" OnClick="@DeleteButtonClicked" />
+                </div>
+            </Content>
+        </DialogTemplates>
+        <DialogPositionData X="center" Y="center" />
+    </SfDialog>
+</div>

@@ -1,0 +1,73 @@
+﻿<SfDialog Width="29.25rem" Height="19rem" Target="DpDialog" CssClass="dp-dialog" CloseOnEscape="false" ShowBackdrop="true" IsModal="true" @bind-Visible="Visibility">
+    <DialogTemplates>
+        <Content>
+            <SfMessage Severity="MessageSeverity.Success">
+                <h1>Success</h1>
+                <p>Hedge Document saved.</p>
+            </SfMessage>
+            <br />
+            <div class="msg-default">
+                <div id="msg" class="e-control e-message e-lib e-outlined" role="alert">
+                    <div class="e-msg-content" style="width: 100%">
+                        <div style="display: flex">
+                            <div style="width: 100%">
+                                <h1>@ConfirmedSmartagsCount</h1>
+                                <p>Smart tags confirmed</p>
+                            </div>
+                            <div style="width: 100%">
+                                <h1>@IncompleteSmartTagsCount</h1>
+                                <p>Smart tags incomplete</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dp-buttons text-right space-x-4 mt-5">
+                <SfButton Type="button" CssClass="button-link button-default" Content="Keep Editing" OnClick="@DlgButtonClose" />
+                <SfButton CssClass="button-primary button-default" Content="Done" OnClick="ContinueNavigate" />
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogEvents></DialogEvents>
+    <DialogPositionData X="center" Y="center"></DialogPositionData>
+</SfDialog>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Inject]
+    private IMediator MediatorService { get; set; } = default!;
+
+    [Parameter]
+    public EditContext EditContext { get; set; }
+
+    [Parameter]
+    public long HedgeRelationshipId { get; set; }
+
+    [Parameter]
+    public int ConfirmedSmartagsCount { get; set; }
+
+    [Parameter]
+    public int IncompleteSmartTagsCount { get; set; }
+
+    private bool Visibility { get; set; } = false;
+
+    public void DlgButtonOpen()
+    {
+        this.Visibility = true;
+    }
+
+    public void DlgButtonClose()
+    {
+        this.Visibility = false;
+    }
+
+    private async Task ContinueNavigate()
+    {
+        EditContext.MarkAsUnmodified();
+        var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId, string.Empty, string.Empty, "HAUI", 0);
+        await MediatorService.Send(updateHRCachedData);
+        NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+    }
+}

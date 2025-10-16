@@ -1,0 +1,178 @@
+﻿@using System.Linq
+@using DerivativeEdge.HedgeAccounting.Api.Client
+
+<div class="col-xs-12 amortization-header">
+    <h5>Option Time Value Amortizations</h5>
+</div>
+<div style="height: calc(100vh - 45rem)">
+    <DefaultGrid DataSource="@OptionAmortizations"
+                 TRowItem="DerivativeEDGEHAApiViewModelsOptionAmortizationVM"
+                 Height="100%"
+                 AllowPaging="false"
+                 AllowSorting="true"
+                 AllowGrouping="false"
+                 AllowFiltering="false"
+                 AllowSelection="false"
+                 EnableVirtualization="false"
+                 EnableGlobalSearch="true"
+                 ShowColumnMenu="false"
+                 ShowToolBar="false"
+                 ShowExcelExportButton="false"
+                 ShowColumnPickerButton="false">
+        <GridColumns>
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.StartDate)" HeaderText="Start Date" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.EndDate)" HeaderText="End Date" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.FixingDate)" HeaderText="Fixing Date" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.PaymentDate)" HeaderText="Amortization Date" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Weight)" HeaderText="Weight" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAEntityOptionAmortization)context;
+                    }
+                    <span>
+                        @string.Format("{0:0.00000}", model.Weight)
+                    </span>
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(DerivativeEDGEHAEntityOptionAmortization.Amount1)" HeaderText="Opt 1 Premium" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAEntityOptionAmortization)context;
+                    }
+                    <span class="@(model.Amount1 > 0 ? "" : "negative-numbers")">
+                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Amount1)
+                    </span>
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(DerivativeEDGEHAEntityOptionAmortization.Amount2)" HeaderText="Opt 2 Premium" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAEntityOptionAmortization)context;
+                    }
+                    <span class="@(model.Amount2 > 0 ? "" : "negative-numbers")">
+                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Amount2)
+                    </span>
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(DerivativeEDGEHAEntityOptionAmortization.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAEntityOptionAmortization)context;
+                    }
+                    <span class="@(model.TotalAmount > 0 ? "" : "negative-numbers")">
+                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.TotalAmount)
+                    </span>
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </DefaultGrid>
+</div>
+<DefaultGrid DataSource="@HedgeRelationshipOptionTimeValues"
+             TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM"
+             Height="100%"
+             AllowPaging="false"
+             AllowSorting="true"
+             AllowGrouping="false"
+             AllowFiltering="false"
+             AllowSelection="false"
+             EnableVirtualization="false"
+             EnableGlobalSearch="true"
+             ShowColumnMenu="false"
+             ShowToolBar="false"
+             ShowExcelExportButton="false"
+             ShowColumnPickerButton="false">
+    <GridColumns>
+        <GridColumn HeaderText="GL Account">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                <span>@(model.GLAccount?.AccountDescription ?? "N/A")</span>
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="Contra">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                <span>@(model.ContraAccount?.AccountDescription ?? "N/A")</span>
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.StartDate)" HeaderText="Start Date" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.FrontRollDate)" HeaderText="Front Roll Date" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.BackRollDate)" HeaderText="Back Roll Date" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.EndDate)" HeaderText="End Date" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                <span class="@(model.TotalAmount > 0 ? "" : "negative-numbers")">
+                    @string.Format("{0:$#,##0.00;($#,##0.00)}", model.TotalAmount)
+                </span>
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.AmortizationMethod)" HeaderText="Method" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.OptionTimeValueAmortType)" HeaderText="Value Type" />
+        <GridColumn HeaderText="Action" TextAlign="TextAlign.Center" Width="80" Freeze="FreezeDirection.Right" IsFrozen="true">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                    <SfDropDownButton CssClass="dp-menu-style">
+                        <DropDownButtonEvents ItemSelected="@((args) => OnItemSelectedMatrix(args, model))" />
+                        <DropDownMenuItems>
+                            <DropDownMenuItem Text="Edit" />
+                            <DropDownMenuItem Text="Delete" />
+                            <DropDownMenuItem Text="Download Excel" />
+                        </DropDownMenuItems>
+                    </SfDropDownButton>
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</DefaultGrid>
+
+@code {
+    #region Parameters
+    [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> HedgeRelationshipOptionTimeValues { get; set; }
+    [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM>> HedgeRelationshipOptionTimeValuesChanged { get; set; }
+    #endregion
+
+    public List<DerivativeEDGEHAApiViewModelsOptionAmortizationVM> OptionAmortizations { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOptionAmortizationGridList();
+        StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadOptionAmortizationGridList();
+        StateHasChanged();
+    }
+
+    private async Task LoadOptionAmortizationGridList()
+    {
+        // Aggregate all option amortizations from all HedgeRelationshipOptionTimeValues
+        if (HedgeRelationshipOptionTimeValues?.Any() == true)
+        {
+            OptionAmortizations = HedgeRelationshipOptionTimeValues
+                .Where(timeValue => timeValue.OptionAmortizations?.Any() == true)
+                .SelectMany(timeValue => timeValue.OptionAmortizations)
+                .OrderBy(amortization => amortization.PaymentDate)
+                .ToList();
+        }
+        else
+        {
+            OptionAmortizations = new List<DerivativeEDGEHAApiViewModelsOptionAmortizationVM>();
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private void OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM data)
+    {
+        string concatenatedString = $"{args.Item.Text}: {data.ID}";
+    }
+}

@@ -1,0 +1,27 @@
+﻿<div id="usedContentDialogTarget">
+    <SfDialog Width="31.25rem" Height="auto" Target="#usedContentDialogTarget" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false" ShowCloseIcon="false" @bind-Visible="Visible">
+        <DialogTemplates>
+            <Header>Unable to delete</Header>
+            <Content>
+                <p class="subheader">The @ContentName is being used by the following templates:</p>
+                <ul>
+                    @foreach(var name in TemplateNames)
+                    {
+                        <li>@name</li>
+                    }
+                </ul>
+                <br>
+                <p>To delete this content:</p>
+                <ol>
+                   <li>Remove it from the listed templates</li>
+                   <li>Return here to delete</li>
+                </ol>
+                <div id="dialogButtons" class="dp-buttons text-right space-x-4">
+                    <SfButton Type="button" CssClass="button-link button-default" Content="Close" OnClick="@CloseButtonClicked" />
+                    <SfButton CssClass="button-primary button-default" Content="View Templates" OnClick="@ViewTemplatesButtonClicked" />
+                </div>
+            </Content>
+        </DialogTemplates>
+        <DialogPositionData X="center" Y="center" />
+    </SfDialog>
+</div>

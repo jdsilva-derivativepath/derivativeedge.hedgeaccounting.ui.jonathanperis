@@ -1,0 +1,235 @@
+﻿@page "/create-template/{templateId:guid?}"
+@layout EmptyLayout
+
+<PageTitle>@PageTitle</PageTitle>
+
+<div class="page-header">
+    <div class="content-container">
+        <div class="title">
+            <span class="page-title">@CreateTemplateForm.Name</span>
+            @if (!IsPreviewMode)
+            {
+                <a onclick="@(() => DlgRenameOpen())" style="cursor: pointer;">
+                    <i class="fa-kit fa-pencil-line fa-sm"></i>
+                </a>
+            }
+        </div>
+        <div class="action-buttons">
+            @if (!IsPreviewMode)
+            {
+                <SfButton Type="Button" OnClick="OnCancelClick" CssClass="action-btn-link">Cancel</SfButton>
+                <SfButton CssClass="button-secondary button-default" OnClick="(() => EnablePreviewMode())" Content="Preview"></SfButton>
+                <SfButton Type="Submit" CssClass="action-btn-primary" OnClick="(() => FormSubmit())">Save Template</SfButton>
+            }
+            else
+            {
+                <SfButton CssClass="button-secondary button-default" OnClick="(() => DisablePreviewMode())" Content="Cancel Preview"></SfButton>
+                <SfButton Type="Submit" CssClass="action-btn-primary" OnClick="(() => FormSubmit())">Save Template</SfButton>
+            }
+        </div>
+    </div>
+</div>
+<div class="page-container">
+    @if (!CreateTemplateNameVisibility || IsEditMode)
+    {
+        @if (!IsPreviewMode)
+        {
+            @if (CreateTemplateForm != null && CreateTemplateForm.HedgeDocumentContents.Any())
+            {
+                <div class="editor-area mt-2">
+                    <EditForm EditContext="EditContext" OnSubmit="FormSubmit">
+                        <ObjectGraphDataAnnotationsValidator />
+                        <div class="msg-with-header">
+                            <div class="content-section">
+                                <SfMessage Visible="@IsErrorMessageVisible" Severity="MessageSeverity.Error">
+                                    <h1>@ErrorMsg?.Title</h1>
+                                    <p>@ErrorMsg?.Message</p>
+                                </SfMessage>
+                            </div>
+                        </div>
+                        <DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate.TemplateRichTextEditor 
+                        ErrorMsg="@ErrorMsg"
+                        IsErrorMessageVisible="@IsErrorMessageVisible"
+                        HedgeDocumentContents="@CreateTemplateForm.HedgeDocumentContents" />
+
+                    </EditForm>
+                </div>
+                <div class="side-panel mr-2">
+                    <SfTab CssClass="dp-tabs default-tab side-panel-tab">
+                        <TabAnimationSettings>
+                            <TabEvents></TabEvents>
+                            <TabAnimationPrevious Effect="@AnimationEffect.None" />
+                            <TabAnimationNext Effect="@AnimationEffect.None" />
+                        </TabAnimationSettings>
+                        <TabItems>
+                            <TabItem>
+                                <ChildContent>
+                                    <TabHeader Text="Editor"></TabHeader>
+                                </ChildContent>
+                                <ContentTemplate>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h4>Document Contents</h4>
+                                        <a href="/"><i class="fa-solid fa-plus-circle btn-icon" hidden></i></a>
+                                    </div>
+                                    @foreach (var contentDetail in CreateTemplateForm.HedgeDocumentContents.OrderBy(x => x.Order))
+                                    {
+                                        <div class="space-y-4">
+                                            @if (contentDetail.Required)
+                                            {
+                                                <SfButton CssClass="button-show-hide button-default e-active btn-active"
+                                                          IconPosition="IconPosition.Right" IconCss="fa-solid fa-lock fa-sm"
+                                                          Content="@contentDetail.Name"></SfButton>
+                                            }
+                                            else
+                                            {
+                                                <SfButton CssClass="@(contentDetail.Hidden ?
+                                                    "button-show-hide button-default btn-display" :
+                                                     "button-show-hide button-default btn-display btn-active")"
+                                                          IconPosition="IconPosition.Right" IconCss="@(contentDetail.Hidden ?
+                                                        "fa-solid fa-eye-slash fa-sm" :"fa-solid fa-eye fa-sm")"
+                                                          IsToggle="true"
+                                                          @onclick="@(e=> OnToggleClick(@contentDetail))" Content="@contentDetail.Name"></SfButton>
+                                            }
+
+                                        </div>
+                                    }
+                                </ContentTemplate>
+                            </TabItem>
+                            <TabItem>
+                                <ChildContent>
+                                    <TabHeader Text="Settings"></TabHeader>
+                                </ChildContent>
+                                <ContentTemplate>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4>Document Contents (@CreateTemplateForm.HedgeDocumentContents.Count.ToString()/@MAXCONTENT)</h4>
+                                        @if (@CreateTemplateForm.HedgeDocumentContents.Count < MAXCONTENT)
+                                        {
+                                            <a class="action-btn-link" style="cursor: pointer;"
+                                               onclick="@(() => { IsCreateEditContentDialogVisible = true;})">
+                                                <i class="fa-solid fa-plus-circle btn-icon"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                    @foreach (var contentDetail in CreateTemplateForm.HedgeDocumentContents.OrderBy(x => x.Order))
+                                    {
+                                        <div class="space-y-4 mx-3">
+                                            <h5>@contentDetail.Name</h5>
+                                        </div>
+                                    }
+                                </ContentTemplate>
+                            </TabItem>
+                        </TabItems>
+                    </SfTab>
+                </div>
+            }
+            else
+            {
+                <div class="editor-area mt-2">
+                    <h3 class="editor-text-empty">Start by clicking the Hedge Document Content to show here.</h3>
+                    <DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate.TemplateRichTextEditor 
+                    ErrorMsg="@ErrorMsg"
+                    IsErrorMessageVisible="@IsErrorMessageVisible"
+                    HedgeDocumentContents="@CreateTemplateForm.HedgeDocumentContents" />
+                </div>
+                <div class="side-panel mr-2">
+                    <SfTab CssClass="dp-tabs default-tab side-panel-tab">
+                        <TabAnimationSettings>
+                            <TabEvents></TabEvents>
+                            <TabAnimationPrevious Effect="@AnimationEffect.None" />
+                            <TabAnimationNext Effect="@AnimationEffect.None" />
+                        </TabAnimationSettings>
+                        <TabItems>
+                            <TabItem>
+                                <ChildContent>
+                                    <TabHeader Text="Editor"></TabHeader>
+                                </ChildContent>
+                                <ContentTemplate>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h4>Document Contents</h4>
+                                        <a href="/"><i class="fa-solid fa-plus-circle btn-icon" hidden></i></a>
+                                    </div>
+                                    <div class="control-section mt-3">
+                                        <div class="row">
+                                            <div class="d-flex justify-content-center">
+                                                <SfCard>
+                                                    <CardHeader>
+                                                        <i class="fa-regular fa-file-spreadsheet fa-2xl card-header-action"></i>
+                                                        <h3><b>You have not defined your Hedge Document Content sections.</b></h3>
+                                                    </CardHeader>
+                                                    <CardContent Content="Hedge Document Contents are reusable blocks of content sections that you will use to identify the areas of documentation within your Hedge Document Templates." />
+                                                    <CardFooter>
+                                                        <CardFooterContent>
+                                                            <SfButton OnClick="@(() => { IsCreateEditContentDialogVisible = true;})" CssClass="action-btn-primary">Create Hedge Document Content</SfButton>
+                                                        </CardFooterContent>
+                                                    </CardFooter>
+                                                </SfCard>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ContentTemplate>
+                            </TabItem>
+                            <TabItem>
+                                <ChildContent>
+                                    <TabHeader Text="Settings"></TabHeader>
+                                </ChildContent>
+                                <ContentTemplate>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4>Document Contents 0/@MAXCONTENT</h4>
+                                        <a class="action-btn-link" style="cursor: pointer;" onclick="@(() => { IsCreateEditContentDialogVisible = true;})"><i class="fa-solid fa-plus-circle btn-icon"></i></a>
+                                    </div>
+                                    <div class="control-section mt-3">
+                                        <div class="row">
+                                            <div class="d-flex justify-content-center">
+                                                <SfCard>
+                                                    <CardHeader>
+                                                        <i class="fa-regular fa-file-spreadsheet fa-2xl card-header-action"></i>
+                                                        <h3><b>You have not defined your Hedge Document Content sections.</b></h3>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        Hedge Document Contents are reusable blocks of content sections that you will use to identify the areas of documentation within your Hedge Document Templates.
+                                                    </CardContent>
+                                                    <CardContent>
+                                                        Click the “+” icon to create a Hedge Document Content.
+                                                    </CardContent>
+
+                                                </SfCard>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ContentTemplate>
+                            </TabItem>
+                        </TabItems>
+                    </SfTab>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="editor-area mt-2">
+                <div class="msg-with-header">
+                    <div class="content-section">
+                        <SfMessage Visible="@IsErrorMessageVisible" Severity="MessageSeverity.Error">
+                            <h1>@ErrorMsg?.Title</h1>
+                            <p>@ErrorMsg?.Message</p>
+                        </SfMessage>
+                    </div>
+                </div>
+                <SfRichTextEditor ID="preview-box" @bind-Value="HtmlBody" Readonly="true" Width="98%">
+                    <RichTextEditorToolbarSettings Enable="false"></RichTextEditorToolbarSettings>
+                </SfRichTextEditor>
+            </div>
+        }
+    }
+</div>
+<DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate.CreateTemplateDialog CreateTemplateForm="@CreateTemplateForm"
+                                                                                    OnSave="@UpdateTemplateName"
+                                                                                    @ref="@_createTemplateDialogComponent"
+                                                                                    Visibility="@CreateTemplateNameVisibility"
+                                                                                    SelectedClientId="@ClientId">
+</DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate.CreateTemplateDialog>
+<ContentDialog @ref="@_contentDialogComponent" AllowedBehavior="@AllowedBehavior" Visible="@IsCreateEditContentDialogVisible" ClientId="@ClientId"
+               OnCancel="@CancelCreateEdit" OnSave="@UpdatePage" />
+<NavigationConfirmation _editContext="EditContext">
+</NavigationConfirmation>

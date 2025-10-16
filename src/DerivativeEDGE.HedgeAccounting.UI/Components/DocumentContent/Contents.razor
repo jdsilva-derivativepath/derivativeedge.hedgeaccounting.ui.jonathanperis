@@ -1,0 +1,85 @@
+﻿<div class="all-contents" style="height: calc(100vh - 18.75rem)">
+    @if (SelectedClientId.GetValueOrDefault() > 0)
+    {
+        if (IsVisibleGridCover)
+        {
+            <GridCover Icon="fa-regular fa-file-spreadsheet fa-6x"
+                       Header="You have not defined your Hedge Document Content sections."
+                       MarkupStringContent=@((MarkupString)
+                       @"<p>Hedge Document Contents are reusable blocks of content sections that you will use to identify the areas of documentation within your Hedge Document Templates.</p>
+                       <br><p>Click 'Create Content' to create a Hedge Document Content.</p>")/>
+        }
+        else
+        {
+            <DefaultGrid @ref="@ContentsGrid"
+                         DataSource="@ContentsList"
+                         TRowItem="Models.DocumentContent"
+                         PageSize="25"
+                         AllowPaging="false"
+                         AllowSorting="false"
+                         AllowFiltering="false"
+                         AllowGrouping="false"
+                         AllowSelection="false"
+                         ShowToolBar="false"
+                         ShowColumnMenu="false"
+                         EmptyRecordSetMessage="">
+                <GridSortSettingsFragment>
+                    <GridSortSettings>
+                        <GridSortColumns>
+                            <GridSortColumn Field="@nameof(Models.DocumentContent.Order)"
+                                            Direction="SortDirection.Ascending"></GridSortColumn>
+                        </GridSortColumns>
+                    </GridSortSettings>
+                </GridSortSettingsFragment>
+                <GridColumns>
+                    <GridColumn Field="@nameof(Models.DocumentContent.Name)" HeaderText="CONTENT NAME" Width="85%"/>
+                    <GridColumn Field="@nameof(Models.DocumentContent.Required)" HeaderText="REQUIRED"
+                                TextAlign="TextAlign.Center" Width="130px">
+                        <Template>
+                            @{
+                                var model = (Models.DocumentContent)context;
+
+                                if (model.Required)
+                                {
+                                    <span>Yes</span>
+                                }
+                                else
+                                {
+                                    <span>No</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="ACTION" TextAlign="TextAlign.Center" Freeze="FreezeDirection.Left"
+                                Width="95px">
+                        <Template>
+                            @{
+                                var model = (Models.DocumentContent)context;
+                                <SfDropDownButton CssClass="dp-menu-style">
+                                    <DropDownButtonEvents ItemSelected="@((args) => OnActionSelected(args, model))"/>
+                                    <DropDownMenuItems>
+                                        <DropDownMenuItem Text="Edit"/>
+                                        <DropDownMenuItem Separator=true/>
+                                        <DropDownMenuItem Text="Delete" class="dp-menu-delete"/>
+                                    </DropDownMenuItems>
+                                </SfDropDownButton>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </DefaultGrid>
+        }
+    }
+    else
+    {
+        <GridCover Icon="fa-regular fa-building-magnifying-glass fa-6x" Header="Select a Client."
+                   Content="First, select a Client to manage their Hedge Document Contents."></GridCover>
+    }
+</div>
+<ContentDialog @ref="@_contentDialogComponent" AllowedBehavior="@AllowedBehavior"
+               Visible="@IsCreateEditContentDialogVisible" ClientId="@SelectedClientId.GetValueOrDefault()"
+               OnCancel="@CancelCreateEdit" OnSave="@UpdatePage"/>
+<UsedContentDialog @ref="@_usedContentDialogComponent" Visible="@IsUsedContentDialogVisible"
+                   OnClose="@CloseUsedContentDialog" OnViewTemplates="@ViewTemplates"/>
+<DeleteDialog @ref="@_deleteContentDialogComponent" Visible="@IsDeleteDialogVisible"
+              OnCancel="@CancelDelete" OnDelete="@UpdatePage"/>

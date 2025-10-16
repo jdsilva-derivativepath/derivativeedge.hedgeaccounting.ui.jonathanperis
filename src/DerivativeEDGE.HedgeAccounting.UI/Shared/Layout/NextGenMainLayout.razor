@@ -1,0 +1,37 @@
+﻿@using DerivativeEdge.Blazor.ComponentLibrary.PortalLauncher.Enums
+@using DerivativeEdge.Blazor.ComponentLibrary.PortalLauncher.TopBar
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Template - @Title</PageTitle>
+<CascadingValue Name="Layout" Value="@this">
+<DpToast XPosition="Center" YPosition="Top" />
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <TopBar ThisApplication="AppKind.Commodities" />
+            @Body
+        </Authorized>
+        <NotAuthorized>
+            @{
+                NavigationManager.NavigateTo("/unauthorized", forceLoad: true);
+            }
+        </NotAuthorized>
+        </AuthorizeView>
+</CascadingAuthenticationState>
+</CascadingValue>
+@code {
+
+    public string Title { get; set; } = string.Empty;
+
+    public async Task Refresh()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+}

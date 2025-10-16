@@ -1,0 +1,987 @@
+﻿@using DerivativeEdge.HedgeAccounting.Api.Client
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+
+@using MediatR
+
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.SplitButtons
+
+@using System.Linq
+@using System.Text.RegularExpressions
+
+@using DerivativeEdge.Blazor.ComponentLibrary.Enums
+@using DerivativeEdge.Blazor.ComponentLibrary.Services
+
+@using DerivativeEDGE.HedgeAccounting.UI.Constants
+@using DerivativeEDGE.HedgeAccounting.UI.Extensions
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
+
+@using DerivativeEDGE.Identity.API.Client
+
+<PageTitle>Hedge Relationships</PageTitle>
+
+@if (IsLoadingHedgeRelationship)
+{
+    <div class="d-flex justify-content-center align-items-center h-[400px]">
+        <SfSpinner @bind-Visible="@IsLoadingHedgeRelationship" Size="40" Type="SpinnerType.Tailwind" Label="Loading Hedge Relationship..." />
+    </div>
+}
+else if (IsSavingHedgeRelationship)
+{
+    <div class="d-flex justify-content-center align-items-center h-[400px]">
+        <SfSpinner @bind-Visible="@IsSavingHedgeRelationship" Size="40" Type="SpinnerType.Tailwind" Label="Saving Hedge Relationship..." />
+    </div>
+}
+else if (HedgeRelationship == null)
+{
+    <div class="flex items-start m-6">
+        <p>Failed to load Hedge Relationship. Please refresh the page or contact support.</p>
+    </div>
+}
+else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
+{
+    @if (ValidationErrors != null && ValidationErrors.Any())
+    {
+        <div class="px-2.5 py-0">
+            <SfMessage Severity="MessageSeverity.Error">
+                <div class="validation-header">Please fix the following errors:</div>
+                <ul>
+                    @foreach (var error in ValidationErrors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            </SfMessage>
+        </div>
+    }
+    <EditForm Model="HedgeRelationship" Context="mainFormContext">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="my-2.5 mx-5 flex justify-between">
+            <div class="flex gap-2.5 flex-wrap items-center">
+                <div class="breadcrumb-div">
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-icons">
+                            <a href="/">
+                                <i class="fa fa-home linkColor"></i>
+                                <i class="fa fa-chevron-right linkColor"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-last">
+                            <a href="@($"{NavManager.BaseUri}hedgerelationship")">
+                                Hedge Relationships
+                            </a>
+                        </li>
+                        <li class="breadcrumb-icons">
+                            <i class="fa fa-chevron-right linkColor"></i>
+                        </li>
+                        <li class="breadcrumb-last">
+                            <a href="@($"{NavManager.BaseUri}hedgerelationship?id={HedgeId}")">
+                                HR ID @HedgeId
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex gap-2.5 flex-wrap items-center">
+                <div class="dp-buttons">
+                    <SfButton Disabled="true" CssClass="button-primary button-default" Content="@HedgeRelationship.HedgeStateText" />
+                    <SfDropDownButton Items="@WorkflowItems" CssClass="dp-dropdown-menu-style dropdown-menu-primary" Content="Workflow">
+                        <DropDownMenuItems>
+                            <DropDownButtonEvents ItemSelected="HandleWorkflowAction" />
+                        </DropDownMenuItems>
+                    </SfDropDownButton>
+                </div>
+            </div>
+        </div>
+
+        <div class="my-2.5 mx-5 flex justify-between">
+            <div class="flex gap-2.5 flex-wrap items-center">
+                <div class="dp-buttons">
+                    <SfButton IsPrimary="true" 
+                    CssClass="button-primary button-default" 
+                    Content="@(IsSavingHedgeRelationship ? "Saving..." : "Save")"
+                    Disabled="@(IsSavingHedgeRelationship || IsSaveDisabled())"
+                    OnClick="SaveHedgeRelationshipAsync" />
+                </div>
+                <div class="dp-buttons">
+                    <SfButton CssClass="button-secondary button-default"
+                    Content="Cancel" 
+                    OnClick="CancelButtonHandler"/>
+                </div>
+                <div class="dp-buttons">
+                    <SfButton IsPrimary="true"
+                    CssClass="button-primary button-default" 
+                    Content="@(IsGeneratingInceptionPackage ? "Generating..." : "Preview Inception Package")"
+                    Disabled="@(IsGeneratingInceptionPackage || IsPreviewInceptionPackageDisabled())"
+                    OnClick="GenerateInceptionPackageAsync" />
+                </div>
+                <div class="dp-buttons">
+                    <SfButton IsPrimary="true" 
+                    CssClass="button-primary button-default" 
+                    Content="@(IsRunningRegression ? "Running Regression..." : "Run Regression")"
+                    Disabled="@(IsRunningRegression || IsRegressionDisabled())"
+                    OnClick="RunRegressionAsync" />
+                </div>
+                <div class="dp-buttons">
+                    <SfButton IsPrimary="true" 
+                    CssClass="button-primary button-default" 
+                    Disabled="@(IsBackloadDisabled())"
+                    Content="Backload" 
+                    OnClick="BackloadAsync" />
+                </div>
+                <div class="dp-inputs" style="width: 11rem; margin-bottom: 0.625rem;">
+                    <label class="input-label">Curve Date</label>
+                    <SfDatePicker CssClass="calendar-datepicker"
+                    TValue="DateTime?"
+                    Value="@CurveDate"
+                    Enabled="true"
+                    Format="MM/dd/yyyy"
+                    Placeholder="mm/dd/yyyy"
+                    ShowClearButton="true" />
+                </div>
+                @if (HedgeRelationship.ShowHrSpecAndChecksButton)
+                {
+                    <div class="dp-buttons">
+                        <SfButton IsPrimary="true" 
+                        CssClass="button-primary button-default" 
+                        IconCss="@(IsDownloadingSpecsAndChecks ? "fa-solid fa-circle-notch fa-spin" : "fa-solid fa-download")"
+                        Disabled="@IsDownloadingSpecsAndChecks"
+                        OnClick="DownloadSpecsAndChecksAsync" />
+                    </div>
+                }
+            </div>
+            <div class="flex gap-2.5 flex-wrap items-center"></div>
+        </div>
+
+        <div class="flex gap-4 justify-between items-stretch flex-wrap my-2.5 mx-5 bg-white shadow-sm">
+            <div class="flex-1 min-w-[18.75rem] p-5 flex flex-col">
+                <div class="flex-grow">
+                    <div class="flex gap-5 justify-between">
+                        <div class="flex-1">
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Client</span>
+                                <SfDropDownList TValue="long"
+                                CssClass="dropdown-input"
+                                Enabled="@(!IsLoadingClients)"
+                                TItem="Client"
+                                Placeholder="@(IsLoadingClients ? "Loading..." : "Select Client")"
+                                @bind-Value="HedgeRelationship.ClientID"
+                                DataSource="AvailableClients">
+                                    <DropDownListEvents TValue="long" TItem="Client" ValueChange="HandleClientValueChangeAsync" />
+                                    <DropDownListFieldSettings Value="ClientId" Text="ClientName" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Entity</span>
+                                <SfDropDownList TValue="long"
+                                CssClass="dropdown-input"
+                                Enabled="@(!IsLoadingEntities && AvailableEntities?.Any() == true)"
+                                TItem="DerivativeEDGEHAEntityLegalEntity"
+                                Placeholder="@(IsLoadingEntities ? "Loading..." : "Select Entity")"
+                                @bind-Value="@HedgeRelationship.BankEntityID"
+                                DataSource="@AvailableEntities">
+                                    <DropDownListFieldSettings Value="Id" Text="Name" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Description</span>
+                                <SfTextBox CssClass="input-textbox" Placeholder="Description" @bind-Value="HedgeRelationship.Description" />
+                            </div>
+                            @if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)
+                            {
+                                <div class="form-group dp-inputs min-w-100">
+                                    <span class="input-label">Hedging Objective</span>
+                                    <SfDropDownList TValue="long?"
+                                    CssClass="dropdown-input flex-grow-1"
+                                    Enabled="true"
+                                    TItem="DropdownModel"
+                                    Placeholder="Hedging Objective"
+                                    @bind-Value="HedgeRelationship.InceptionMemoTemplateID"
+                                    DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgingobjective")">
+                                        <DropDownListEvents TValue="long?" TItem="DropdownModel" />
+                                        <DropDownListFieldSettings Text="Text" Value="ID" />
+                                    </SfDropDownList>
+                                </div>
+                                <div class="richtexteditorouter w-50 my-2">
+                                    <SfRichTextEditor EnableResize="true" CssClass="e-richtexteditor" @bind-Value="HedgeRelationship.Objective">
+                                        <RichTextEditorToolbarSettings Items="@BasicTools" />
+                                    </SfRichTextEditor>
+                                </div>
+                            } else {
+                                <div class="dp-inputs min-w-100">
+                                    <span class="input-label">Hedge Documentation</span>
+                                    <SfTextBox CssClass="input-multiline"
+                                    Placeholder="Hedge Documentation"
+                                    Enabled="false"
+                                    @bind-Value="HedgeRelationship.Objective" />
+                                </div>
+                            }
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Hedged Risk</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumHedgeRiskType"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DropdownModel"
+                                Placeholder="Hedged Risk"
+                                @bind-Value="HedgeRelationship.HedgeRiskType"
+                                DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgedrisk")">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHedgeRiskType" TItem="DropdownModel" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Hedged Direction</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumHedgeDirection"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DropdownModel"
+                                Placeholder="Hedged Direction"
+                                @bind-Value="HedgeRelationship.HedgeDirection"
+                                DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgeddirection")">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHedgeDirection" TItem="DropdownModel" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Hedged Type</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumHRHedgeType"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DropdownModel"
+                                Placeholder="Hedged Type"
+                                @bind-Value="HedgeRelationship.HedgeType"
+                                DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgetype")">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHRHedgeType" TItem="DropdownModel" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Hedging Instrument Structure</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumHedgingInstrumentStructure"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="HedgingInstrumentStructureOption"
+                                Placeholder="Hedging Instrument Structure"
+                                @bind-Value="HedgeRelationship.HedgingInstrumentStructure"
+                                DataSource="@GetHedgingInstrumentStructureOptions()">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHedgingInstrumentStructure" TItem="HedgingInstrumentStructureOption" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            @if (HedgeRelationship?.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated
+                              && !string.IsNullOrEmpty(HedgeRelationship?.HedgeDocumentTemplateName))
+                            {
+                                <div class="dp-buttons">
+                                    <SfButton CssClass="button-link button-default"
+                                    IconCss="fa fa-external-link"
+                                    OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/gallery-hrdocument?"))"
+                                    Content="Select Template" />
+                                </div>
+                            }
+                            @if (string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
+                              && !(IsNewHedgeDocumentTemplate))
+                            {
+                                <div class="dp-buttons">
+                                    <SfButton CssClass="button-link button-default"
+                                    IconCss="fa fa-external-link"
+                                    Content="Preview Document"
+                                    OnClick="PreviewHedgeDocumentObjective" />
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
+                              && (IsNewHedgeDocumentTemplate))
+                            {
+                                <div class="dp-buttons">
+                                    <SfButton CssClass="button-link button-default"
+                                    IconCss="fa fa-external-link"
+                                    Content="Preview Document"
+                                    OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/preview-hrdocument?"))" />
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName))
+                            {
+                                <div class="dp-buttons">
+                                    <SfButton CssClass="button-link button-default"
+                                    IconCss="fa fa-external-link"
+                                    Content="Edit Document"
+                                    OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/edit-hrdocument?"))" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 min-w-[18.75rem] p-5 flex flex-col">
+                <div class="flex-grow">
+                    <div class="flex gap-5 justify-between">
+                        <div class="flex-1">
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">@BenchMarkLabel</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumBenchmark"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DropdownModel"
+                                Placeholder="@BenchMarkLabel"
+                                @bind-Value="HedgeRelationship.Benchmark"
+                                DataSource="@DropdownDataHelper.GetDropdownDatasource("contractualrate")">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumBenchmark" TItem="DropdownModel" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Notional</span>
+                                <NumericHotKeys>
+                                    <SfNumericTextBox CssClass="input-numeric" Enabled="true" TValue="double" @bind-Value="HedgeRelationship.Notional" />
+                                </NumericHotKeys>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <label class="input-label">Designation Date</label>
+                                <SfDatePicker CssClass="calendar-datepicker"
+                                              TValue="DateTime?"
+                                              @bind-Value="DesignationDate"
+                                              Format="MM/dd/yyyy"
+                                              Placeholder="mm/dd/yyyy"
+                                              ShowClearButton="true" />
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <label class="input-label">De-designation Date</label>
+                                <SfDatePicker CssClass="calendar-datepicker"
+                                              TValue="DateTime?"
+                                              @bind-Value="DeDesignationDate"
+                                              Format="MM/dd/yyyy"
+                                              Placeholder="mm/dd/yyyy"
+                                              ShowClearButton="true" />
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Hedged Item Type</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumHedgedItemType"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DropdownModel"
+                                Placeholder="Hedged Item Type"
+                                @bind-Value="HedgeRelationship.HedgedItemType"
+                                DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgeditemtype")">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHedgedItemType" TItem="DropdownModel" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group dp-inputs min-w-100">
+                                <span class="input-label">Hedged Item</span>
+                                <SfDropDownList TValue="DerivativeEDGEHAEntityEnumAssetLiability"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DropdownModel"
+                                Placeholder="Hedged Item"
+                                @bind-Value="HedgeRelationship.AssetLiability"
+                                DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgeditem")">
+                                    <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumAssetLiability" TItem="DropdownModel" />
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    @bind-Checked="HedgeRelationship.IsAnOptionHedge"
+                                    Label="Hedge is an Option" />
+                                </div>
+                            }
+                            <div class="dp-inputs">
+                                <SfCheckBox CssClass="input-checkbox"
+                                @bind-Checked="HedgeRelationship.OffMarket"
+                                Label="Off-Market" />
+                            </div>
+                            @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated && HedgeRelationship.IsHAOptIntEnabled)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    @bind-Checked="HedgeRelationship.ExcludeIntrinsicValue"
+                                    Label="Exclude Intrinsic Value" />
+                                </div>
+                            }
+                            @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    @bind-Checked="HedgeRelationship.IsDeltaMatchOption"
+                                    Label="Delta Match Option" />
+                                </div>
+                            }
+                            <div class="dp-inputs">
+                                <SfCheckBox CssClass="input-checkbox"
+                                @bind-Checked="HedgeRelationship.QualitativeAssessment"
+                                Label="Qualitative Assessment" />
+                            </div>
+                            @if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    Disabled="@(HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Draft)"
+                                    @bind-Checked="HedgeRelationship.PreIssuanceHedge"
+                                    Label="Pre-Issuance Hedge" />
+                                </div>
+                            }
+                            @if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    Disabled="@(HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Draft)"
+                                    @bind-Checked="HedgeRelationship.PortfolioLayerMethod"
+                                    Label="Portfolio Layer Method" />
+                                </div>
+                            }
+                            @if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    @bind-Checked="HedgeRelationship.Shortcut"
+                                    Label="Shortcut" />
+                                </div>
+                            }
+                            @if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue && HedgeRelationship.AssetLiability == DerivativeEDGEHAEntityEnumAssetLiability.Asset)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    @bind-Checked="HedgeRelationship.AvailableForSale"
+                                    Label="Available For Sale" />
+                                </div>
+                            }
+                            @if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow)
+                            {
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox"
+                                    Visible="HedgeRelationship.Acquisition"
+                                    @bind-Checked="HedgeRelationship.Acquisition" 
+                                    Label="Aquisition" />
+                                </div>
+                            }
+                            @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated && HedgeRelationship.ExcludeIntrinsicValue)
+                            {
+                                <div class="form-group dp-inputs min-w-100">
+                                    <SfDropDownList TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod"
+                                    CssClass="dropdown-input"
+                                    Enabled="true"
+                                    @bind-Value="HedgeRelationship.IntrinsicMethod"
+                                    TItem="DropdownModel"
+                                    Placeholder="Exclude Intrinsic Value"
+                                    DataSource="@DropdownDataHelper.GetDropdownDatasource("intrinsicmethod")">
+                                        <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod?" TItem="DropdownModel" />
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 min-w-[18.75rem] p-5 flex flex-col">
+                <div class="flex-grow">
+                    <div class="flex gap-5 justify-between">
+                        <SfChart Title="Effectiveness Snapshot">
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime"
+                            Title="Date" 
+                            LabelFormat="MM-yy"
+                            LabelRotation="0">
+                            </ChartPrimaryXAxis>
+
+                            <ChartPrimaryYAxis Title="R²" 
+                            Name="primaryYAxis"
+                            Minimum="0" 
+                            Maximum="1.5">
+                            </ChartPrimaryYAxis>
+
+                            <ChartAxes>
+                                <ChartAxis Name="secondaryYAxis" 
+                                OpposedPosition="true"
+                                Title="Slope"
+                                Minimum="0" 
+                                Maximum="1.5"
+                                LineStyle="@(new ChartAxisLineStyle{ Width = 0 })">
+                                    <ChartAxisMajorGridLines Width="0" />
+                                </ChartAxis>
+                            </ChartAxes>
+
+                            <ChartSeriesCollection>
+                                <!-- Column Chart for R² -->
+                                <ChartSeries DataSource="@EffectivenessChartData" 
+                                XName="Date" 
+                                YName="R2Value"
+                                Type="ChartSeriesType.Column" 
+                                Name="R²"
+                                Fill="#3b98d4"
+                                ColumnWidth="0.2"
+                                YAxisName="primaryYAxis">
+                                    <ChartSeriesAnimation Enable="true" />
+                                </ChartSeries>
+
+                                <!-- Line Chart for Slope -->
+                                <ChartSeries DataSource="@EffectivenessChartData" 
+                                XName="Date" 
+                                YName="Slope"
+                                Type="ChartSeriesType.Line" 
+                                Name="Slope" 
+                                Fill="#f79321"
+                                Width="2"
+                                YAxisName="secondaryYAxis">
+                                    <ChartMarker Visible="true" 
+                                    Width="8" 
+                                    Height="8" 
+                                    Fill="#f79321"
+                                    Shape="ChartShape.Circle">
+                                    </ChartMarker>
+                                    <ChartSeriesAnimation Enable="true" />
+                                </ChartSeries>
+                            </ChartSeriesCollection>
+
+                            <ChartLegendSettings Visible="true" 
+                            ItemPadding="15">
+                            </ChartLegendSettings>
+
+                            <ChartTooltipSettings Enable="true" />
+                        </SfChart>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="my-2.5 mx-5 flex justify-between">
+            <div class="flex gap-2.5 flex-wrap items-center"></div>
+            <div class="flex gap-2.5 flex-wrap items-center">
+                <div class="dp-buttons">
+                    <SfDropDownButton CssClass="dp-dropdown-menu-style dropdown-menu-primary" Content="New">
+                        <DropDownButtonEvents ItemSelected="NewMenuOnItemSelected" />
+                        <DropDownMenuItems>
+                            @if (!HedgeRelationship.IsAnOptionHedge)
+                            {
+                                <DropDownMenuItem Text="Amortization"></DropDownMenuItem>
+                            }
+                            <DropDownMenuItem Text="Option Amortization"></DropDownMenuItem>
+                        </DropDownMenuItems>
+                    </SfDropDownButton>
+                </div>
+            </div>
+        </div>
+        
+        <SfTab @ref="hedgerelationshiptabRef" CssClass="dp-tabs default-tab">
+            <TabAnimationSettings>
+                <TabEvents></TabEvents>
+                <TabAnimationPrevious Effect="@AnimationEffect.None" />
+                <TabAnimationNext Effect="@AnimationEffect.None" />
+            </TabAnimationSettings>
+            <TabEvents Selected="OnSelectedTab"></TabEvents>
+            <TabItems>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Instruments and Analysis"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <InstrumentAnalysisTab @ref="instrumentAnalysisTabRef" @bind-HedgeRelationship="@HedgeRelationship" />
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Test Results"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <TestResultsTab @ref="testResultsTabRef" 
+                        @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches"
+                        LatestHedgeRegressionBatch="@HedgeRelationship.LatestHedgeRegressionBatch" />
+                    </ContentTemplate>
+                </TabItem>
+                @* <TabItem Visible="@HedgeRelationship.IsAnOptionHedge">
+                    <ChildContent>
+                        <TabHeader Text="Option Amortization"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <OptionAmortizationTab @bind-HedgeRelationshipOptionTimeValues="@HedgeRelationship.HedgeRelationshipOptionTimeValues" />
+                    </ContentTemplate>
+                </TabItem> *@
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Option Amortization"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <OptionAmortizationTab @bind-HedgeRelationshipOptionTimeValues="@HedgeRelationship.HedgeRelationshipOptionTimeValues" />
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Amortization"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <AmortizationTab @bind-HedgeRelationshipOptionTimeValueAmorts="@HedgeRelationship.HedgeRelationshipOptionTimeValueAmorts" />
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="History"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <HedgeRelationshipHistoryTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches"/>
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Log"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <HedgeRelationshipLogsTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches" />
+                    </ContentTemplate>
+                </TabItem>
+            </TabItems>
+        </SfTab>
+
+        @if (IsAmortizationModal)
+        {
+            <SfDialog Width="@STANDARD_MODAL_WIDTH" Height="auto" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false">
+                <DialogTemplates>
+                    <Header>Add/Edit Amortization</Header>
+                    <Content>
+                        <EditForm Model="AmortizationModel" OnSubmit="OnSubmitAmortization" Context="amortizationFormContext">
+                            <DataAnnotationsValidator />
+                            <ValidationMessage For="@(() => AmortizationModel.GLAccountID)" />
+                            <ValidationMessage For="@(() => AmortizationModel.ContraAccountID)" />
+                            <ValidationMessage For="@(() => AmortizationModel.StartDate)" />
+                            <div class="form-group dp-inputs">
+                                <span class="input-label">GL Account</span>
+                                <SfComboBox TValue="long"
+                                            CssClass="dropdown-input"
+                                            Enabled="true"
+                                            TItem="DerivativeEDGEHAEntityGLAccount"
+                                            Placeholder="GL Account"
+                                            @bind-Value="AmortizationModel.GLAccountID"
+                                            DataSource="AmortizationGLAccounts">
+                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
+                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                </SfComboBox>
+                            </div>
+                            <div class="form-group dp-inputs">
+                                <span class="input-label">Contra</span>
+                                <SfComboBox TValue="long" 
+                                            CssClass="dropdown-input" 
+                                            Enabled="true" 
+                                            TItem="DerivativeEDGEHAEntityGLAccount" 
+                                            Placeholder="Contra"
+                                            @bind-Value="AmortizationModel.ContraAccountID"
+                                            DataSource="AmortizationContraAccounts">
+                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
+                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                </SfComboBox>
+                            </div>
+                            <div class="form-group dp-inputs">
+                                <span class="input-label">Financial Centers</span>
+                                <SfMultiSelect TValue="List<string>"
+                                               CssClass="dropdown-input"
+                                               Enabled="true"
+                                               TItem="FinancialCenterOption"
+                                               Placeholder="Financial Centers"
+                                               @bind-Value="AmortizationFinancialCenters"
+                                               DataSource="@GetFinancialCenterOptions()">
+                                    <MultiSelectFieldSettings Value="@nameof(FinancialCenterOption.Value)" Text="@nameof(FinancialCenterOption.Text)" />
+                                </SfMultiSelect>
+                            </div>
+                            <div class="form-group dp-inputs">
+                                <span class="input-label">Payment Frequency</span>
+                                <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency"
+                                            CssClass="dropdown-input"
+                                            Enabled="true"
+                                            TItem="PaymentFrequencyOption"
+                                            Placeholder="Payment Frequency"
+                                            @bind-Value="AmortizationModel.PaymentFrequency"
+                                            DataSource="@GetPaymentFrequencyOptions()">
+                                    <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency" TItem="PaymentFrequencyOption" />
+                                    <ComboBoxFieldSettings Value="@nameof(PaymentFrequencyOption.Value)" Text="@nameof(PaymentFrequencyOption.Text)" />
+                                </SfComboBox>
+                            </div>
+                            <div class="custom-datepicker-container">
+                                <div class="form-group dp-inputs">
+                                    <span class="input-label">Day Count Convention</span>
+                                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv"
+                                                CssClass="dropdown-input"
+                                                Enabled="true"
+                                                TItem="DayCountConvOption"
+                                                Placeholder="Day Count Convention"
+                                                @bind-Value="AmortizationModel.DayCountConv"
+                                                DataSource="@GetDayCountConvOptions()">
+                                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv" TItem="DayCountConvOption" />
+                                        <ComboBoxFieldSettings Value="@nameof(DayCountConvOption.Value)" Text="@nameof(DayCountConvOption.Text)" />
+                                    </SfComboBox>
+                                </div>
+                                <div class="form-group dp-inputs">
+                                    <span class="input-label">Payment Convention</span>
+                                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv"
+                                                CssClass="dropdown-input"
+                                                Enabled="@(AmortizationModel.ID != 0)"
+                                                TItem="PayBusDayConvOption"
+                                                Placeholder="Payment Convention"
+                                                @bind-Value="AmortizationModel.PayBusDayConv"
+                                                DataSource="@GetPayBusDayConvOptions()">
+                                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv" TItem="PayBusDayConvOption" />
+                                        <ComboBoxFieldSettings Value="@nameof(PayBusDayConvOption.Value)" Text="@nameof(PayBusDayConvOption.Text)" />
+                                    </SfComboBox>
+                                </div>
+                            </div>
+                            <div class="custom-datepicker-container">
+                                <div class="dp-inputs">
+                                    <label class="input-label">Start Date</label>
+                                    <SfDatePicker TValue="DateTime?"
+                                                  CssClass="calendar-datepicker" 
+                                                  Enabled="true" 
+                                                  Format="MM/dd/yyyy" 
+                                                  Placeholder="mm/dd/yyyy" 
+                                                  ShowClearButton="true"
+                                                  @bind-Value="AmortizationStartDate">
+                                    </SfDatePicker>
+                                </div>
+                                <div class="dp-inputs">
+                                    <label class="input-label">End Date</label>
+                                    <SfDatePicker TValue="DateTime?"
+                                                  CssClass="calendar-datepicker" 
+                                                  Enabled="true" 
+                                                  Format="MM/dd/yyyy" 
+                                                  Placeholder="mm/dd/yyyy" 
+                                                  ShowClearButton="true"
+                                                  @bind-Value="AmortizationEndDate">
+                                    </SfDatePicker>
+                                </div>
+                            </div>
+                            <div class="custom-datepicker-container">
+                                <div class="dp-inputs">
+                                    <label class="input-label">Front Roll Date</label>
+                                    <SfDatePicker TValue="DateTime?"
+                                                  CssClass="calendar-datepicker" 
+                                                  Enabled="true" 
+                                                  Format="MM/dd/yyyy" 
+                                                  Placeholder="mm/dd/yyyy" 
+                                                  ShowClearButton="true"
+                                                  @bind-Value="AmortizationFrontRollDate">
+                                    </SfDatePicker>
+                                </div>
+                                <div class="dp-inputs">
+                                    <label class="input-label">Back Roll Date</label>
+                                    <SfDatePicker TValue="DateTime?"
+                                                  CssClass="calendar-datepicker" 
+                                                  Enabled="true"
+                                                  Format="MM/dd/yyyy" 
+                                                  Placeholder="mm/dd/yyyy" 
+                                                  ShowClearButton="true"
+                                                  @bind-Value="AmortizationBackRollDate">
+                                    </SfDatePicker>
+                                </div>
+                            </div>
+                            <div class="form-group dp-inputs">
+                                <span class="input-label">Total Amount</span>
+                                <NumericHotKeys>
+                                    <SfNumericTextBox TValue="double"
+                                                      CssClass="input-numeric" 
+                                                      Placeholder="Total Amount" 
+                                                      Enabled="true"
+                                                      @bind-Value="AmortizationModel.TotalAmount" />
+                                </NumericHotKeys>
+                            </div>
+                            <div class="custom-checkbox-container">
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.AdjDates" Label="Adj Dates" />
+                                </div>
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.Straightline" Label="Straightline" />
+                                </div>
+                                <div class="dp-inputs">
+                                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.IncludeInRegression" Label="Include In Regression" />
+                                </div>
+                            </div>
+                            <div class="custom-action-container ">
+                                <div class="dp-buttons">
+                                    <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@NewMenuDlgButtonOnClose" IsPrimary="false" />
+                                    <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" />
+                                </div>
+                            </div>
+                        </EditForm>
+                    </Content>
+                </DialogTemplates>
+                <DialogPositionData X="center" Y="center" />
+            </SfDialog>
+        }
+        else if (IsOptionAmortizationModal)
+        {
+            <SfDialog Width="@(HedgeRelationship.IsAnOptionHedge ? WIDE_MODAL_WIDTH : NARROW_MODAL_WIDTH)" Height="auto" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false">
+                <DialogTemplates>
+                    <Header> Option Amortization</Header>
+                    <Content>
+                        <EditForm Model="Model" OnSubmit="OnSubmitOptionAmortization" Context="optionAmortizationFormContext">
+                            <div class="dp-inputs">
+                                <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizeOptionPremium" Label="Amortize Option Premium" />
+                            </div>
+                            <div class="flex-1 min-w-[18.75rem] flex flex-col p-0">
+                                <div class="flex-grow">
+                                    <div class="flex gap-4 justify-between">
+                                        <div class="flex-1">
+                                            <div class="form-group dp-inputs">
+                                                <span class="input-label">GL Account</span>
+                                                <SfComboBox TValue="long"
+                                                            CssClass="dropdown-input"
+                                                            Enabled="true"
+                                                            TItem="DerivativeEDGEHAEntityGLAccount"
+                                                            Placeholder="GL Account"
+                                                            @bind-Value="OptionAmortizationModel.GLAccountID"
+                                                            DataSource="AmortizationGLAccounts">
+                                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                                </SfComboBox>
+                                            </div>
+                                            <div class="form-group dp-inputs">
+                                                <span class="input-label">Contra</span>
+                                                <SfComboBox TValue="long"
+                                                            CssClass="dropdown-input"
+                                                            Enabled="true"
+                                                            TItem="DerivativeEDGEHAEntityGLAccount"
+                                                            Placeholder="Contra"
+                                                            @bind-Value="AmortizationModel.ContraAccountID"
+                                                            DataSource="AmortizationContraAccounts">
+                                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                                </SfComboBox>
+                                            </div>
+                                            <div class="form-group dp-inputs">
+                                                <span class="input-label">Amortization Method</span>
+                                                <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
+                                                            CssClass="dropdown-input"
+                                                            TItem="AmortizationMethodOption"
+                                                            Placeholder="Amortization Method"
+                                                            @bind-Value="OptionAmortizationModel.AmortizationMethod"
+                                                            DataSource="@GetAmortizationMethodOptions()">
+                                                    <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
+                                                    <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
+                                                </SfComboBox>
+                                            </div>
+                                            <div class="form-group dp-inputs">
+                                                <span class="input-label">Total Amount</span>
+                                                <NumericHotKeys>
+                                                    <SfNumericTextBox TValue="double"
+                                                                      CssClass="input-numeric"
+                                                                      Placeholder="Total Amount"
+                                                                      Enabled="true"
+                                                                      @bind-Value="OptionAmortizationModel.TotalAmount" />
+                                                </NumericHotKeys>
+                                            </div>
+                                        </div>
+                                        @if (HedgeRelationship.IsAnOptionHedge)
+                                        {
+                                            <div class="flex-1">
+                                                <div class="form-group dp-inputs">
+                                                    <span class="input-label">Intrinsic Value GL Account</span>
+                                                    <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value GL Account">
+                                                        <ComboBoxEvents TValue="string" TItem="DropdownModel" />
+                                                        <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                                    </SfComboBox>
+                                                </div>
+                                                <div class="form-group dp-inputs">
+                                                    <span class="input-label">Intrinsic Value Contra</span>
+                                                    <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Contra">
+                                                        <ComboBoxEvents TValue="string" TItem="DropdownModel" />
+                                                        <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                                    </SfComboBox>
+                                                </div>
+                                                <div class="form-group dp-inputs">
+                                                    <span class="input-label">Intrinsic Value Amortization Method</span>
+                                                    <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Amortization Method">
+                                                        <ComboBoxEvents TValue="string" TItem="DropdownModel" />
+                                                        <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                                    </SfComboBox>
+                                                </div>
+                                                <div class="form-group dp-inputs">
+                                                    <span class="input-label">Intrinsic Value</span>
+                                                    <NumericHotKeys>
+                                                        <SfNumericTextBox CssClass="input-numeric" Placeholder="Intrinsic Value" Enabled="true" TValue="long?" />
+                                                    </NumericHotKeys>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="custom-datepicker-container">
+                                <div class="dp-inputs" style="width: 100%">
+                                    <label class="input-label">Start Date</label>
+                                    <SfDatePicker TValue="DateTime?"
+                                                  CssClass="calendar-datepicker"
+                                                  Enabled="true"
+                                                  Format="MM/dd/yyyy"
+                                                  Placeholder="mm/dd/yyyy"
+                                                  ShowClearButton="true"
+                                                  @bind-Value="OptionAmortizationStartDate">
+                                    </SfDatePicker>
+                                </div>
+                                <div class="dp-inputs" style="width: 100%">
+                                    <label class="input-label">End Date</label>
+                                    <SfDatePicker TValue="DateTime?"
+                                                  CssClass="calendar-datepicker"
+                                                  Enabled="true"
+                                                  Format="MM/dd/yyyy"
+                                                  Placeholder="mm/dd/yyyy"
+                                                  ShowClearButton="true"
+                                                  @bind-Value="OptionAmortizationEndDate">
+                                    </SfDatePicker>
+                                </div>
+                            </div>
+                            <div class="custom-action-container ">
+                                <div class="dp-buttons">
+                                    <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@NewMenuDlgButtonOnClose" IsPrimary="false" />
+                                    <SfButton CssClass="button-primary button-default" Content="Generate" IsPrimary="true" />
+                                </div>
+                            </div>
+                        </EditForm>
+                    </Content>
+                </DialogTemplates>
+                <DialogPositionData X="center" Y="center"></DialogPositionData>
+            </SfDialog>
+        }
+        else if (IsHedgeDocumentPreviewModal)
+        {
+            <SfDialog Width="@WIDE_MODAL_WIDTH" Height="auto" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false">
+                <DialogTemplates>
+                    <Header>Hedge Document</Header>
+                    <Content>
+                        <div class="max-h-[400px] overflow-y-auto p-4 border border-gray-200 rounded-md bg-gray-100">
+                            @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.Objective))
+                            {
+                                <div class="leading-relaxed text-gray-900 [&>p]:mb-4 [&>p:last-child]:mb-0">
+                                    @((MarkupString)(HedgeRelationship.Objective))
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center p-8">
+                                    <p class="text-gray-500">No hedge document content available.</p>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="flex float-right gap-2 pt-4 border-t border-gray-200 mt-3">
+                            <div class="dp-buttons">
+                                <SfButton CssClass="button-secondary button-default" Content="Close"
+                                OnClick="@(() => OpenModal = string.Empty)" IsPrimary="false" />
+                            </div>
+                        </div>
+                    </Content>
+                </DialogTemplates>
+                <DialogPositionData X="center" Y="center"></DialogPositionData>
+            </SfDialog>
+        }
+    </EditForm>
+}

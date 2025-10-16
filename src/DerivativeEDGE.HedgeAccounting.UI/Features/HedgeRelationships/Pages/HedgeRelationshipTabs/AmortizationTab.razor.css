@@ -1,0 +1,16 @@
+﻿.grid-container {
+    display: inline-block;
+}
+
+.negative-numbers {
+    color: #d84e48;
+}
+
+.amortization-header h5 {
+    font-family: 'proximanova-semibold';
+    font-size: 1rem;
+    color: white;
+    padding: 0.75rem;
+    margin: 0;
+    background-color: #66666e;
+}

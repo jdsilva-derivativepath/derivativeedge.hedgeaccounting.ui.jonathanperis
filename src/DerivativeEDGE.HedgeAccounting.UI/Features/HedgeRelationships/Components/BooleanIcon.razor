@@ -1,0 +1,11 @@
+﻿@code {
+    [Parameter] public bool Value { get; set; }
+}
+@if (Value)
+{
+    <i class="fa-solid fa-check-circle"></i>
+}
+else
+{
+    <span>-</span>
+}

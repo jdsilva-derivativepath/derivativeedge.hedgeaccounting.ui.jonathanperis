@@ -1,0 +1,48 @@
+﻿@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
+
+<div class="flex items-center gap-2">
+    <div class="dp-inputs">
+        <label class="text-default clear-both block text-sm">Client</label>
+        <SfComboBox TValue="long?" CssClass="dropdown-input"
+                    Enabled="@(!IsLoading)"
+                    TItem="Client"
+                    Placeholder="@(IsLoading ? "Loading..." : "Select Client")"
+                    @bind-Value="SelectedClientId"
+                    DataSource="Clients">
+            <ComboBoxEvents TValue="long?" TItem="Client" ValueChange="ClientComboboxValueChange" Created="OnCreated" />
+            <ComboBoxFieldSettings Value="@nameof(Client.ClientId)" Text="@nameof(Client.ClientName)" />
+        </SfComboBox>
+    </div>
+
+    <div class="dp-inputs datepicker-wrapper">
+        <label class="text-default clear-both block text-sm">Curve Date</label>
+        <SfDatePicker TValue="DateTime?" CssClass="calendar-datepicker"
+                      Value="@CurveDate"
+                      Format="MM/dd/yyyy"
+                      Placeholder="mm/dd/yyyy"
+                      ShowClearButton="true"
+                      Width="200px">
+            <DatePickerEvents TValue="DateTime?" ValueChange="OnCurveDateChanged" />
+        </SfDatePicker>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<Client> Clients { get; set; } = new();
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public long? SelectedClientId { get; set; }
+    [Parameter] public DateTime? CurveDate { get; set; }
+    [Parameter] public EventCallback<long?> SelectedClientIdChanged { get; set; }
+    [Parameter] public EventCallback<DateTime?> CurveDateChanged { get; set; }
+    [Parameter] public EventCallback OnClientCreated { get; set; }
+
+    private async Task ClientComboboxValueChange() =>
+        await SelectedClientIdChanged.InvokeAsync(SelectedClientId);
+
+    private async Task OnCurveDateChanged(ChangedEventArgs<DateTime?> args) =>
+        await CurveDateChanged.InvokeAsync(args.Value);
+
+    private async Task OnCreated() => await OnClientCreated.InvokeAsync();
+}

@@ -1,0 +1,26 @@
+﻿<div id="createContentDialogTarget">
+    <SfDialog Width="33rem" Height="auto" Target="#createContentDialogTarget" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false" ShowCloseIcon="true" @bind-Visible="Visible">
+        <DialogTemplates>
+            <Header>@HeaderText</Header>
+            <Content>
+                <EditForm Model="Model" OnSubmit="FormSubmit">
+                    <CustomValidation @ref="@_customValidation" />
+                    <DataAnnotationsValidator />
+                    <div class="form-group dp-inputs">
+                        <span class="input-label">Document Content Name</span>
+                        <SfTextBox ID="document-content-name" CssClass="input-textbox" @bind-Value="Model.Name"></SfTextBox>
+                        <ValidationMessage For="@(() => Model.Name)" />
+                    </div>
+                    <div class="dp-inputs">
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="Model.Required" Label="Required" />
+                    </div>
+                    <div id="dialogButtons" class="dp-buttons text-right space-x-4">
+                        <SfButton Type="button" CssClass="button-link button-default" Content="Cancel" OnClick="@CancelButtonClicked" />
+                        <SfButton CssClass="button-primary button-default" Content="Save" />
+                    </div>
+                </EditForm>
+            </Content>
+        </DialogTemplates>
+        <DialogPositionData X="center" Y="center" />
+    </SfDialog>
+</div>

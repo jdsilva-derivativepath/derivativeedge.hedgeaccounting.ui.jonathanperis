@@ -1,0 +1,112 @@
+﻿@page "/"
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
+@using Microsoft.AspNetCore.Components.Web
+@namespace DerivativeEDGE.HedgeAccounting.UI.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    var initialState = new InitialApplicationState
+    {
+        AccessToken = await HttpContext.GetTokenAsync("access_token"),
+        RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
+        IdToken = await HttpContext.GetTokenAsync("id_token")
+    };
+
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link href="_content/Syncfusion.Blazor.Themes/tailwind.css" rel="stylesheet" />
+    <script src="_content/Syncfusion.Blazor/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
+    <link rel="icon" type="image/x-icon" sizes="16x16" href="~/favicon.ico">
+    
+   @* component library resources *@
+
+    <link rel="icon" type="image/x-icon" sizes="16x16" href="~/favicon.ico">
+    <link rel="stylesheet" href="_content/DerivativeEdge.Blazor.ComponentLibrary/resources/css/currentgen.css" />
+    <link rel="stylesheet" href="_content/DerivativeEdge.Blazor.ComponentLibrary/AllStyles.css" />
+    <script src="_content/DerivativeEdge.Blazor.ComponentLibrary/AllScripts.js"></script>
+    
+    @*  compiled custom component css file (change this to match your project's name) *@
+    <link href="DerivativeEDGE.HedgeAccounting.UI.styles.css" rel="stylesheet" /> 
+    
+    @* this application's css file *@
+    <link href="~/css/site.css" rel="stylesheet" />
+
+    <component type="typeof(HeadOutlet)" render-mode="Server" />
+</head>
+<body>
+    <component type="typeof(App)" param-InitialState="initialState" render-mode="Server" />
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.server.js"></script>
+    <script>
+
+        setInterval(startSessionCheck, 300000);
+        function startSessionCheck()
+        {
+            try {
+                const url = new URL(window.location.href);
+                const base_url = url.origin;
+                fetch(base_url+ '/session-health')
+                    .then(response => response.json())
+                    .then(data => {
+                        if(!data)
+                        {
+                            const currentUrl = encodeURIComponent(window.location.href);
+                            window.location.href = base_url+'/sessiontimedout?redirectUrl='+ currentUrl;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking session expiry:', error);
+                    });
+            }
+            catch (error) {
+                console.error('Error checking session expiry:', error);
+            }
+        }
+
+        window.downloadFileFromStream = async function (fileName, contentStreamReference) {
+            const arrayBuffer = await contentStreamReference.arrayBuffer();
+            const blob = new Blob([arrayBuffer]);
+            const url = URL.createObjectURL(blob);
+
+            const anchorElement = document.createElement('a');
+            anchorElement.href = url;
+            anchorElement.download = fileName ?? 'download.xlsx';
+            anchorElement.click();
+            anchorElement.remove();
+
+            URL.revokeObjectURL(url);
+        };
+
+        window.downloadFile = (fileName, base64String) => {
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = `data:application/octet-stream;base64,${base64String}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        window.triggerHiddenSubmit = function () {
+          var btn = document.getElementById('hiddenSubmit');
+          if (btn) btn.click();
+        };
+    </script>
+</body>
+</html>

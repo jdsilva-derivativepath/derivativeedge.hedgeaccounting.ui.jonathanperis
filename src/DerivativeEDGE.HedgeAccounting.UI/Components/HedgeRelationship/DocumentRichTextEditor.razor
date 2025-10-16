@@ -1,0 +1,72 @@
+﻿@foreach (var contentDetail in HedgeDocumentContents.OrderBy(x => x.Order))
+{
+    <div class="richtexteditorouter w-100 my-2">
+        <div>
+            @{
+                var hasError = (IsErrorMessageVisible &&
+                ErrorMsg.Message.Equals(ContentEmptyValidationMsg.Message)
+                && ((contentDetail.Required || !contentDetail.Hidden) && (string.IsNullOrWhiteSpace(contentDetail.HtmlBody) ||
+                Regex.IsMatch(contentDetail.HtmlBody, @"^\s*(<p>\s*(<br\s*/?>\s*)*</p>|<br\s*/?>)\s*$", RegexOptions.IgnoreCase))));
+                if (hasError)
+                {
+                    <div class="@(contentDetail.Hidden ? "d-none" : "")">
+                        <div class="titlebar titlebar-invalid">
+                            <div class="titlebartext">
+                                @contentDetail.Name
+                            </div>
+                        </div>
+                        <SfRichTextEditor @ref="_refRichTextEditor[contentDetail.Name]" CssClass="rich-text-editor-invalid"
+                                          @bind-Value="@contentDetail.HtmlBody" AdditionalSanitizeAttributes="@additionalSanitizeAttributes" EnableHtmlSanitizer="true"
+                                          Height="330px">
+                            <RichTextEditorFontFamily Width="50px" Default="Inter" />
+                            <RichTextEditorPasteCleanupSettings  PlainText="true" Prompt="false"/>
+                            <RichTextEditorToolbarSettings Items="@Tools" >
+                                <RichTextEditorCustomToolbarItems>
+                                    <RichTextEditorCustomToolbarItem Name="InsertField">
+                                        <Template>
+                                            <SfDropDownButton Items="@Items" 
+                                                Content="Insert Field" style="width: 140px !important;font-size: 0.875rem;">
+                                                <DropDownButtonEvents ItemSelected="((args) =>  
+                                                     OnItemSelect(args, _refRichTextEditor[contentDetail.Name]))"></DropDownButtonEvents>
+                                            </SfDropDownButton>
+                                        </Template>
+                                    </RichTextEditorCustomToolbarItem>
+                                </RichTextEditorCustomToolbarItems>
+                            </RichTextEditorToolbarSettings>
+                        </SfRichTextEditor>
+                        <ValidationMessage For="@(() => @contentDetail.HtmlBody)"></ValidationMessage>
+                    </div>
+                }
+                else
+                {
+                    <div class="@(contentDetail.Hidden ? "d-none" : "")">
+                        <div class="titlebar titlebar">
+                            <div class="titlebartext">
+                                @contentDetail.Name
+                            </div>
+                        </div>
+                        <SfRichTextEditor @ref="_refRichTextEditor[contentDetail.Id.ToString()]"
+                                          CssClass="rich-text-editor"
+                                          @bind-Value="contentDetail.HtmlBody" AdditionalSanitizeAttributes="@additionalSanitizeAttributes" EnableHtmlSanitizer="true"
+                                          Height="330px">
+                            <RichTextEditorFontFamily Width="50px" Default="Inter" />
+                            <RichTextEditorPasteCleanupSettings  PlainText="true" Prompt="false"/>
+                            <RichTextEditorToolbarSettings Items="@Tools">
+                                <RichTextEditorCustomToolbarItems>
+                                    <RichTextEditorCustomToolbarItem Name="InsertField">
+                                        <Template>
+                                            <SfDropDownButton Items="@Items" Content="Insert Field" style="width: 140px !important;font-size: 0.875rem;">
+                                                <DropDownButtonEvents ItemSelected="((args) =>
+                                                OnItemSelect(args, _refRichTextEditor[contentDetail.Id.ToString()]))"></DropDownButtonEvents>
+                                            </SfDropDownButton>
+                                        </Template>
+                                    </RichTextEditorCustomToolbarItem>
+                                </RichTextEditorCustomToolbarItems>
+                            </RichTextEditorToolbarSettings>
+                        </SfRichTextEditor>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}

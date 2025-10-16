@@ -1,0 +1,36 @@
+﻿<div class="accounting-details-container">
+    <div class="dp-inputs" style="width: 15rem;">
+        <span class="input-label">Standard</span>
+        <SfDropDownList CssClass="dropdown-input"
+                        Enabled="true"
+                        TItem="StandardOption"
+                        TValue="string"
+                        PopupHeight="100px"
+                        Placeholder="Standard"
+                        @bind-Value="@SelectedStandardValue"
+                        DataSource="@StandardOptions">
+            <DropDownListEvents TItem="StandardOption" TValue="string" />
+            <DropDownListFieldSettings Text="Text" Value="ID" />
+        </SfDropDownList>
+    </div>
+    <div class="dp-inputs">
+        <SfCheckBox CssClass="input-checkbox"
+                    @bind-Checked="IsChecked"
+                    Label="Hedge for Tax Purposes" />
+    </div>
+</div>
+
+@code {
+    private bool IsChecked { get; set; } = true;
+    private string SelectedStandardValue { get; set; } = "None";
+    public class StandardOption
+    {
+        public string ID { get; set; }
+        public string Text { get; set; }
+    }
+    private List<StandardOption> StandardOptions = new List<StandardOption>()
+    {
+        new StandardOption(){ ID= "None", Text="None" },
+        new StandardOption(){ ID= "ASC815", Text="ASC815" },
+    };
+}

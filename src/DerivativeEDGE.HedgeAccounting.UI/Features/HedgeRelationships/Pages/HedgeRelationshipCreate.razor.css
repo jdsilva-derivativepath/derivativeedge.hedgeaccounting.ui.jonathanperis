@@ -1,0 +1,21 @@
+﻿
+
+@media (max-width: 768px) {
+    .container-row {
+        justify-content: flex-start;
+        gap: 8px;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+}
+
+.message-container {
+    width: 760px;
+}

@@ -1,0 +1,13 @@
+﻿::deep .dp-dropdown-menu {
+    min-width: 17.375rem;
+}
+
+::deep .fa-solid.fa-check-circle {
+    color: #4f8f04;
+}
+
+::deep .fa-trash-can {
+    display: inline-block;
+    color: #3b98d4;
+    cursor: pointer;
+}

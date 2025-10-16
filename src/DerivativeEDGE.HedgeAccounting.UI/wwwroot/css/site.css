@@ -1,0 +1,124 @@
+/* Custom */
+
+body {
+    background: #fafafa;
+}
+
+.view-container {
+    background: #fafafa;
+    height: calc(100vh);
+    display: inherit;
+    overflow-y: auto;
+    padding: 4.4rem 2rem 2rem 2rem;
+}
+
+.breadcrumb-div {
+    font-family: proximanova-semibold, sans-serif;
+    font-size: 1.2rem;
+    padding: .4rem 0 1rem 0;
+    color: #8c8b8b;
+    border: none;
+    display: block
+}
+
+.breadcrumb-first {
+    color: #3b98d4 !important;
+}
+
+.breadcrumb-icons {
+    font-weight: 900;
+    font-size: .8em;
+    color: #3b98d4;
+    float: left;
+    padding-right: .6rem;
+}
+
+.breadcrumb-last {
+    color: #3e3f46;
+}
+
+ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+}
+
+    /* Add a slash symbol (/) before/behind each list item */
+ul.breadcrumb li + li:before {
+    padding: 4px;
+    color: black;
+    content: " ";
+}
+
+a {
+    color: #0071c1;
+}
+
+/* Add a color to all links inside the list */
+ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+}
+
+/* Add a color on mouse-over */
+ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+}
+
+.linkColor {
+    color: #3b98d4 !important;
+    cursor: pointer;
+}
+
+/* Custom css syncfusion for SfDropDownButton - swapziila design - start */
+.dp-dropdown-menu-style .e-dropdown-btn, .e-btn {
+    height: 2.25rem;
+    line-height: 1rem;
+    font-style: normal;
+    border-radius: 0;
+}
+
+.dp-dropdown-menu-style.dropdown-menu-primary.e-dropdown-btn {
+    background-color: #4f96d0;
+    color: #ffffff;
+}
+
+.dp-dropdown-menu-style.dropdown-menu-secondary.e-dropdown-btn {
+    background-color: #fff;
+    border-color: var(--action-color);
+    color: var(--action-color);
+}
+
+.dp-dropdown-menu-style.e-dropdown-popup ul {
+    border: 1px solid #3b98d4;
+}
+
+.dp-dropdown-menu-style.e-dropdown-popup ul .e-item:hover {
+    background: #3b98d4;
+    color: #ffffff;
+    margin: 0 0.313rem 0 0.313rem;
+}
+.dp-dropdown-menu-style.e-dropdown-popup ul .e-item {
+    margin: 0 0.313rem 0 0.313rem;
+}
+/* Custom css syncfusion for SfDropDownButton - swapziila design - end */
+
+.custom-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-title {
+    color: var(--color-text-default, #2A1F3D);
+    font-family: var(--font-family-sans, "proximanova-regular");
+    font-size: var(--typography-font-size-heading-3, 20px);
+    font-style: normal;
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: var(--typography-line-height-heading-3, 28px); /* 140% */
+}
+
+.header-icon.fa-solid.fa-xmark {
+    cursor: pointer;
+}

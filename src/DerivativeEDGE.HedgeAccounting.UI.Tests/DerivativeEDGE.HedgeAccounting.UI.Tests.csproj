@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="C:\Users\bjolicoeur\.nuget\packages\derivativeedge.blazor.componentlibrary\1.0.1287\contentFiles\any\net8.0\DataGrid\Private\PrivateDrawerColumnStyles.razor.scss" />
+    <Content Remove="C:\Users\bjolicoeur\.nuget\packages\derivativeedge.blazor.componentlibrary\1.0.1287\contentFiles\any\net8.0\DataGrid\Private\PrivateDrawerFilterStyles.razor.scss" />
+    <Content Remove="C:\Users\bjolicoeur\.nuget\packages\derivativeedge.blazor.componentlibrary\1.0.1287\contentFiles\any\net8.0\DataGrid\Private\PrivateDrawerFooterStyles.razor.scss" />
+    <Content Remove="C:\Users\bjolicoeur\.nuget\packages\derivativeedge.blazor.componentlibrary\1.0.1287\contentFiles\any\net8.0\DataGrid\Private\PrivateDrawerHeaderStyles.razor.scss" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="Bogus" Version="35.6.2" />
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="DerivativeEdge.Blazor.ComponentLibrary" Version="1.0.2259" />
+    <PackageReference Include="DerivativeEDGE.Domain.Entities" Version="1.0.1499" />
+    <PackageReference Include="DerivativeEDGE.FeatureFlag" Version="1.0.37" />
+    <PackageReference Include="FakeItEasy" Version="8.3.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.7" />
+    <PackageReference Include="Microsoft.FeatureManagement" Version="4.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.50.0" />
+    <PackageReference Include="Polly" Version="8.5.2" />
+    <PackageReference Include="Verify.AngleSharp" Version="4.5.0" />
+    <PackageReference Include="Verify.Blazor" Version="11.0.0" />
+    <PackageReference Include="Verify.DiffPlex" Version="3.1.2" />
+    <PackageReference Include="Verify.ImageMagick" Version="3.7.1" />
+    <PackageReference Include="Verify.ImageSharp" Version="4.4.1" />
+    <PackageReference Include="Verify.Playwright" Version="3.0.0" />
+    <PackageReference Include="Verify.Xunit" Version="28.14.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DerivativeEDGE.HedgeAccounting.UI\DerivativeEDGE.HedgeAccounting.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Components\" />
+  </ItemGroup>
+</Project>

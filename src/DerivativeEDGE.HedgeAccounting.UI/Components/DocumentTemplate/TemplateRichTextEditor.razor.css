@@ -1,0 +1,11 @@
+﻿::deep .dp-mention-chip {
+    background: #f3f4f6;
+    border-radius: 2px;
+    border: none;
+    color: #4f46e5;
+    cursor: default;
+}
+
+::deep .e-control {
+    font-family: Inter !important;
+}

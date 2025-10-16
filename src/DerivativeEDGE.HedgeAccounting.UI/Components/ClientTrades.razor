@@ -1,0 +1,186 @@
+﻿@using SelectionMode = Syncfusion.Blazor.Grids.SelectionMode
+@using SelectionType = Syncfusion.Blazor.Grids.SelectionType
+@inject IMediator Mediator
+@inject IAlertService Alert
+
+<SetPageTitle Title="Default Grid" />
+
+<DefaultGrid @ref="@DefaultGrid"
+             DataSource="@Trades"
+             TRowItem="ClientTrade"
+             PageSize="25"
+             AllowPaging="true"
+             AllowSorting="true"
+             AllowGrouping="true"
+             AllowActionBar="true"
+             AllowReordering="true"
+             AllwaysShowActionBar="false"
+             EnableAdvanceFiltering="true"
+             EnableVirtualization="false"
+             EnableGridViewFilter="true"
+             EnableGlobalSearch="true"
+             AggregateFields="@AggregateFields"
+             ExportFileName="@ExportFileName"
+             ExcludeSearchFields="@ExcludeFieldsFromSearch"
+             AlwaysSearchFields="@IncludeFieldsForSearch"
+             OnRowClicked="@OnRowClicked"
+             SelectionMode="SelectionMode.Row"
+             SelectionType="SelectionType.Multiple"
+             DataTableGridViewItems="@DataTableGridViewItems"
+             ViewCrudEvent="@DataTableRequestHandler">
+    <ActionBar>
+        <div id="selected-items">
+            @(DefaultGrid?.RowsSelectedCount ?? 0) Selected
+        </div>
+        <div id="dp-buttons" class="space-x-4">
+            <SfButton CssClass="button-link button-default" @onclick="CopySelectedRecord" IconCss="icon-copy" Content="Duplicate"></SfButton>
+            <SfButton CssClass="button-link button-default" @onclick="DeleteSelectedRecord" IconCss="icon-delete-alt" Content="Delete"></SfButton>
+            <SfButton CssClass="button-link button-default" @onclick="DownloadRecord" IconCss="icon-download" Content="Download"></SfButton>
+        </div>
+    </ActionBar>
+    <DpAggregateGroupCaptionTemplate>
+        @{
+            var aggregate = (context as AggregateTemplateContext);
+            <div>
+                <p>Sum: @aggregate?.Sum</p>
+            </div>
+        }
+    </DpAggregateGroupCaptionTemplate>
+    <DpAggregateFooterTemplate>
+        @{
+            var aggregate = (context as AggregateTemplateContext);
+            <div>
+                <p>Sum: @aggregate?.Sum</p>
+            </div>
+        }
+    </DpAggregateFooterTemplate>
+    <GridColumns>
+        <GridColumn Field="@nameof(ClientTrade.ClientId)" HeaderText="Client ID" IsPrimaryKey="true" />
+        <GridColumn Field="@nameof(ClientTrade.ClientName)" HeaderText="Client Name" />
+        <GridColumn Field="@nameof(ClientTrade.DealDate)" HeaderText="Deal Date" />
+        <GridColumn Field="@nameof(ClientTrade.TransactionDate)" HeaderText="Transaction Date" Format="MM/dd/yyyy" Type="ColumnType.Date" />
+        <GridColumn Field="@nameof(ClientTrade.TradeDate)" HeaderText="Trade Date" Format="MM/dd/yyyy" Type="ColumnType.Date" />
+        <GridColumn Field="@nameof(ClientTrade.TradeStatus)" HeaderText="Trade Status" FilterSettings="@(new FilterSettings { Type = Syncfusion.Blazor.Grids.FilterType.CheckBox })" TextAlign="TextAlign.Center">
+            <Template>
+                @{
+                    var model = (ClientTrade)context;
+
+                    if (model.TradeStatus)
+                    {
+                        <div class="statustemp e-activecolor">
+                            <span class="statustxt e-activecolor">Approved</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="statustemp e-inactivecolor">
+                            <span class="statustxt e-inactivecolor">Pending</span>
+                        </div>
+                    }
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field=@nameof(ClientTrade.Currency) HeaderText="Currency" TextAlign="TextAlign.Center" />
+        <GridColumn Field=@nameof(ClientTrade.Notional) HeaderText="Notional" Format="###,###,###.##;(###,###,###.00);-0" TextAlign="TextAlign.Right" />
+        <GridColumn Field=@nameof(ClientTrade.Amount) HeaderText="Amount" Format="###,###,###.##;(###,###,###.00);-0" TextAlign="TextAlign.Right" />
+        <GridColumn Field=@nameof(ClientTrade.Description) HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
+    </GridColumns>
+</DefaultGrid>
+
+@code {
+    private string ExportFileName { get; set; } = "Data Grid";
+
+    private DefaultGrid<ClientTrade>? DefaultGrid { get; set; }
+    private List<ClientTrade> Trades { get; set; } = new();
+    private List<string> ExcludeFieldsFromSearch { get; } = new();
+    private List<DropdownListModel> AggregateFields { get; set; } = new List<DropdownListModel>()
+    {
+        new DropdownListModel { fieldName=nameof(ClientTrade.Notional), Text="Notional" },
+        new DropdownListModel { fieldName=nameof(ClientTrade.Amount), Text="Amount"}
+    };
+    // columns that are always included in the search, even if the column is not shown
+    private List<string> IncludeFieldsForSearch { get; } = new() { nameof(ClientTrade.Description) };
+    private List<GridViewModel> DataTableGridViewItems { get; set; } = new();
+
+    // Page Component Event
+    protected override async Task OnInitializedAsync()
+    {
+        //TODO -- Here we would implement our custom logic to populate the grid as the index view is loaded. For the sake of simplicity,
+        // we are just populating hard-coded trade(s) via a mock trade client.
+        await base.OnInitializedAsync();
+        await LoadTrades();
+        LoadGridViewFilters();
+    }
+
+    private async Task LoadTrades()
+    {
+        try
+        {
+            var query = new GetTrades.Query();
+            var response = await Mediator.Send(query, CancellationToken.None);
+            Trades = response.Trades.ToList();
+        }
+        catch(Exception)
+        {
+            await Alert.ShowToast("There was a problem retrieving the Client trades.", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+
+    private void LoadGridViewFilters()
+    {
+        // Your filter views may be differnt
+        DataTableGridViewItems = new List<GridViewModel>()
+        {
+            new GridViewModel(){ Filter= "Default", IsDefault=true },
+            new GridViewModel(){ Filter= "Sorting", GridSettingsJson="{\"GroupCol\":[],\"SortedCol\":[{\"Direction\":\"Descending\",\"Field\":\"ClientName\",\"IsFromGroup\":false}]}", IsDefault=false },
+            new GridViewModel(){ Filter= "Sorting & Grouping", GridSettingsJson="{\"GroupCol\":[\"ClientName\"],\"SortedCol\":[{\"Direction\":\"Ascending\",\"Field\":\"ClientName\",\"IsFromGroup\":true},{\"Direction\":\"Descending\",\"Field\":\"Currency\",\"IsFromGroup\":false}]}", IsDefault=false },
+            new GridViewModel(){ Filter= "Grouping", GridSettingsJson="{\"GroupCol\":[\"Currency\"],\"SortedCol\":[{\"Direction\":\"Ascending\",\"Field\":\"Currency\",\"IsFromGroup\":true}]}", IsDefault=false },
+            new GridViewModel(){ Filter= "SingleExcelFilter", GridSettingsJson ="{\"GroupCol\":null,\"SortedCol\":[],\"FilterdCol\":[{\"Field\":\"ClientName\",\"IgnoreAccent\":true,\"MatchCase\":true,\"Operator\":\"Equal\",\"Predicate\":\"or\",\"Uid\":\"grid-column229\",\"Value\":\"ANANTR\",\"ActualValue\":null},{\"Field\":\"ClientName\",\"IgnoreAccent\":true,\"MatchCase\":true,\"Operator\":\"Equal\",\"Predicate\":\"or\",\"Uid\":\"grid-column229\",\"Value\":\"ANTON\",\"ActualValue\":null}],\"QueryCol\":null}", IsDefault = false },
+            new GridViewModel(){ Filter= "SingleQueryFilter", GridSettingsJson="{\"GroupCol\":null,\"SortedCol\":[],\"FilterdCol\":[{\"Field\":\"ClientName\",\"IgnoreAccent\":true,\"MatchCase\":true,\"Operator\":\"Equal\",\"Predicate\":\"or\",\"Uid\":\"grid-column2\",\"Value\":\"ANTON\",\"ActualValue\":null}],\"QueryCol\":null}", IsDefault=false },
+        };
+    }
+
+    // Default Grid Event Handlers
+    private async Task CopySelectedRecord()
+    {
+        await Task.Run(() => { var selectedRecords = DefaultGrid?.InnerGrid?.SelectedRecords; });
+        // TODO - Implement what should happen when a selected record is copied
+    }
+    private async Task DeleteSelectedRecord()
+    {
+        await Task.Run(() => { var selectedRecords = DefaultGrid?.InnerGrid?.SelectedRecords; });
+        // TODO -- Implement when a selected record is deleted.
+    }
+    private async Task DownloadRecord()
+    {
+        await Task.Run(() => { var selectedRecords = DefaultGrid?.InnerGrid?.SelectedRecords; });
+        // TODO - Implement what should happen when selected record is downloaded
+    }
+
+    private void OnRowClicked(ClientTrade? model)
+    {
+        // TODO - Implement here what happens when a user clicks on a row.
+    }
+
+    private async Task DataTableRequestHandler(GridViewModel selectedGridViewItem)
+    {
+        switch (selectedGridViewItem.RequestType)
+        {
+            case "Save":
+                {
+                    //TODO -- Implement Save functionality with await
+                    break;
+                }
+            case "SaveAs":
+                {
+                    //TODO -- Implement Save As functionality with await
+                    break;
+                }
+            case "Delete":
+                {
+                    //TODO -- Implement Delete functionality with await
+                    break;
+                }
+        }
+    }
+}

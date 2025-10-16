@@ -1,0 +1,156 @@
+﻿@using DerivativeEdge.HedgeAccounting.Api.Client
+@using Syncfusion.Blazor.Grids
+@using DerivativeEdge.Blazor.ComponentLibrary.Grids.DefaultGrid
+@using DerivativeEdge.Blazor.ComponentLibrary.Models
+@using DerivativeEdge.Blazor.ComponentLibrary.Enums
+@using DerivativeEdge.Blazor.ComponentLibrary.Utilities
+
+@* --- Static and Alias Usings --- *@
+@using SelectionMode = Syncfusion.Blazor.Grids.SelectionMode
+@using SelectionType = Syncfusion.Blazor.Grids.SelectionType
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+
+<DefaultGrid TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipVM"
+             @ref="_grid"
+             DataSource="Data"
+             Height="100%"
+             AllowPaging="true"
+             AllowSorting="true"
+             AllowGrouping="true"
+             AllowActionBar="true"
+             AllowReordering="true"
+             AllowSelection="false"
+             EnableVirtualization="false"
+             EnableGridViewFilter="true"
+             SelectionMode="SelectionMode.Row"
+             SelectionType="SelectionType.Single"
+             ViewCrudEvent="OnViewCrudEventInternal"
+             OnRowClicked="HandleRowClicked"
+             EmptyRecordSetMessage="@(IsLoading ? "Loading data..." : "No records found.")"
+             DataTableGridViewItems="GridViewItems">
+    <GridSortSettingsFragment>
+        <GridSortSettings>
+            <GridSortColumns>
+                <GridSortColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.ID)" Direction="SortDirection.Ascending"></GridSortColumn>
+            </GridSortColumns>
+        </GridSortSettings>
+    </GridSortSettingsFragment>
+    <GridColumns>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.BankEntity.LegalEntity.Name)" HeaderText="Entity" Width="130" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.ID)" HeaderText="HR Id" Width="130" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.HedgeTypeText)" HeaderText="Hedge Type" Width="160" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.ClientID)" HeaderText="ClientID" Visible="false" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.Description)" HeaderText="Description" Width="160" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.Notional)" Format="@ComponentLibraryConstants.NumberFormat" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="160" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.DesignationDate)" HeaderText="Designation Date" Width="200" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.DedesignationDate)" HeaderText="De-designation Date" Width="220" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.HedgeRiskTypeText)" HeaderText="Hedged Risk Type" Width="200" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.HedgeStateText)" HeaderText="Current State" Width="200" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.HedgedItemTypeText)" HeaderText="Hedged Item Type" Width="200" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.HedgedItem.Description)" HeaderText="Hedged Item" Width="180" />
+
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.CumulativeChanges)" HeaderText="Cumulative Change" FilterSettings="@(new FilterSettings { Type = Syncfusion.Blazor.Grids.FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="220">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).CumulativeChanges)" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.PeriodicChanges)" HeaderText="Periodic Change" FilterSettings="@(new FilterSettings { Type = Syncfusion.Blazor.Grids.FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="220">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).PeriodicChanges)" />
+            </Template>
+        </GridColumn>
+
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.Observation)" HeaderText="Period Count" Width="180" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.PeriodSizeText)" HeaderText="Period Size" Width="180" />
+
+        @* CFH *@
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.BenchmarkText)" HeaderText="Contractual Rate / Benchmark" Width="250" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.HedgingInstrumentStructureText)" HeaderText="Hedging Instrument Structure" Width="250" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.IsAnOptionHedge)" HeaderText="Hedge is an Option" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="250">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).IsAnOptionHedge)" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.OffMarket)" HeaderText="Off-Market" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="250">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).OffMarket)" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.QualitativeAssessment)" HeaderText="Qualitative Assessment" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="250">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).QualitativeAssessment)" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.PreIssuanceHedge)" HeaderText="Pre-Issuance Hedge" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="250">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).PreIssuanceHedge)" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.IsDeltaMatchOption)" HeaderText="Delta Match Option" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="250">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).IsDeltaMatchOption)" />
+            </Template>
+        </GridColumn>
+
+        @* FVH *@
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.FairValueMethodText)" HeaderText="Fair Value Method" Width="250" />
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.Shortcut)" HeaderText="Shortcut" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="180">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).Shortcut)" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.AvailableForSale)" HeaderText="Available for Sale" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="230">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).AvailableForSale.GetValueOrDefault())" />
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM.PortfolioLayerMethod)" HeaderText="Portfolio Layer Method" FilterSettings="@(new FilterSettings { Type = FilterType.CheckBox })" TextAlign="TextAlign.Center" Width="250">
+            <Template>
+                <BooleanIcon Value="@(((DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context).PortfolioLayerMethod)" />
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Action" TextAlign="TextAlign.Center" Width="80" Freeze="FreezeDirection.Right" IsFrozen="true">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipVM)context;
+                    if (model.HedgeStateText == "Draft")
+                    {
+                        <button class="icon-button" @onclick:stopPropagation @onclick="() => OnDeleteRequested.InvokeAsync(model.ID)">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</DefaultGrid>
+
+@code {
+    private DefaultGrid<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> _grid = null!;
+
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public IEnumerable<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> Data { get; set; } = Array.Empty<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM>();
+    [Parameter] public List<GridViewModel> GridViewItems { get; set; } = new();
+    [Parameter] public EventCallback<GridViewModel> ViewCrudEvent { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM?> OnRowClicked { get; set; }
+    [Parameter] public EventCallback<long> OnDeleteRequested { get; set; }
+
+    public void SetView(string filter) => _grid?.SetView(filter);
+
+    private async Task OnViewCrudEventInternal(GridViewModel view)
+    {
+        if (ViewCrudEvent.HasDelegate)
+            await ViewCrudEvent.InvokeAsync(view);
+    }
+
+    private void HandleRowClicked(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM? item)
+    {
+        if (OnRowClicked.HasDelegate)
+            OnRowClicked.InvokeAsync(item);
+    }
+}

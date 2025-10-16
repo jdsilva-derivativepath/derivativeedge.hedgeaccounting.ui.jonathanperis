@@ -1,0 +1,18 @@
+﻿<SfSidebar class="dp-drawer" Width="50%" CloseOnDocumentClick="true" ShowBackdrop="true" Position="SidebarPosition.Right" Type="SidebarType.Over" @bind-IsOpen="Visible" ShowCloseIcon="true" OnClose="@CloseModal">
+    <ChildContent>
+        <div class="drawer-header">
+            <div class="drawer-title">@TemplateName</div>
+            <span id="close" class="icon-close drawer-close-icon" @onclick="@CloseModal"></span>
+        </div>
+        <div class="drawer-content">
+            <SfRichTextEditor @bind-Value="HtmlBody" Readonly="true">
+                <RichTextEditorToolbarSettings Enable="false"></RichTextEditorToolbarSettings>
+            </SfRichTextEditor>
+        </div>
+        <div class="drawer-footer">
+            <div class="space-x-4 dp-buttons">
+                <SfButton CssClass="button-secondary button-default" Content="Close Preview" @onclick="@CloseModal"></SfButton>
+            </div>
+        </div>
+    </ChildContent>
+</SfSidebar>

@@ -1,0 +1,132 @@
+﻿.dp-button-container {
+    display: flex;
+}
+
+.dp-buttons {
+    display: inline-block;
+}
+
+/* hedge relation details > Panel - start */
+.panel-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    margin: 0.625rem 1.25rem 0.625rem 1.25rem;
+    background: #fff;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.panel {
+    flex: 1;
+    min-width: 18.75rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel.no-padding {
+    padding: 0 !important;
+}
+
+.panel-content {
+    flex-grow: 1;
+}
+
+.sub-panel {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.panel-content h5,
+.panel-content p {
+    margin-bottom: 0.313rem;
+}
+
+.panel-content p {
+    font-weight: bold;
+}
+
+.sub-panel-left, .sub-panel-right {
+    flex: 1;
+    /*min-width: 10rem;*/
+}
+
+@media (max-width: 64rem) {
+    .panel-container {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 48rem) {
+    .sub-panel {
+        flex-direction: column;
+    }
+}
+
+/* hedge relation details > Panel - end */
+
+::deep .custom-dropdown-menu, .e-dropdown-btn.e-btn {
+    background-color: #3b98d4 !important;
+    color: #ffffff !important;
+    width: 2.5rem !important;
+    height: 1.875rem !important;
+    padding: 0rem !important;
+}
+
+::deep .custom-dropdown-menu .e-dropdown-btn .e-caret::before, .e-dropdown-btn.e-btn .e-caret::before {
+    content: "\e729" !important;
+}
+
+.action-bar-container {
+    margin: 0.625rem 1.25rem 0.625rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-bar-container .right-selection, .left-section {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.dp-menu-style .e-dropdown-btn, .e-dropdown-btn.e-btn {
+    border-color: #4f96d0 !important;
+    background-color: #4f96d0 !important;
+    width: 129px !important;
+    height: 36px !important;
+    padding: 0px !important;
+    color: white !important;
+}
+
+.dp-menu-style .e-dropdown-btn .e-caret::before, .e-dropdown-btn.e-btn .e-caret::before {
+    content: "\e729" !important;
+}
+
+.hedge-new-trade .dp-menu-style .e-dropdown-btn .e-caret::before, .e-dropdown-btn.e-btn .e-caret::before {
+    content: "\e729" !important;
+}
+
+/* amortization modal css - start */
+
+.custom-datepicker-container {
+    display: flex;
+    gap: 17px;
+}
+
+.custom-checkbox-container {
+    display: flex;
+    margin: 0.938rem 0 0.938rem 0;
+    justify-content: space-between;
+}
+
+.custom-action-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-top: 25px;
+}
+/* amortization modal css - end */

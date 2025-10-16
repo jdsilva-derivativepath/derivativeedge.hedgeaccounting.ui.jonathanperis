@@ -1,0 +1,47 @@
+﻿@if (Visibility)
+{
+    <SfDialog Width="500px" Target="DpDialog" ShowBackdrop="true" CssClass="dp-dialog"
+              IsModal="true" @bind-Visible="Visibility" ShowCloseIcon="(EditTemplateForm.Id != Guid.Empty || IsEditMode)" CloseOnEscape="false">
+        <DialogTemplates>
+            <Header>@HeaderText</Header>
+            <Content>
+                <EditForm Model="@EditTemplateForm" OnSubmit="SubmitInitialCreateForm">
+                    <div class="msg-with-header">
+                        <div class="content-section">
+                            <SfMessage Visible="@IsMessageVisible" Severity="MessageSeverity.Error">
+                                <h1>@CharacterCountValidation.Title</h1>
+                                <p>@CharacterCountValidation.Message</p>
+                            </SfMessage>
+                        </div>
+                    </div>
+                    <CustomValidation @ref="@_customValidation" />
+                    <DataAnnotationsValidator />
+                    <div class="section-row">
+                        <div class="dp-inputs">
+                            <span class="input-label">Template Name</span>
+                            <SfTextBox CssClass="input-textbox" @bind-Value="@EditTemplateForm.Name" />
+                            <ValidationMessage For="@(() => @EditTemplateForm.Name)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="section-row">
+                        <div class="dp-inputs" >
+                            <span class="input-label">Description</span>
+                            <SfTextBox CssClass="input-multiline" Multiline="true" @bind-Value="@EditTemplateForm.Description" />
+                            <ValidationMessage For="@(() => @EditTemplateForm.Description)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="dp-buttons text-right space-x-4">
+                        @if (EditTemplateForm.Id != Guid.Empty || IsEditMode)
+                        {
+                            <SfButton Type="button" CssClass="button-link button-default" Content="Cancel" OnClick="@DlgRenameClose" />
+                        }
+                        <SfButton CssClass="button-primary button-default" Content="Apply" IsPrimary="true" />
+                    </div>
+                </EditForm>
+            </Content>
+        </DialogTemplates>
+        <DialogEvents OnClose="@DlgRenameClose"></DialogEvents>
+        <DialogPositionData X="center" Y="center"></DialogPositionData>
+    </SfDialog>
+
+}

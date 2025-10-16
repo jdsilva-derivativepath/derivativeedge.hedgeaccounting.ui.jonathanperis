@@ -1,0 +1,23 @@
+﻿<div class="page-header">
+    <div class="content-container">
+        <div class="title">
+            <span class="page-title">@TemplateName</span>
+
+        </div>
+        <div class="action-buttons">
+            <SfButton CssClass="action-btn-link" OnClick="(() => CancelPreview())" Content="Cancel Preview"></SfButton>
+            <SfButton Type="Submit" CssClass="action-btn-primary" OnClick="(() => EditHrDocument())" Disabled=!AllowEditHrDocument>Edit Document</SfButton>
+        </div>
+    </div>
+</div>
+<div class="page-container">
+    @if (HtmlBody != null)
+    {
+        <div id="full-screen-editor" class="editor-area">
+            <SfRichTextEditor @bind-Value="HtmlBody" Readonly="true" Width="98%">
+                <RichTextEditorToolbarSettings Enable="false"></RichTextEditorToolbarSettings>
+            </SfRichTextEditor>
+
+        </div>
+    }
+</div>

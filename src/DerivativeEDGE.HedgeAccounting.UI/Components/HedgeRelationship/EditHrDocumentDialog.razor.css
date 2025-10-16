@@ -1,0 +1,11 @@
+﻿.e-dlg-content {
+    padding-bottom: 0 !important;
+}
+
+::deep .input-multiline {
+    height: 170px !important;
+}
+
+::deep .e-message.e-error {
+    margin-bottom: 1rem !important;
+}

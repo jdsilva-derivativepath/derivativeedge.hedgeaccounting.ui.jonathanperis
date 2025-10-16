@@ -1,0 +1,93 @@
+﻿@using System.Linq;
+@using DerivativeEdge.HedgeAccounting.Api.Client
+
+<div class="w-full max-h-[35vh] overflow-y-auto">
+    @if (HistoryBatches?.Any() == true)
+    {
+        @foreach (var batch in HistoryBatches)
+        {
+            <div class="bg-gray-50 border-b-2 border-gray-300 p-2.5 mb-3.5 flex flex-col max-w-[28.125rem]">
+                <h3 class="font-regular mb-2 p-0">Periodic Regression.</h3>
+                <div class="flex items-center justify-start gap-2">
+                    @{
+                        var displayDate = GetDisplayDate(batch);
+                    }
+                    <span class="text-sm text-gray-800 font-medium min-w-[200px] flex-shrink-0">@displayDate</span>
+                    <span class="text-gray-600 font-bold mx-2 flex-shrink-0">|</span>
+                    <span class="text-sm text-gray-500 font-regular flex-grow">@(batch.RunBy?.Person?.FullName ?? "Unknown User")</span>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="flex flex-col items-center justify-center p-8 text-gray-500">
+            <div class="text-center">
+                <h3>📋 No History Data Available</h3>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    #region Parameters
+    [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HedgeRegressionBatches { get; set; }
+    [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>> HedgeRegressionBatchesChanged { get; set; }
+    #endregion
+
+    public List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HistoryBatches { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        LoadHistoryData();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void LoadHistoryData()
+    {
+        if (HedgeRegressionBatches == null || !HedgeRegressionBatches.Any())
+        {
+            HistoryBatches = new List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
+            return;
+        }
+
+        HistoryBatches = HedgeRegressionBatches
+            .Where(batch => batch.Enabled)
+            .OrderByDescending(batch => batch.CreatedOn)
+            .ToList();
+    }
+
+    private string GetDisplayDate(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM batch)
+    {
+        // Try to get the date from HedgeRelationshipLog first
+        if (batch.HedgeRelationshipLogs?.Any() == true)
+        {
+            var firstLog = batch.HedgeRelationshipLogs.First();
+            if (firstLog.CreatedOn != DateTime.MinValue)
+            {
+                return firstLog.CreatedOn.ToString("MMMM dd, yyyy 'at' h:mm tt");
+            }
+        }
+
+        // Try RunDate if it's a valid string and can be parsed
+        if (!string.IsNullOrEmpty(batch.RunDate) && DateTime.TryParse(batch.RunDate, out DateTime runDate))
+        {
+            return runDate.ToString("MMMM dd, yyyy 'at' h:mm tt");
+        }
+
+        // Try ValueDate if it's a valid string and can be parsed
+        if (!string.IsNullOrEmpty(batch.ValueDate) && DateTime.TryParse(batch.ValueDate, out DateTime valueDate))
+        {
+            return valueDate.ToString("MMMM dd, yyyy 'at' h:mm tt");
+        }
+
+        // Fallback to CreatedOn if it's not the default value
+        if (batch.CreatedOn != DateTime.MinValue)
+        {
+            return batch.CreatedOn.ToString("MMMM dd, yyyy 'at' h:mm tt");
+        }
+
+        // Last resort - use current date
+        return DateTime.Now.ToString("MMMM dd, yyyy 'at' h:mm tt");
+    }
+}

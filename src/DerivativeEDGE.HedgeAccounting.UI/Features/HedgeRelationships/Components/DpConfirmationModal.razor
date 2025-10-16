@@ -1,0 +1,75 @@
+﻿@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+
+<SfDialog Width="@Width"
+          Height="@Height"
+          CssClass="dp-dialog"
+          IsModal="true"
+          AllowDragging="false"
+          EnableResize="false"
+          ShowCloseIcon="false"
+          @bind-Visible="Visible">
+    <DialogTemplates>
+        <Header>
+            <div class="custom-dialog-header">
+                <div class="header-text">
+                    <span class="header-title">@Title</span>
+                </div>
+                @if (ShowCloseIcon) {
+                    <i class="header-icon fa-solid fa-xmark" @onclick="HandleCancel"></i>
+                }
+            </div>
+        </Header>
+        <Content>
+            <span>@Message</span>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        @if (ShowCancelButton)
+        {
+            <DialogButton CssClass="button-link button-default"
+                          Content="@CancelText"
+                          IsPrimary="false"
+                          OnClick="@HandleCancel" />
+        }
+        <DialogButton CssClass="button-primary button-default"
+                      Content="@ConfirmText"
+                      IsPrimary="true"
+                      OnClick="@HandleConfirm" />
+    </DialogButtons>
+    <DialogPositionData X="center" Y="center" />
+</SfDialog>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string Title { get; set; } = "Confirmation";
+    [Parameter] public string Message { get; set; } = "";
+    [Parameter] public string ConfirmText { get; set; } = "OK";
+    [Parameter] public string CancelText { get; set; } = "Cancel";
+    [Parameter] public bool ShowCancelButton { get; set; } = true;
+    [Parameter] public bool ShowCloseIcon { get; set; } = true;
+
+    [Parameter] public EventCallback OnConfirmed { get; set; }
+    [Parameter] public EventCallback OnCancelled { get; set; }
+
+    [Parameter] public string Width { get; set; } = "30rem";
+    [Parameter] public string Height { get; set; } = "14rem";
+
+    private async Task HandleCancel()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+        if (OnCancelled.HasDelegate)
+            await OnCancelled.InvokeAsync();
+    }
+
+    private async Task HandleConfirm()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+        if (OnConfirmed.HasDelegate)
+            await OnConfirmed.InvokeAsync();
+    }
+}

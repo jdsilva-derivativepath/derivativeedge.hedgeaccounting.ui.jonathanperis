@@ -1,0 +1,25 @@
+﻿::deep .dp-dialog .e-dlg-header-content {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #BBB;
+    height: 3.25rem;
+}
+
+    ::deep .dp-dialog .e-dlg-header-content .e-dlg-closeicon-btn.e-btn {
+        bottom: 0.75rem;
+        left: 0.375rem;
+    }
+
+::deep .dp-dialog .e-dlg-header {
+    flex: 1 0 0;
+    color: #3E3F46;
+    font-family: "Proxima Nova", sans-serif;
+    font-size: 1.125rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.75rem;
+}
+
+::deep .dp-dialog .e-dlg-content {
+    padding: 1.5rem;
+    align-self: stretch;
+}

@@ -1,0 +1,92 @@
+﻿.details-section-header h5 {
+    font-family: 'proximanova-semibold';
+    font-size: 1rem;
+    color: white;
+    padding: 0.75rem;
+    margin: 0;
+    background-color: #66666e;
+}
+
+.details-section-body {
+    display: flex;
+    background-color: #ffffff;
+    padding: 0.625rem;
+}
+
+.grid-container {
+    display: inline-block;
+}
+
+.negative-numbers {
+    color: #d84e48;
+}
+
+.custom-dropdown-css {
+    padding-bottom: 0 !important;
+}
+
+.dropdown-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.dropdown-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dp-inputs {
+    flex: 1;
+    min-width: 15.625rem;
+}
+
+.custom-seperator {
+    margin: 0 1.563rem 0 1.563rem;
+    border-left: 0.125rem solid #a9a9a9;
+}
+
+@media (max-width: 48rem) {
+    .dropdown-row {
+        flex-direction: column;
+    }
+}
+
+.custom-small-dropdown {
+    padding-bottom: 0 !important;
+    width: 160px !important;
+    min-width: 0 !important;
+}
+
+.hedge-grid-container {
+    padding-bottom: 1.25rem;
+}
+
+.action-bar-container {
+    margin: 0.625rem 0 0.625rem 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-bar-container .right-selection, .left-section {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+::deep .fa-trash-can {
+    display: inline-block;
+    color: #3b98d4;
+    cursor: pointer;
+}
+
+::deep .fa-link {
+    display: inline-block;
+    color: #3b98d4;
+    cursor: pointer;
+}
+
+.select-existing-modal-container {
+    margin: 1.875rem 5.313rem 0 5.313rem;
+}

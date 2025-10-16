@@ -1,0 +1,44 @@
+{
+  "profiles": {
+    "debug": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+
+        //PROXY_MODE=LocalDevelopment uses a mock for authentication and is only used for local debug
+        //"PROXY_MODE": "LocalDevelopment",
+
+        "JWT_AUDIENCE": "https://dev.derivativepath.com",
+        "JWT_ISSUER": "https://dev-proxy.derivativepath.com",
+        "JWT_ISSUERSIGNINGKEY": "W)e0nbVL]Fh2X*2+DuQ9b0ho3Yk!jTYu,mtCKjKV",
+        "IDENTITY_API_BASE": "https://dev-identity.derivativepath.com",
+        "IDENTITY_API_KEY": "12345",
+
+        "SPLITIO_API_KEY": "pn1v258iejuul0c49ll525at5b64ids58re6",
+        "SPLITIO_CONNECTION_TIMEOUT": "10000",
+
+        "HEDGE_ACCOUNTING_SERVICE_URL": "https://localhost:7173",
+        //"HEDGE_ACCOUNTING_SERVICE_URL": "https://dev-hedgeaccounting.derivativepath.com",
+        //"HEDGE_ACCOUNTING_SERVICE_URL": "http://localhost:5127",
+
+        "HEDGE_ACCOUNTING_SERVICE_CLIENTID": "aedb01c4-4683-4458-8321-ea26c8630ef1",
+        "HEDGE_ACCOUNTING_SERVICE_CLIENTSECRET": "TDF2ZCtQOHpnRC9yYUVnQlVJUm9kQT09OjA3MWQ4MTFmLWViNDMtNDZmZi1iODNiLWQ3OTUxNWI4MGVjYQ==",
+        "AUTH_SERVICE_URL": "https://dev-apiauth.derivativepath.com/",
+
+        "AUTH_CLIENTID_API": "B8877EC3-B79E-488E-8B0D-AA3C3314C2A9",
+        "AUTH_CLIENTSECRET_API": "RVhpY2Z1SnVqdDNLVjl0U0s2RzFDUT09OjZjNmQ2NjkzLWQwMDUtNDUyYy1iZDg3LWMyN2ZhY2VhZTViMg==",
+        "SWAPZILLA_APIKEY_USER": "8F64FA98-F200-4CCC-ADC5-5038D11568E2",
+        "SWAPZILLA_APIKEY_PASSWORD": "A8AC9FD7-5FBA-4618-AE38-D16F8C92350E",
+
+        "AUTH_URL": "https://dev-apiauth.derivativepath.com/authorize",
+        "NOTIFICATION_HUB_BASE_URL": "https://dev-notification.derivativepath.com/",
+        "SWAPZILLA_BASE_ADDRESS": "https://devportal.derivativepath.com/",
+        "OTEL_ENDPOINT": "http://localhost:4317",
+        "OTEL_SERVICE_NAME": "local-hedgeaccounting-ui"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7185"
+    }
+  }
+}

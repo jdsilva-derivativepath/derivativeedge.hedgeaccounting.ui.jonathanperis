@@ -1,0 +1,65 @@
+﻿<SfDialog Width="29.25rem" Height="16rem" Target="DpDialog" CssClass="dp-dialog" CloseOnEscape="false"  ShowBackdrop="true" IsModal="true" @bind-Visible="Visibility">
+    <DialogTemplates>
+        <Header>
+            <h3>Discard unsaved changes?</h3>
+        </Header>
+        <Content>
+            You have made changes that haven’t been saved yet. Closing this will discard all your unsaved changes.
+            <div class="dp-buttons text-right space-x-4 mt-5">
+                <SfButton Type="button" CssClass="button-link button-default" Content="Keep Editing" OnClick="@DlgButtonClose" />
+                <SfButton CssClass="button-danger button-default" Content="Discard Changes" OnClick="ContinueNavigate" />
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogEvents></DialogEvents>
+    <DialogPositionData X="center" Y="center"></DialogPositionData>
+</SfDialog>
+<NavigationLock ConfirmExternalNavigation="true" OnBeforeInternalNavigation="OnBeforeNavigationChange"></NavigationLock>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Parameter]
+    public EditContext _editContext { get; set; }
+    private bool Visibility { get; set; } = false;
+
+    private LocationChangingContext CurrentChangingContext { get; set; }
+
+    private bool ForceNavigate { get; set; } 
+
+    private void DlgButtonClose()
+    {
+        this.Visibility = false;
+        ForceNavigate = false;
+    }
+
+    private void OnBeforeNavigationChange(LocationChangingContext locationChangingContext)
+    {
+        if (ForceNavigate)
+        {
+            return;
+        }
+
+        if (_editContext is null)
+        {
+            return;
+        }
+
+        if (_editContext.IsModified())
+        {
+            this.Visibility = true;
+            CurrentChangingContext = locationChangingContext;
+            locationChangingContext.PreventNavigation();
+        }
+
+    }
+
+    private void ContinueNavigate()
+    {
+        ForceNavigate = true;
+        NavigationManager.NavigateTo(CurrentChangingContext.TargetLocation);
+    }
+
+
+}
