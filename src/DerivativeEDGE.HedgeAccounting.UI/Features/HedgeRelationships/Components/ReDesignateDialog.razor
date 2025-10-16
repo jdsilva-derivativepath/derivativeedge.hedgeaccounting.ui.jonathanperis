@@ -1,0 +1,233 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using DerivativeEdge.HedgeAccounting.Api.Client
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums
+@using static DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipDetails
+
+<SfDialog Width="600px"
+          Height="auto"
+          CssClass="dp-dialog"
+          IsModal="true"
+          AllowDragging="false"
+          EnableResize="false"
+          ShowCloseIcon="true"
+          @bind-Visible="Visible">
+    <DialogTemplates>
+        <Header>
+            <div class="custom-dialog-header">
+                <div class="header-text">
+                    <span class="header-title">Re-Designation Workflow</span>
+                </div>
+                <i class="header-icon fa-solid fa-xmark" @onclick="HandleClose"></i>
+            </div>
+        </Header>
+        <Content>
+            <div class="overflow-auto" style="max-height: 70vh;">
+                <div class="p-4">
+                    <!-- Redesignation Date -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Redesignation Date <span class="text-red-600">*</span></label>
+                        <SfDatePicker CssClass="calendar-datepicker"
+                                      TValue="DateTime?"
+                                      @bind-Value="RedesignationDate"
+                                      Format="MM/dd/yyyy"
+                                      Placeholder="mm/dd/yyyy"
+                                      Enabled="true" />
+                    </div>
+
+                    <!-- Time Values Date Range -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-normal text-gray-700 mb-2">Time Values Start Date <span class="text-red-600">*</span></label>
+                            <SfDatePicker CssClass="calendar-datepicker"
+                                          TValue="DateTime?"
+                                          @bind-Value="TimeValuesStartDate"
+                                          Format="MM/dd/yyyy"
+                                          Placeholder="mm/dd/yyyy"
+                                          Enabled="true" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-normal text-gray-700 mb-2">Time Values End Date <span class="text-red-600">*</span></label>
+                            <SfDatePicker CssClass="calendar-datepicker"
+                                          TValue="DateTime?"
+                                          @bind-Value="TimeValuesEndDate"
+                                          Format="MM/dd/yyyy"
+                                          Placeholder="mm/dd/yyyy"
+                                          Enabled="true" />
+                        </div>
+                    </div>
+
+                    <!-- Payment Amount -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Payment <span class="text-red-600">*</span></label>
+                        <SfNumericTextBox CssClass="input-textbox"
+                                          TValue="decimal?"
+                                          @bind-Value="Payment"
+                                          Format="C2"
+                                          Placeholder="0.00"
+                                          Enabled="true" />
+                    </div>
+
+                    <!-- Payment Frequency -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Payment Frequency <span class="text-red-600">*</span></label>
+                        <SfDropDownList CssClass="dropdown-input"
+                                        TValue="string"
+                                        TItem="PaymentFrequencyOption"
+                                        @bind-Value="PaymentFrequency"
+                                        DataSource="@AvailablePaymentFrequencies"
+                                        Placeholder="Select Payment Frequency">
+                            <DropDownListFieldSettings Text="Text" Value="Value" />
+                        </SfDropDownList>
+                    </div>
+
+                    <!-- Day Count Convention -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Day Count Convention <span class="text-red-600">*</span></label>
+                        <SfDropDownList CssClass="dropdown-input"
+                                        TValue="string"
+                                        TItem="DayCountConvOption"
+                                        @bind-Value="DayCountConv"
+                                        DataSource="@AvailableDayCountConventions"
+                                        Placeholder="Select Day Count Convention">
+                            <DropDownListFieldSettings Text="Text" Value="Value" />
+                        </SfDropDownList>
+                    </div>
+
+                    <!-- Payment Business Day Convention -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-normal text-gray-700 mb-2">Payment Business Day Convention <span class="text-red-600">*</span></label>
+                        <SfDropDownList CssClass="dropdown-input"
+                                        TValue="string"
+                                        TItem="PayBusDayConvOption"
+                                        @bind-Value="PayBusDayConv"
+                                        DataSource="@AvailablePayBusDayConventions"
+                                        Placeholder="Select Business Day Convention">
+                            <DropDownListFieldSettings Text="Text" Value="Value" />
+                        </SfDropDownList>
+                    </div>
+
+                    <!-- Checkboxes Section -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <input type="checkbox" 
+                                   id="adjustedDates" 
+                                   @bind="AdjustedDates"
+                                   class="mr-2" />
+                            <label for="adjustedDates" class="text-sm text-gray-700">Adjusted Dates</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" 
+                                   id="markAsAcquisition" 
+                                   @bind="MarkAsAcquisition"
+                                   class="mr-2" />
+                            <label for="markAsAcquisition" class="text-sm text-gray-700">Mark as Acquisition</label>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(ValidationMessage))
+                    {
+                        <div class="mt-4">
+                            <SfMessage Severity="MessageSeverity.Warning">
+                                @ValidationMessage
+                            </SfMessage>
+                        </div>
+                    }
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton CssClass="button-link button-default"
+                      Content="Cancel"
+                      IsPrimary="false"
+                      OnClick="@HandleClose" />
+        <DialogButton CssClass="button-primary button-default"
+                      Content="Re-Designate"
+                      IsPrimary="true"
+                      Disabled="@(!IsValid)"
+                      OnClick="@HandleReDesignate" />
+    </DialogButtons>
+    <DialogPositionData X="center" Y="center" />
+</SfDialog>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public EventCallback OnReDesignated { get; set; }
+
+    // Model properties
+    [Parameter] public DateTime? RedesignationDate { get; set; }
+    [Parameter] public DateTime? TimeValuesStartDate { get; set; }
+    [Parameter] public DateTime? TimeValuesEndDate { get; set; }
+    [Parameter] public decimal? Payment { get; set; } = 0;
+    [Parameter] public string PaymentFrequency { get; set; } = string.Empty;
+    [Parameter] public string DayCountConv { get; set; } = string.Empty;
+    [Parameter] public string PayBusDayConv { get; set; } = string.Empty;
+    [Parameter] public bool AdjustedDates { get; set; }
+    [Parameter] public bool MarkAsAcquisition { get; set; }
+    [Parameter] public bool IsDocTemplateFound { get; set; }
+
+    // Data sources
+    [Parameter] public List<PaymentFrequencyOption> AvailablePaymentFrequencies { get; set; } = new();
+    [Parameter] public List<DayCountConvOption> AvailableDayCountConventions { get; set; } = new();
+    [Parameter] public List<PayBusDayConvOption> AvailablePayBusDayConventions { get; set; } = new();
+
+    private string ValidationMessage { get; set; } = string.Empty;
+
+    // Validation logic from legacy: isRedesignationValid()
+    private bool IsValid
+    {
+        get
+        {
+            // Payment must be non-zero
+            if (Payment == null || Payment == 0)
+                return false;
+
+            // Redesignation date must be valid
+            if (RedesignationDate == null)
+                return false;
+
+            // Start and End dates must be valid
+            if (TimeValuesStartDate == null || TimeValuesEndDate == null)
+                return false;
+
+            // Start date must be before End date
+            if (TimeValuesStartDate >= TimeValuesEndDate)
+                return false;
+
+            // Required fields must be filled
+            if (string.IsNullOrEmpty(PayBusDayConv) || 
+                string.IsNullOrEmpty(PaymentFrequency) || 
+                string.IsNullOrEmpty(DayCountConv))
+                return false;
+
+            return true;
+        }
+    }
+
+    private async Task HandleClose()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    private async Task HandleReDesignate()
+    {
+        if (!IsValid)
+        {
+            ValidationMessage = "Please fill in all required fields and ensure dates are valid.";
+            StateHasChanged();
+            return;
+        }
+
+        if (OnReDesignated.HasDelegate)
+        {
+            await OnReDesignated.InvokeAsync();
+        }
+        await HandleClose();
+    }
+}
