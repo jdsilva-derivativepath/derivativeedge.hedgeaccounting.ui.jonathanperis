@@ -1,0 +1,201 @@
+﻿<div class="row syncfusionconversion">
+    <div class="col-xs-12" id="HedgedItemDiv">
+    </div>
+    <div class="col-xs-12" data-ng-hide="showSelectNewTrade">
+        <div class="addingTradeToHedgedHedgingItemDiv" data-ng-class='Model.HedgedItems.length === 0 ? "absolute" : ""'>
+            <button type="button" style="margin-right:10px;" data-ng-click="openLinkExistingTrade('HedgedItem');">Select existing trade</button>
+            <div class="dropdown dropdown-reverse">
+                <div class="dropdown-toggle" data-toggle="dropdown">
+                    <button type="button">New trade</button>
+                </div>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('callabledebt', 'HedgedItem')">Callable Debt</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('cancelable', 'HedgedItem')">Cancelable</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('cap', 'HedgedItem')">Cap Floor</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('collar', 'HedgedItem')">Collar</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('debt', 'HedgedItem')">Debt</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('debtoption', 'HedgedItem')">Debt Option</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('swap', 'HedgedItem')">Swap</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('swapwithoption', 'HedgedItem')">Swap With Cap/Floor</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('swaption', 'HedgedItem')">Swaption</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('corridor', 'HedgedItem')">Corridor</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('fxforward', 'HedgedItem')">FX Forward</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row search_margin syncfusionconversion">
+    <div class="col-xs-12" id="HedgingItemDiv">
+    </div>
+    <div class="col-xs-12" data-ng-hide="showSelectNewTrade">
+        <div class="addingTradeToHedgedHedgingItemDiv" data-ng-class='Model.HedgingItems.length === 0 ? "absolute" : ""'>
+            <button type="button" style="margin-right:10px;" data-ng-click="openLinkExistingTrade('HedgingItem');">Select existing trade</button>
+            <div class="dropdown dropdown-reverse">
+                <div class="dropdown-toggle" data-toggle="dropdown">
+                    <button type="button">New trade</button>
+                </div>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('callabledebt', 'HedgingItem')">Callable Debt</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('cancelable', 'HedgingItem')">Cancelable</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('cap', 'HedgingItem')">Cap Floor</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('collar', 'HedgingItem')">Collar</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('debt', 'HedgingItem')">Debt</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('debtoption', 'HedgingItem')">Debt Option</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('swap', 'HedgingItem')">Swap</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('swapwithoption', 'HedgingItem')">Swap With Cap/Floor</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('swaption', 'HedgingItem')">Swaption</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('corridor', 'HedgingItem')">Corridor</button>
+                    </li>
+                    <li>
+                        <button type="button" data-ng-click="openNewTrade('fxforward', 'HedgingItem')">FX Forward</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row search_margin" style="margin-bottom:20px;">
+    <div class="col-xs-12 homePageModuleSection">
+        <div class="row homePageModuleSectionTitleRow">
+            <div class="col-xs-12">
+                <h5 class="homePageModuleSectionTitle">EFFECTIVENESS</h5>
+            </div>
+        </div>
+        <div class="row search_margin">
+            <div class="col-xs-1" style="width: 15px;"></div>
+            <div class="col-xs-11" style="width:calc(100% - 30px)">
+                <div class="row form-group flex">
+                    <div class="col-xs-4">
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Prospective Assessment Method">
+                                <select data-ng-model="Model.ProspectiveEffectivenessMethodID" class="text-box" data-ng-disabled="DesignatedIsDPIUser">
+                                    <option ng-repeat="x in DropDownList.EffectivenessMethods" value="{{x.ID}}" data-ng-disabled="{{x.Disabled}}">{{x.Name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Retrospective Assessment Method">
+                                <select data-ng-model="Model.RetrospectiveEffectivenessMethodID" class="text-box" data-ng-disabled="DesignatedIsDPIUser">
+                                    <option ng-repeat="x in DropDownList.EffectivenessMethods" value="{{x.ID}}" data-ng-disabled="{{x.Disabled}}">{{x.Name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-5 placeholder placeholderselect hide" data-placeholder="Ineffectiveness Measurement" style="width: 36%;">
+                                <select data-ng-model="Model.InEffMeasurement" class="text-box" data-ng-disabled="DesignatedIsDPIUser">
+                                    <option ng-repeat="x in DropDownList.InEffMeasurementList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-4 placeholder placeholderselect" data-placeholder="Report Currency" style="width: 49%; margin: 0px 2% 0 0;min-width:200px;">
+                                <select data-ng-model="Model.ReportCurrency" class="text-box" data-ng-disabled="DesignatedIsDPIUser">
+                                    <option ng-repeat="x in DropDownList.Currencies" value="{{x.ShortName}}">{{x.LongName}}</option>
+                                </select>
+
+                            </div>
+                            <div class="col-xs-4 placeholder placeholderselect" data-placeholder="Report Frequency" style="width: 49%;min-width:150px;">
+                                <select data-ng-model="Model.ReportingFrequency" class="text-box" data-ng-disabled="DesignatedIsDPIUser">
+                                    <option ng-repeat="x in DropDownList.ReportingFrequencyList" value="{{x.Value}}" data-ng-disabled="{{x.Disabled}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-8" style="width:60%;margin-left:30px;padding:10px 10px 0px 30px; border-left: 2px solid #a9a9a9;">
+                        <div class="row form-group">
+                            <div class="col-xs-12 regularHeadingsBold">
+                                Regression Settings:
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-5">
+                                <div class="col-xs-3 placeholder sameRowMidTextbox" data-placeholder="Period Count" style="min-width:100px;">
+                                    <input type="text" class="text-box" placeholder="Period Count" data-ng-model="Model.Observation" data-ng-disabled="DesignatedIsDPIUser" />
+                                </div>
+                                <div class="col-xs-4 placeholder placeholderselect" data-placeholder="Period Size" style="min-width:140px;">
+                                    <select data-ng-model="Model.PeriodSize" class="text-box" data-ng-disabled="DesignatedIsDPIUser">
+                                        <option ng-repeat="x in DropDownList.PeriodSizeList" value="{{x.Value}}" data-ng-disabled="{{x.Disabled}}">{{x.Text}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-xs-12 regularHeadingsBold">
+                                Regression:
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12">
+                                <div class="pull-left sameRowMidTextbox">
+                                    <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.CumulativeChanges" data-ng-hide="Model.CumulativeChanges" data-ng-click="toggleRegression(true);"></i>
+                                    <span class="radiofontawesomewithyes fa-stack" data-type="Model.CumulativeChanges" data-ng-show="Model.CumulativeChanges" data-ng-click="toggleRegression(true);">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                    <span class="checkboxText">Cumulative Changes</span>
+                                </div>
+                                <div class="pull-left sameRowMidTextbox">
+                                    <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.PeriodicChanges" data-ng-hide="Model.PeriodicChanges" data-ng-click="toggleRegression(false);"></i>
+                                    <span class="radiofontawesomewithyes fa-stack" data-type="Model.PeriodicChanges" data-ng-show="Model.PeriodicChanges" data-ng-click="toggleRegression(false);">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                    <span class="checkboxText">Periodic Changes</span>
+                                </div>
+                                <div class="pull-left">
+                                    <i class="fa fa-square-o" data-type="Model.EOM" data-ng-hide="Model.EOM" data-ng-click="!IsPeriodSizeMonth() || checkboxClickEvent($event);"></i>
+                                    <i class="fa fa-check-square" data-type="Model.EOM" data-ng-show="Model.EOM" data-ng-click="!IsPeriodSizeMonth() || checkboxClickEvent($event);"></i>
+                                    <span class="checkboxText">End Of Month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-1" style="width: 15px;"></div>
+        </div>
+    </div>
+</div>

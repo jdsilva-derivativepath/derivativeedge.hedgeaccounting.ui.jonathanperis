@@ -1,0 +1,171 @@
+﻿<style>
+    .ngdialog.ngdialog-theme-default.custom-height-800 .ngdialog-content {
+        height: 800px;
+    }
+</style>
+
+<div class="row homePageModuleSectionTitleRow" style="margin:20px 1px 2px 1px">
+    <div class="col-xs-12">
+        <h5 class="homePageModuleSectionTitle" style="padding: 12px 18px;">{{SelectedOptionValueType}}</h5>
+    </div>
+</div>
+
+<div class="row syncfusionconversion">
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="amortizationScheduleDiv1"></div>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<div class="row syncfusionconversion">
+    <div class="col-xs-12" id="amortizationDiv1">
+    </div>
+</div>
+
+<br />
+<br />
+
+<script type="text/ng-template" id="haOptionTimeValueAmort">
+    <form name="amortizationForm" novalidate>
+        <div class="row form-group">
+            <div class="col-xs-6">
+                <i class="fa fa-square-o"
+                   data-type="HedgeRelationshipOptionTimeValueAmort.AmortizeOptionPremimum"
+                   data-ng-hide="HedgeRelationshipOptionTimeValueAmort.AmortizeOptionPremimum"
+                   data-ng-click="checkboxClickEvent($event,'HedgeRelationshipOptionTimeValueAmort')"></i>
+                <i class="fa fa-check-square"
+                   data-type="HedgeRelationshipOptionTimeValueAmort.AmortizeOptionPremimum"
+                   data-ng-show="HedgeRelationshipOptionTimeValueAmort.AmortizeOptionPremimum"
+                   data-ng-click="checkboxClickEvent($event,'HedgeRelationshipOptionTimeValueAmort')"></i>
+                <span class="checkboxText">Amortize Option Premium</span>
+            </div>
+        </div>
+        <div class="row">
+            <div data-ng-class="{'form-group col-xs-6': HedgeRelationshipOptionTimeValueAmort.ID === 0, 'form-group col-xs-12': HedgeRelationshipOptionTimeValueAmort.ID > 0}" data-ng-style="HedgeRelationshipOptionTimeValueAmort.ID === 0 && {'padding-right':'10px'} || {'padding-right':'0px'}">
+                <div class="placeholder placeholderselect" data-placeholder="GL Account">
+                    <select data-ng-model="HedgeRelationshipOptionTimeValueAmort.GLAccountID"
+                            class="text-box selectvalues-convert-tostring"
+                            data-modelvalue="HedgeRelationshipOptionTimeValueAmort"
+                            data-typeofscope="template"
+                            name="GLAccountID"
+                            ng-style="{'border-color': (amortizationForm.GLAccountID.$touched && amortizationForm.GLAccountID.$invalid) ? 'red' : ''}"
+                            required>
+                        <option value="">None</option>
+                        <option ng-repeat="x in DropDownList.GLAccounts" value="{{x.Id}}">{{x.AccountDescription}}</option>
+                    </select>
+                    <div class="error-message" data-ng-show="amortizationForm.GLAccountID.$touched && amortizationForm.GLAccountID.$invalid">
+                        The GL Account field is required.
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-xs-6" style="padding-left:10px" data-ng-if="Model.IsAnOptionHedge && HedgeRelationshipOptionTimeValueAmort.ID === 0">
+                <div class="placeholder placeholderselect" data-placeholder="Intrinsic Value GL Account">
+                <select data-ng-model="HedgeRelationshipOptionTimeValueAmort.IVGLAccountID" class="text-box selectvalues-convert-tostring" data-modelvalue="HedgeRelationshipOptionTimeValueAmort" data-typeofscope="template">
+                        <option value="">None</option>
+                        <option ng-repeat="x in DropDownList.GLAccounts" value="{{x.Id}}">{{x.AccountDescription}}</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+        <div class="row">
+            <div data-ng-class="{'form-group col-xs-6': HedgeRelationshipOptionTimeValueAmort.ID === 0, 'form-group col-xs-12': HedgeRelationshipOptionTimeValueAmort.ID > 0}" data-ng-style="HedgeRelationshipOptionTimeValueAmort.ID === 0 && {'padding-right':'10px'} || {'padding-right':'0px'}">
+                <div class="placeholder placeholderselect" data-placeholder="Contra">
+                    <select data-ng-model="HedgeRelationshipOptionTimeValueAmort.ContraAccountID" class="text-box selectvalues-convert-tostring" data-modelvalue="HedgeRelationshipOptionTimeValueAmort" data-typeofscope="template">
+                        <option value="">None</option>
+                        <option ng-repeat="x in DropDownList.GLAccounts" value="{{x.Id}}">{{x.AccountDescription}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-xs-6" style="padding-left:10px" data-ng-if="Model.IsAnOptionHedge && HedgeRelationshipOptionTimeValueAmort.ID === 0">
+                <div class="placeholder placeholderselect" data-placeholder="Intrinsic Value Contra">
+                    <select data-ng-model="HedgeRelationshipOptionTimeValueAmort.IVContraAccountID" class="text-box selectvalues-convert-tostring" data-modelvalue="HedgeRelationshipOptionTimeValueAmort" data-typeofscope="template">
+                        <option value="">None</option>
+                        <option ng-repeat="x in DropDownList.GLAccounts" value="{{x.Id}}">{{x.AccountDescription}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div data-ng-class="{'form-group col-xs-6': HedgeRelationshipOptionTimeValueAmort.ID === 0, 'form-group col-xs-12': HedgeRelationshipOptionTimeValueAmort.ID > 0}" data-ng-style="HedgeRelationshipOptionTimeValueAmort.ID === 0 && {'padding-right':'10px'} || {'padding-right':'0px'}">
+                <div class="placeholder placeholderselect" data-placeholder="Amortization Method">
+                    <select data-ng-model="HedgeRelationshipOptionTimeValueAmort.AmortizationMethod" class="text-box" data-ng-disabled="!Model.IsAnOptionHedge" data-ng-change="selectedAmortizationMethodChanged(HedgeRelationshipOptionTimeValueAmort.AmortizationMethod)">
+                        <option ng-repeat="x in DropDownList.AmortizationMethodList | filter:filterByOptionAmortType" value="{{x.Value}}">{{x.Text}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-6 form-group" style="padding-left:10px" data-ng-if="Model.IsAnOptionHedge && HedgeRelationshipOptionTimeValueAmort.ID === 0">
+                <div class="placeholder placeholderselect" data-placeholder="Intrinsic Value Amortization Method">
+                    <select data-ng-model="HedgeRelationshipOptionTimeValueAmort.IVAmortizationMethod" class="text-box" data-ng-change="selectedIVAmortizationMethodChanged(HedgeRelationshipOptionTimeValueAmort.IVAmortizationMethod)">
+                        <option ng-repeat="x in DropDownList.AmortizationMethodList" value="{{x.Value}}">{{x.Text}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div data-ng-class="{'form-group col-xs-6': HedgeRelationshipOptionTimeValueAmort.ID === 0, 'form-group col-xs-12': HedgeRelationshipOptionTimeValueAmort.ID > 0}" data-ng-style="HedgeRelationshipOptionTimeValueAmort.ID === 0 && {'padding-right':'10px'} || {'padding-right':'0px'}">
+                <div class="placeholder" data-placeholder="Total Amount">
+                    <input type="text" id="totalAmount" class="text-box" data-ng-model="HedgeRelationshipOptionTimeValueAmort.TotalAmount" placeholder="Total Amount" data-ng-disabled="HedgeRelationshipOptionTimeValueAmort.AmortizationMethod === 'Swaplet'" />
+                </div>
+            </div>
+
+            <div class="col-xs-6 form-group" style="padding-left:10px" data-ng-if="Model.IsAnOptionHedge && HedgeRelationshipOptionTimeValueAmort.ID === 0">
+                <div class="placeholder" data-placeholder="Intrinsic Value">
+                    <input type="text" id="intrinsicValue" class="text-box" data-ng-model="HedgeRelationshipOptionTimeValueAmort.IntrinsicValue" placeholder="Intrinsic Value" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <div data-ng-class="{'col-xs-3 placeholder': HedgeRelationshipOptionTimeValueAmort.ID === 0, 'col-xs-6 placeholder': HedgeRelationshipOptionTimeValueAmort.ID > 0}" style="padding-right:10px" data-placeholder="Start Date">
+                <input type="text" id="optionAmortStartDate" class="text-box datepickplugin" data-datetime="MM/dd/yyyy"
+                       data-ng-model="HedgeRelationshipOptionTimeValueAmort.StartDate"
+                       placeholder="Start Date"
+                       data-ng-value="HedgeRelationshipOptionTimeValueAmort.StartDate"
+                       name="StartDate"
+                       ng-style="{'border-color': (amortizationForm.StartDate.$touched && !HedgeRelationshipOptionTimeValueAmort.StartDate) ? 'red' : ''}"
+                       required />
+                <div class="error-message" data-ng-show="amortizationForm.StartDate.$touched && !HedgeRelationshipOptionTimeValueAmort.StartDate">
+                    Start Date is required.
+                </div>
+            </div>
+            <div data-ng-class="{'col-xs-3 placeholder': HedgeRelationshipOptionTimeValueAmort.ID === 0, 'col-xs-6 placeholder': HedgeRelationshipOptionTimeValueAmort.ID > 0}" style="padding-right:10px" data-placeholder="End Date">
+                <input type="text" id="optionAmortEndDate" class="text-box datepickplugin" data-datetime="MM/dd/yyyy"
+                       data-ng-model="HedgeRelationshipOptionTimeValueAmort.EndDate"
+                       placeholder="End Date"
+                       name="EndDate"
+                       data-ng-value="HedgeRelationshipOptionTimeValueAmort.EndDate"
+                       ng-style="{'border-color': (amortizationForm.EndDate.$touched && !HedgeRelationshipOptionTimeValueAmort.EndDate) ? 'red' : ''}"
+                       required />
+                <div class="error-message" data-ng-show="amortizationForm.EndDate.$touched && !HedgeRelationshipOptionTimeValueAmort.EndDate">
+                    End Date is required.
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-xs-12">
+                <button type="button" class="btn btn-info" data-ng-click="generateOptionTimeValueAmort();"
+                        data-ng-disabled="!HedgeRelationshipOptionTimeValueAmort.AmortizeOptionPremimum
+                    || HedgeRelationshipOptionTimeValueAmort.AmortizationMethod === 'None'
+                        || amortizationForm.$invalid">
+                    <span data-ng-show="HedgeRelationshipOptionTimeValueAmort.ID === undefined || HedgeRelationshipOptionTimeValueAmort.ID === 0">Generate</span><span data-ng-show="HedgeRelationshipOptionTimeValueAmort.ID > 0">Update</span>
+                </button>
+                <button type="button" class="btn btn-cancel" data-ng-click="cancelGenerateOptionTimeValueAmort();">Cancel</button>
+            </div>
+        </div>
+    </form>
+
+</script>
+
+
+<script type="text/x-template" id="actionAmortizationTemplate1">
+    <select class="hedgeActionSelectionTest"
+            data-ng-model="itemActionAmortization{{:ID}}.selectedAction"
+            data-ng-change="selectedItemActionAmortizationChanged(itemActionAmortization{{:ID}}.selectedAction, {{:~index}}, {{:ID}})">
+        <option value="">Choose Action</option>
+        <option value="Edit">Edit</option>
+        <option value="Delete">Delete</option>
+        <option value="Download Excel">Download Excel</option>
+    </select>
+</script>

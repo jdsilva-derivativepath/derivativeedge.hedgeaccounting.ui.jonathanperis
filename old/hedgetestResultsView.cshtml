@@ -1,0 +1,98 @@
+﻿<div class="row homePageModuleSectionTitleRow">
+    <div class="col-xs-12">
+        <h5 class="homePageModuleSectionTitle" style="padding: 12px 18px;">MOST RECENT TEST RESULTS (REGRESSION)</h5>
+    </div>
+</div>
+
+<div class="row syncfusionconversion regressionTestResultsTableGraphStatisticsContainer" data-ng-show="Model.LatestHedgeRegressionBatch !== undefined && Model.LatestHedgeRegressionBatch.HedgeRegressionBatchResults !== undefined">
+    <div class="pull-left" id="regressionTestResultsGraphStatisticsContainer">
+        <div class="row">
+            <div class="col-xs-4 testresultsSlope">
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">Slope</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.Slope | number:2}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">R</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.R | number:2}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">R^2</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.RSquared | number:2}}</div>
+                </div>
+            </div>
+            <div class="col-xs-4 testresultsSlope">
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">Std Error</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.StandardError | number:2}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">Obs</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.Observation | number:0}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">y-intercept</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.YIntercept | number:2}}</div>
+                </div>
+            </div>
+            <div class="col-xs-4 testresultsSlope">
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">t-Test</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.B1tStat | number:2}}/{{Model.LatestHedgeRegressionBatch.B1tStatAnalytics}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">Significance</div>
+                    <div class="col-xs-12 testresultsSlopeValues">0</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">F-Stat</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.FStat | number:2}}/{{Model.LatestHedgeRegressionBatch.FStatAnalytics}}</div>
+                </div>
+            </div>
+            <div class="col-xs-4 testresultsSlope" data-ng-show="Model.CumulativeChanges">
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">d</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.D | number:2}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">Positive Autocorrelation</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.PositiveAutoCorrelation}}</div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 testresultsSlopeHeader">Negative Autocorrelation</div>
+                    <div class="col-xs-12 testresultsSlopeValues">{{Model.LatestHedgeRegressionBatch.NegativeAutoCorrelation}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="regressionTestResultsGraphContainer"></div>
+            </div>
+        </div>
+    </div>
+    <div class="pull-left" id="regressionTestResultsGraphTableContainer">
+        <div id="regressionResultDiv"></div>
+    </div>
+</div>
+
+<div class="row homePageModuleSectionTitleRow" style="margin:20px 1px 2px 1px">
+    <div class="col-xs-12">
+        <h5 class="homePageModuleSectionTitle" style="padding: 12px 18px;">ALL TESTS</h5>
+    </div>
+</div>
+
+<div class="row syncfusionconversion" data-ng-show="Model.HedgeRegressionBatches !== undefined && Model.HedgeRegressionBatches.length > 0">
+    <div class="col-xs-12" id="allTestsDiv">
+    </div>
+</div>
+<br />
+<br />
+<script type="text/x-template" id="actionTestTemplate">
+    <select class="hedgeActionSelectionTest"
+            data-ng-model="itemActionTest{{:ID}}.selectedAction"
+            data-ng-change="selectedItemActionTestChanged(itemActionTest{{:ID}}.selectedAction, {{:~index}}, {{:ID}})">
+        <option value="">Choose Action</option>
+        <option value="Download Excel">Download Excel</option>
+        <option value="Delete" data-ng-show="Model.HedgeState === 'Draft' || checkUserRole('24') || checkUserRole('17') || checkUserRole('5')">Delete</option>
+    </select>
+</script> 

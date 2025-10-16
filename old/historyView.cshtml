@@ -1,0 +1,21 @@
+﻿<div class="row" id="hedgeRelationshipHistoryTabContent">
+    <div class="col-xs-4">
+        <div class="row form-group" data-ng-repeat="a in Model.HedgeRelationshipActivities">
+            <div class="col-xs-2 annotationListRowFirstColumn">
+                <i class="fa pull-left annotationNotesDisplay" data-ng-class="{'fa-briefcase':a.ActivityTypeEnum==='BackloadRegression' || a.ActivityTypeEnum==='RelationshipDesignated','fa-line-chart':a.ActivityTypeEnum==='UserRegression'||a.ActivityTypeEnum==='PeriodicRegression','fa-check':a.ActivityTypeEnum==='RelationshipCreated'||a.ActivityTypeEnum==='RelationshipUpdated'}" aria-hidden="true"></i>
+            </div>
+            <div class="col-xs-10 annotationListRowMainColumn">
+                <div class="row">
+                    <div class="col-xs-12 annotationNotes">{{a.ActivityTypeText}}. <a  data-ng-show="a.ActivityTypeEnum==='Designated'" href="javascript:void(0);" data-ng-click="generateInceptionPackage();">View inception package</a></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <span class="pull-left annotationTime">{{a.CreatedOn | date: 'MMMM dd, yyyy'}} at {{a.CreatedOn | date: 'h:mm a'}}</span>
+                        <span class="pull-left annotationTime annotationPipe">|</span>
+                        <span class="pull-left annotationTime">{{a.CreatedByUser.Person.FullName}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+﻿<div class="row search_margin" id="accountingDetailsHA">
+    <div class="col-xs-1" style="width: 4.16%;"></div>
+    <div class="col-xs-11">
+        <div class="row form-group">
+            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Standard">
+                <select data-ng-model="Model.Standard" class="text-box" data-ng-disabled="Model.HedgeState !== 'Draft'">
+                    <option ng-repeat="x in DropDownList.StandardList" value="{{x.Value}}">{{x.Text}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-xs-12">
+                <i class="fa fa-square-o" data-type="Model.TaxPurposes" data-ng-hide="Model.TaxPurposes" data-ng-click="checkboxClickEvent($event)"></i>
+                <i class="fa fa-check-square" data-type="Model.TaxPurposes" data-ng-show="Model.TaxPurposes" data-ng-click="checkboxClickEvent($event)"></i>
+                <span class="checkboxText">Hedge for Tax Purposes</span>
+            </div>
+        </div>
+        <div class="row form-group" data-ng-hide="openDetailsTab">
+            <div class="col-xs-12">
+                <i class="fa fa-square-o" data-type="Model.IsAnOptionHedge" data-ng-hide="Model.IsAnOptionHedge" data-ng-click="checkboxClickEvent($event)"></i>
+                <i class="fa fa-check-square" data-type="Model.IsAnOptionHedge" data-ng-show="Model.IsAnOptionHedge" data-ng-click="checkboxClickEvent($event)"></i>
+                <span class="checkboxText">Hedge is an Option</span>
+            </div>
+        </div>
+        <div class="row form-group" data-ng-hide="openDetailsTab">
+            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Hedging Instrument Structure">
+                <select data-ng-model="Model.HedgingInstrumentStructure" class="text-box">
+                    <option ng-repeat="x in DropDownList.HedgingInstrumentStructureList" value="{{x.Value}}">{{x.Text}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group" data-ng-show="!openDetailsTab && Model.IsAnOptionHedge">
+            <div class="col-xs-12">
+                <i class="fa fa-square-o" data-type="Model.IsDeltaMatchOption" data-ng-hide="Model.IsDeltaMatchOption" data-ng-click="checkboxClickEvent($event)"></i>
+                <i class="fa fa-check-square" data-type="Model.IsDeltaMatchOption" data-ng-show="Model.IsDeltaMatchOption" data-ng-click="checkboxClickEvent($event)"></i>
+                <span class="checkboxText">Delta Match Option</span>
+            </div>
+        </div>
+        <div class="row form-group" data-ng-show="!openDetailsTab && Model.IsAnOptionHedge">
+            <div class="col-xs-12">
+                <i class="fa fa-square-o" data-type="Model.AmortizeOptionPremimum" data-ng-hide="Model.AmortizeOptionPremimum" data-ng-click="checkboxClickEvent($event)"></i>
+                <i class="fa fa-check-square" data-type="Model.AmortizeOptionPremimum" data-ng-show="Model.AmortizeOptionPremimum" data-ng-click="checkboxClickEvent($event)"></i>
+                <span class="checkboxText">Amortize Option Premium</span>
+            </div>
+        </div>
+        <div class="row form-group" data-ng-show="!openDetailsTab && Model.IsAnOptionHedge">
+            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Amortization Method">
+                <select data-ng-model="Model.AmortizationMethod" class="text-box">
+                    <option ng-repeat="x in DropDownList.AmortizationMethodList" value="{{x.Value}}">{{x.Text}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group" data-ng-show="!openDetailsTab && Model.IsAnOptionHedge">
+            <div class="col-xs-12 placeholder" data-placeholder="Option Premium">
+                <input type="text" class="text-box" data-ng-model="Model.OptionPremium" placeholder="Option Premium" />
+            </div>
+        </div>
+        <div class="row form-group" style="display:none;">
+            <div class="col-xs-12">
+                <i class="fa fa-square-o" data-type="Model.ForeignCurrencyAfterTaxBasis" data-ng-hide="Model.ForeignCurrencyAfterTaxBasis" data-ng-click="checkboxClickEvent($event)"></i>
+                <i class="fa fa-check-square" data-type="Model.ForeignCurrencyAfterTaxBasis" data-ng-show="Model.ForeignCurrencyAfterTaxBasis" data-ng-click="checkboxClickEvent($event)"></i>
+                <span class="checkboxText">FX After Tax Basis</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-1" style="width: 4.16%;"></div>
+</div>   

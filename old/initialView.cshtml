@@ -1,0 +1,178 @@
+﻿<div data-ng-hide="openDetailsTab">
+    <div class="row search_margin">
+        <div class="col-xs-12 col-md-6">
+            <button type="button" class="btn btn-info" data-ng-click="continue();">Continue</button>
+            <button type="button" class="btn btn-cancel" style="margin-right:10px" data-ng-disabled="InProgress" data-ng-click="cancel();">Cancel</button>
+        </div>
+    </div>
+
+    <div class="row search_margin">
+        <div class="col-xs-12 flex" style="flex-wrap: wrap">
+            <div class="mainmodule homePageModuleSection col-xs-12 col-md-3">
+                <div class="row homePageModuleSectionTitleRow">
+                    <div class="col-xs-12">
+                        <h5 class="homePageModuleSectionTitle">RELATIONSHIP INFORMATION</h5>
+                    </div>
+                </div>
+                <div class="row search_margin">
+                    <div class="col-xs-1" style="width: 4.16%;"></div>
+                    <div class="col-xs-11">
+                        <!-- directive: dpi-clients-select -->
+                        <!-- directive: bank-entity-select -->
+
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder" data-placeholder="Description">
+                                <input type="text" class="text-box" data-ng-model="Model.Description" placeholder="Description" />
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Hedged Risk*">
+                                <select data-ng-model="Model.HedgeRiskType" class="text-box">
+                                    <option ng-repeat="x in DropDownList.HedgeRiskTypeList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group hide">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Hedge Direction*">
+                                <select data-ng-model="Model.HedgeDirection" class="text-box">
+                                    <option ng-repeat="x in DropDownList.HedgeDirectionList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Hedge Type*">
+                                <select data-ng-model="Model.HedgeType" class="text-box">
+                                    <option ng-repeat="x in DropDownList.HedgeTypeList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgeType === 'FairValue'">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Fair Value Method">
+                                <select data-ng-model="Model.FairValueMethod" class="text-box">
+                                    <option ng-repeat="x in DropDownList.FairValueMethodList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <!-- Need to revert this but only temp, need to know the new requirements for this -->
+                            <div class="col-xs-12 placeholder" data-placeholder="Designation Date">
+                                <input type="text" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.DesignationDate" placeholder="Designation Date" data-ng-value="Model.DesignationDate" getIsGoodDate="true" />
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder" data-placeholder="Dedesignation Date">
+                                <input type="text" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.DedesignationDate" placeholder="Dedesignation Date" data-ng-value="Model.DedesignationDate" />
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgeRiskType === 'InterestRate'">
+                            <div class="col-xs-12 placeholder placeholderselect" id="idBenchmark" data-placeholder="Benchmark">
+                                <select data-ng-model="Model.Benchmark" class="text-box">
+                                    <option ng-repeat="x in DropDownList.BenchmarkList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgeRiskType === 'ForeignExchange' && Model.HedgeType !== 'NetInvestment'">
+                            <div class="col-xs-12 placeholder placeholderselect" id="idHedgeExposure" data-placeholder="Exposure">
+                                <select data-ng-model="Model.HedgeExposure" class="text-box">
+                                    <option ng-repeat="x in DropDownList.HedgeExposureList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row form-group" data-ng-show="Model.HedgeRiskType === 'ForeignExchange' && Model.HedgeType === 'NetInvestment'">
+                            <div class="col-xs-12 placeholder placeholderselect" id="idCurrencyExposure" data-placeholder="Exposure">
+                                <select data-ng-model="Model.ExposureCurrency" class="text-box">
+                                    <option ng-repeat="x in DropDownList.Currencies" value="{{x.ShortName}}">{{x.ShortName}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Hedged Item Type">
+                                <select data-ng-model="Model.HedgedItemType" class="text-box">
+                                    <option ng-repeat="x in DropDownList.HedgedItemTypeList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgedItemType === 'SHOW'">
+                            <div class="col-xs-12 placeholder" data-placeholder="Item Type Desc">
+                                <textarea id="initHedgedItemTypeDesc" data-ng-model="Model.HedgedItemTypeDesc" placeholder="Description"></textarea>
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgeType === 'FairValue'">
+                            <div class="col-xs-12">
+                                <i class="fa fa-square-o" data-type="Model.Shortcut" data-ng-hide="Model.Shortcut" data-ng-click="checkboxClickEvent($event)"></i>
+                                <i class="fa fa-check-square" data-type="Model.Shortcut" data-ng-show="Model.Shortcut" data-ng-click="checkboxClickEvent($event)"></i>
+                                <span class="checkboxText">Shortcut</span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Hedged Item">
+                                <select data-ng-model="Model.AssetLiability" class="text-box">
+                                    <option ng-repeat="x in DropDownList.AssetLiabilityList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgeType === 'NetInvestment'">
+                            <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Accounting Treatment">
+                                <select data-ng-model="Model.HedgeAccountingTreatment" class="text-box">
+                                    <option ng-repeat="x in DropDownList.AccountingTreatmentList" value="{{x.Value}}">{{x.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group" data-ng-show="Model.HedgeType === 'FairValue' && Model.AssetLiability === 'Asset'">
+                            <div class="col-xs-12">
+                                <i class="fa fa-square-o" data-type="Model.AvailableForSale" data-ng-hide="Model.AvailableForSale" data-ng-click="checkboxClickEvent($event)"></i>
+                                <i class="fa fa-check-square" data-type="Model.AvailableForSale" data-ng-show="Model.AvailableForSale" data-ng-click="checkboxClickEvent($event)"></i>
+                                <span class="checkboxText">Available For Sale</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 4.16%;"></div>
+                </div>
+            </div>
+            <div class="gap col-xs-0 col-md-1"></div>
+            <div class="mainmodule homePageModuleSection col-xs-12 col-md-3" ng-if="!Model.IsCaarHedgeTemplate">
+                <div class="row homePageModuleSectionTitleRow">
+                    <div class="col-xs-12">
+                        <h5 class="homePageModuleSectionTitle">HEDGING OBJECTIVE</h5>
+                    </div>
+                </div>
+                <div class="row search_margin">
+                    <div class="col-xs-1" style="width: 4.16%;"></div>
+                    <div class="col-xs-11">
+                        @*inception memo template*@
+                        <div class="row form-group" data-ng-show="Model.HedgeRiskType !== 'None'">
+                            <div class="col-xs-12 placeholder placeholderselect" id="idHedgeInceptionMemoTemplate" data-placeholder="Template">
+                                <select data-ng-model="Model.InceptionMemoTemplateID" class="text-box">
+                                    <option ng-repeat="x in DropDownList.HedgeInceptionMemoTemplates" value="{{x.ID}}" data-ng-disabled="{{x.Disabled}}">{{x.Name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12 regularHeadings">
+                                Describe the objective of this hedge relationship. This will be included in the inception package.
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-xs-12">
+                                <textarea id="initObjective" data-ng-model="Model.Objective" placeholder="Objective"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-xs-1" style="width: 4.16%;"></div>
+                </div>
+            </div>
+            <div class="gap col-xs-0 col-md-1" ng-if="!Model.IsCaarHedgeTemplate"></div>
+            <div class="mainmodule homePageModuleSection col-xs-12 col-md-3">
+                <div class="row homePageModuleSectionTitleRow">
+                    <div class="col-xs-12">
+                        <h5 class="homePageModuleSectionTitle">ACCOUNTING</h5>
+                    </div>
+                </div>
+                @{Html.RenderPartial("~/Views/HedgeAccounting/accountingView.cshtml");}
+            </div>
+        </div>
+    </div>
+</div>

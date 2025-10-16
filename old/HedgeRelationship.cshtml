@@ -1,0 +1,343 @@
+﻿@using DerivativeEDGE.Swapzilla.Extensions
+@model DerivativeEDGE.ViewModels.Core.HedgeAccountingViewDisplay
+
+@{
+    ViewBag.Title = "Hedge Accounting";
+}
+
+<script>
+    var theme = Context.Session.GetString("Theme");
+</script>
+<link href="@Url.DatedContent("~/Content/Purplepatch/css/" + Context.Session.GetString("Theme") + "/CreateEditScreen.css")" rel="stylesheet" />
+<link href="@Url.DatedContent("~/Content/Purplepatch/css/" + Context.Session.GetString("Theme") + "/TablesFilters.css")" rel="stylesheet" />
+<link href="@Url.DatedContent("~/Content/Purplepatch/css/" + Context.Session.GetString("Theme") + "/TradeScreens.css")" rel="stylesheet" />
+<link href="@Url.DatedContent("~/Content/Purplepatch/css/" + Context.Session.GetString("Theme") + "/OpportunityScreens.css")" rel="stylesheet" />
+<link href="@Url.DatedContent("~/Content/Purplepatch/css/" + Context.Session.GetString("Theme") + "/HedgeAccounting.css")" rel="stylesheet" />
+<link href='@Url.DatedContent("~/Content/Purplepatch/css/" + Context.Session.GetString("Theme") + "/FxScreens.css")' rel="stylesheet" />
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/highcharts/js/regressionPlugIn-trendline.js")"></script>
+
+<script src="~/Scripts/jquery-typing.min.js"></script>
+<script src="~/Scripts/jquery.cookie.js"></script>
+
+
+<div id="haaAppContainer" data-ng-app="tradeApp" class="customPaddingToFullPageofApp">
+    <div data-ng-controller="hedgeRelationshipAddEditCtrl" data-ng-init="init(@Model.Id);" class="hedgeContainerClass">
+
+        <!-- directive: ha-error -->
+        @**BREAD CRUMBS*****@
+        <div class="row">
+            <div class="col-sm-8" style="width:calc(100% - 300px)">
+                <div class="breadCrumb module">
+                    <ul>
+                        @if (Model.BreadcrumbTrail != null && Model.BreadcrumbTrail.Count > 0)
+                        {
+                            foreach (var item in Model.BreadcrumbTrail)
+                            {
+                                <li>
+                                    @{
+                                        //DE-2866
+                                        var htmlAttr = new Dictionary<string, object>();
+                                        htmlAttr.Add("id", string.Format("{0}_{1}", item.Controller.ToLower(), item.Action.ToLower()));
+
+                                    }
+                            @(item.Params != null ? @Html.ActionLink(item.Title, item.Action, item.Controller, routeValues: new RouteValueDictionary(item.Params), htmlAttributes: htmlAttr)
+                                    : @Html.ActionLink(item.Title, item.Action, item.Controller, routeValues: null, htmlAttributes: htmlAttr))
+                        </li>
+
+                                                }
+                        }
+                    </ul>
+                </div>
+                <div class="chevronOverlay main">
+                </div>
+                <div class="loading-spiner-holder" data-loading><div class="loading-spiner"><img class="newloading" alt="" src="@Url.Content("/Content/Purplepatch/images/loading_img/default.svg")" /></div></div>
+            </div>
+
+            <!---div class="col-sm-4" style="width:260px" data-ng-show="openDetailsTab"-->
+            <div class="col-sm-4 HRDropdwnContainer" data-ng-show="openDetailsTab">
+                <div class="pull-right" id="statusTextDiv">
+                    <div class="pull-left statustext bkgrd6">{{Model.HedgeStateText}}</div>
+                    <div class="pull-left dropdown">
+                        <div class="pull-right dropdown-toggle" data-toggle="dropdown" data-ng-disabled="InProgress">
+                            {{onActionChangeValue}} &nbsp;&nbsp;<i class="fa fa-chevron-down" aria-hidden="true"></i>
+                        </div>
+                        <ul class="dropdown-menu hedgeRelationNewTradeDrpDown">
+                            <li data-ng-repeat="x in DropDownList.ActionList">
+                                <button data-ng-disabled="InProgress || x.Disabled" type="button" data-ng-click="onChangeActionValue(x.Value)">{{x.Value}}</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row userMessageRow hide" data-ng-hide="relationshipUserMessage == ''">
+                <div class="col-xs-12 flex">
+                    <div class="pull-left usermessageicondiv">
+                        <i class="fa fa-check-circle-o" aria-hidden="true"></i>
+                    </div>
+                    <div id="userMessageDivId" class="pull-left usermessagemessagediv">
+                        {{relationshipUserMessage}}
+                    </div>
+                </div>
+            </div>
+
+            @*<div class="row search_margin" data-ng-hide="relationshipUserMessage == ''">
+                    <div class="col-xs-12 flex">
+                        <div class="pull-left usermessageicondiv">
+                            <i class="fa fa-check-circle-o" aria-hidden="true"></i>
+                        </div>
+                        <div class="pull-left usermessagemessagediv regularHeadingsBoldEnhanced">
+                            {{relationshipUserMessage}}
+                            <i class="fa fa-times pull-right" aria-hidden="true" data-ng-click="relationshipUserMessage = '';"></i>
+                        </div>
+                    </div>
+                </div>*@
+
+            @{
+                Html.RenderPartial("~/Views/HedgeAccounting/initialView.cshtml");
+            }
+
+            @{
+                Html.RenderPartial("~/Views/HedgeAccounting/detailsView.cshtml");
+            }
+
+            @*************************DIALOG*******************************@
+
+            <script type="text/ng-template" id="firstDialog">
+                <!-- directive: ha-error -->
+                <div id="tradeAnalysisTabs" class="ej2-section">
+                    <div id="grid-table-view">
+                        <edge-grid-table elem-id="grid"
+                                         id="Grid"
+                                         settings="vm.table.settings"
+                                         instance="vm.table.instance"
+                                         header-settings="vm.headerSettings">
+                            <header-template-left-ellipsis-menu>
+                                <button type="button" class="btn btn-info" data-ng-click="vm.linkTrade()">Link</button>
+                            </header-template-left-ellipsis-menu>
+                        </edge-grid-table>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/ng-template" id="dedesignateDialog">
+                <div class="ngdialog-message">
+                    <div class="validation-summary-errors" data-ng-hide="DedesignateUserMessage == ''">
+                        <div class="row">
+                            <div class="col-xs-1">
+                                <i class="fa fa-exclamation-triangle" style="font-size: 32px;"></i>
+                            </div>
+                            <div class="col-xs-11">
+                                <span style="font-size: 16px;margin-left: 21px;">{{DedesignateUserMessage}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        Reason
+                    </div>
+                    <div class="row form-group">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.Termination" data-ng-hide="Model.Termination" data-ng-click="toggleReason(0);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.Termination" data-ng-show="Model.Termination" data-ng-click="toggleReason(0);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">Termination</span>
+                    </div>
+                    <div class="row form-group">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.Ineffectiveness" data-ng-hide="Model.Ineffectiveness" data-ng-click="toggleReason(1);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.Ineffectiveness" data-ng-show="Model.Ineffectiveness" data-ng-click="toggleReason(1);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">Ineffectiveness</span>
+                    </div>
+                    <div class="row form-group">
+                        <div class="placeholder" data-placeholder="De-designation Date" Date">
+                            <input type="text" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.DeDesignation.DedesignationDate" data-ng-value="Model.DeDesignation.DedesignationDate" placeholder="Termination Date" />
+                        </div>
+                    </div>
+                    <div class="row form-group" data-ng-show="Model.Termination">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.FullCashPayment" data-ng-hide="Model.FullCashPayment" data-ng-click="toggleCashPaymentType(0);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.FullCashPayment" data-ng-show="Model.FullCashPayment" data-ng-click="toggleCashPaymentType(0);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">Full Cash Payment</span>
+                    </div>
+                    <div class="row form-group" data-ng-show="Model.Termination">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.PartialCashPayment" data-ng-hide="Model.PartialCashPayment" data-ng-click="toggleCashPaymentType(1);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.PartialCashPayment" data-ng-show="Model.PartialCashPayment" data-ng-click="toggleCashPaymentType(1);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">Partial Cash Payment</span>
+                    </div>
+                    <div class="row form-group" data-ng-show="Model.Termination">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.NoCashPayment" data-ng-hide="Model.NoCashPayment" data-ng-click="toggleCashPaymentType(2);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.NoCashPayment" data-ng-show="Model.NoCashPayment" data-ng-click="toggleCashPaymentType(2);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">No Cash Payment</span>
+                    </div>
+                    <div class="row form-group">
+                        <div data-ng-if="Model.DedesignationReason === 0" class="placeholder" data-placeholder="Termination Fee">
+                            <input type="text" id="deDesignateAmount" class="text-box" data-ng-model="Model.DeDesignation.Payment" data-ng-value="Model.DeDesignation.Payment" placeholder="Termination Fee" />
+                        </div>
+                        <div data-ng-if="Model.DedesignationReason === 1" class="placeholder" data-placeholder="Payment">
+                            <input type="text" id="deDesignateAmount" class="text-box" data-ng-model="Model.DeDesignation.Payment" data-ng-value="Model.DeDesignation.Payment" placeholder="Payment" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="placeholder" data-placeholder="Hedging Item Accrual">
+                            <input type="text" id="deDesignateAccrual" class="text-box" data-ng-model="Model.DeDesignation.Accrual" data-ng-value="Model.DeDesignation.Accrual" placeholder="Hedging Item Accrual" />
+                        </div>
+                    </div>
+                    <div class="row form-group" data-ng-show="Model.HedgeType === 'FairValue' && Model.Shortcut === false && Model.Termination === true && Model.DeDesignation.ShowBasisAdjustmentBalance === true">
+                        <div class="placeholder" data-placeholder="Basis Adjustment Balance">
+                            <input type="text" id="deDesignateBasisAdjustmentBalance" class="text-box" data-ng-model="Model.DeDesignation.BasisAdjustmentBalance" data-ng-value="Model.DeDesignation.BasisAdjustmentBalance" placeholder="Basis Adjustment Balance" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        Hedged Exposure still Exist?
+                    </div>
+                    <div class="row form-group">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.DeDesignation.HedgedExposureExist" data-ng-hide="Model.DeDesignation.HedgedExposureExist" data-ng-click="toggleHedgedExposureExist(1);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.DeDesignation.HedgedExposureExist" data-ng-show="Model.DeDesignation.HedgedExposureExist" data-ng-click="toggleHedgedExposureExist(1);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">Yes</span>
+                    </div>
+                    <div class="row form-group">
+                        <i class="radiofontawesomewithno fa fa-circle-o" data-type="Model.HedgedExposureNotExist" data-ng-hide="Model.HedgedExposureNotExist" data-ng-click="toggleHedgedExposureExist(0);"></i>
+                        <span class="radiofontawesomewithyes fa-stack" data-type="Model.HedgedExposureNotExist" data-ng-show="Model.HedgedExposureNotExist" data-ng-click="toggleHedgedExposureExist(0);">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="checkboxText">No</span>
+                    </div>
+                    <div class="row form-group">
+                        Time Value Entries:
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-12 placeholder" data-placeholder="Start Date">
+                            <input type="text" id="deDesignateStartDate" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.TimeValuesStartDate"
+                                   data-ng-value="Model.TimeValuesStartDate" placeholder="Start Date"/>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="placeholder" data-placeholder="End Date">
+                            <input type="text" id="deDesignateEndDate" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.TimeValuesEndDate"
+                                   data-ng-value="Model.TimeValuesEndDate" placeholder="End Date"/>
+                        </div>
+                    </div>
+                    <div class="row search_margin">
+                        <button type="button" class="btn btn-info" data-ng-click="deDesignate();" data-ng-disabled="DedesignateDisabled">De-Designate</button>
+                        <button type="button" class="btn btn-cancel" data-ng-click="cancel();">Cancel</button>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/ng-template" id="redesignateDialog">
+                <div class="ngdialog-message">
+                    <div class="row form-group">
+                        <div class="placeholder" data-placeholder="Re-designation Date" Date">
+                            <input type="text" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.RedesignationDate" data-ng-value="Model.RedesignationDate" placeholder="Re-Designation Date" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Payment Frequency">
+                            <select data-ng-model="Model.PaymentFrequency" class="text-box selectvalues-convert-tostring" data-modelvalue="Model" data-typeofscope="template">
+                                <option value="">None</option>
+                                <option ng-repeat="x in DropDownList.PaymentFrequencyList" value="{{x.Value}}">{{x.Text}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Day Count Convention">
+                            <select data-ng-model="Model.DayCountConv" class="text-box selectvalues-convert-tostring" data-modelvalue="Model" data-typeofscope="template">
+                                <option value="">None</option>
+                                <option ng-repeat="x in DropDownList.DayCountConvList" value="{{x.Value}}">{{x.Text}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-12 placeholder placeholderselect" data-placeholder="Payment Convention">
+                            <select data-ng-model="Model.PayBusDayConv" class="text-box selectvalues-convert-tostring" data-modelvalue="Model" data-typeofscope="template">
+                                <option value="">None</option>
+                                <option ng-repeat="x in DropDownList.PayBusDayConvList" value="{{x.Value}}">{{x.Text}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-12 placeholder" data-placeholder="Start Date">
+                            <input type="text" id="deDesignateStartDate" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.TimeValuesStartDate" data-ng-value="Model.TimeValuesStartDate" placeholder="Start Date" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="placeholder" data-placeholder="End Date">
+                            <input type="text" id="deDesignateEndDate" class="text-box datepickplugin" data-datetime="MM/dd/yyyy" data-ng-model="Model.TimeValuesEndDate" data-ng-value="Model.TimeValuesEndDate" placeholder="End Date" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="placeholder" data-placeholder="Amount">
+                            <input type="text" id="reDesignateAmount" class="text-box" data-ng-model="Model.Payment" data-ng-value="Model.Payment" placeholder="Amount" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 form-group">
+                            <i class="fa fa-square-o" data-type="Model.AdjustedDates" data-ng-hide="Model.AdjustedDates" data-ng-click="checkboxRedesignationClickEvent($event)"></i>
+                            <i class="fa fa-check-square" data-type="Model.AdjustedDates" data-ng-show="Model.AdjustedDates" data-ng-click="checkboxRedesignationClickEvent($event)"></i>
+                            <span class="checkboxText">Adj Dates</span>
+                        </div>
+                        <div class="col-xs-6 form-group">
+                            <i class="fa fa-square-o" data-type="Model.MarkAsAcquisition" data-ng-hide="Model.MarkAsAcquisition" data-ng-click="checkboxRedesignationClickEvent($event)"></i>
+                            <i class="fa fa-check-square" data-type="Model.MarkAsAcquisition" data-ng-show="Model.MarkAsAcquisition" data-ng-click="checkboxRedesignationClickEvent($event)"></i>
+                            <span class="checkboxText">Acquisition</span>
+                        </div>
+                    </div>
+                    <div class="row search_margin">
+                        <button type="button" class="btn btn-info" data-ng-click="reDesignate();" data-ng-disabled="!isRedesignationValid()">Re-Designate</button>
+                        <button type="button" class="btn btn-cancel" data-ng-click="cancel();">Cancel</button>
+                    </div>
+                </div>
+            </script>
+
+        </div>
+    </div>
+    <div id="divRichEditor"></div>
+
+    <div id="tradeInformationDialog" title="TRADE INFORMATION">
+        <div id="tradeInformationDialogBody" class="invisible">
+        </div>
+    </div>
+
+@section scripts{
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/cancelableSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/capFloorSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/debtSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/swapSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/swaptionSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/callableDebtSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/debtOptionSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/collarSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/swapembeddedoptionSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/corridorSpecific.js")'></script>
+        <script src='@Url.DatedContent("~/Content/AngularJs/SpecificJS/fxSingleSpecific.js")'></script>
+        <script>
+            $(document).ready(function () {
+                /******Bread Crumb********/
+                jQuery(".breadCrumb").jBreadCrumb();
+            });
+            var model = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
+            function getModel() {
+                return model;
+            }
+        </script>
+}
+
+
+
