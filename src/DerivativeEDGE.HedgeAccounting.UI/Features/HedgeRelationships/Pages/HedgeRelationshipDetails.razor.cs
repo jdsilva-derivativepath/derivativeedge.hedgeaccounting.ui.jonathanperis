@@ -960,28 +960,23 @@ public partial class HedgeRelationshipDetails
 
         try
         {
-            // API Call: Check if document template exists
-            // var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeId));
-            
-            // if (findDocTemplateResponse.HasTemplate)
-            // {
-            //     // Save current state first
-            //     await SaveHedgeRelationshipAsync();
-            //     
-            //     // Reload hedge relationship
-            //     await GetHedgeRelationship(HedgeId);
-            // }
+            // Save current state before designation
+            await SaveHedgeRelationshipAsync();
 
-            // API Call: Run regression for inception
-            // await Mediator.Send(new RunRegression.Command(HedgeRelationship, hedgeResultType: "Inception"));
+            // Execute designation workflow
+            var response = await Mediator.Send(new DesignateHedgeRelationship.Command(HedgeId));
+            
+            if (response.HasError)
+            {
+                await AlertService.ShowToast(response.ErrorMessage, AlertKind.Error, "Designation Failed", showButton: true);
+                return;
+            }
 
-            // API Call: Check analytics status
-            // var analyticsStatus = await Mediator.Send(new CheckAnalyticsStatus.Query(HedgeId));
+            // Update the local hedge relationship with the latest state
+            HedgeRelationship = response.HedgeRelationship;
             
-            // API Call: Generate inception package
-            // var response = await Mediator.Send(new GenerateInceptionPackage.Command(HedgeRelationship, preview: false));
-            
-            await AlertService.ShowToast("Designate workflow initiated. API calls need to be implemented.", AlertKind.Info, "Info", showButton: true);
+            await AlertService.ShowToast("Hedge Relationship successfully designated.", AlertKind.Success, "Success", showButton: true);
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -1047,30 +1042,40 @@ public partial class HedgeRelationshipDetails
     {
         DedesignationReason = reason;
         
-        // API Call: Load de-designation data for the selected reason
-        // var response = await Mediator.Send(new GetDedesignateData.Query(HedgeId, reason));
-        // 
-        // if (response.ErrorMessage != null)
-        // {
-        //     IsDeDesignateDisabled = true;
-        //     DedesignateUserMessage = response.ErrorMessage;
-        //     DedesignateIsError = true;
-        //     DedesignationDateDialog = response.DedesignationDate;
-        // }
-        // else
-        // {
-        //     IsDeDesignateDisabled = false;
-        //     DedesignateUserMessage = string.Empty;
-        //     DedesignateTimeValuesStartDate = response.DedesignationDate;
-        //     DedesignateTimeValuesEndDate = response.TimeValuesEndDate;
-        //     DedesignationDateDialog = response.DedesignationDate;
-        //     DedesignatePayment = response.Payment;
-        //     ShowBasisAdjustmentBalance = response.ShowBasisAdjustmentBalance;
-        //     BasisAdjustment = response.BasisAdjustment;
-        //     BasisAdjustmentBalance = response.BasisAdjustmentBalance;
-        //     CashPaymentType = 0;
-        //     HedgedExposureExist = true;
-        // }
+        try
+        {
+            // API Call: Load de-designation data for the selected reason
+            var response = await Mediator.Send(
+                new GetDeDesignateData.Query(HedgeId, (DerivativeEDGEHAEntityEnumDedesignationReason)reason));
+            
+            if (response.HasError || !string.IsNullOrEmpty(response.ErrorMessage))
+            {
+                IsDeDesignateDisabled = true;
+                DedesignateUserMessage = response.ErrorMessage ?? "An error occurred loading de-designation data";
+                DedesignateIsError = true;
+                DedesignationDateDialog = response.DedesignationDate;
+            }
+            else
+            {
+                IsDeDesignateDisabled = false;
+                DedesignateUserMessage = string.Empty;
+                DedesignateTimeValuesStartDate = response.TimeValuesStartDate;
+                DedesignateTimeValuesEndDate = response.TimeValuesEndDate;
+                DedesignationDateDialog = response.DedesignationDate;
+                DedesignatePayment = response.Payment;
+                ShowBasisAdjustmentBalance = response.ShowBasisAdjustmentBalance;
+                BasisAdjustment = response.BasisAdjustment;
+                BasisAdjustmentBalance = response.BasisAdjustmentBalance;
+                CashPaymentType = 0;
+                HedgedExposureExist = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            IsDeDesignateDisabled = true;
+            DedesignateUserMessage = $"Error loading de-designation data: {ex.Message}";
+            DedesignateIsError = true;
+        }
         
         StateHasChanged();
     }
@@ -1079,23 +1084,35 @@ public partial class HedgeRelationshipDetails
     {
         try
         {
-            // API Call: Execute de-designation
-            // var command = new DeDesignateHedgeRelationship.Command
-            // {
-            //     HedgeRelationshipId = HedgeId,
-            //     DedesignationDate = DedesignationDateDialog,
-            //     DedesignationReason = DedesignationReason,
-            //     Payment = DedesignatePayment,
-            //     TimeValuesStartDate = DedesignateTimeValuesStartDate,
-            //     TimeValuesEndDate = DedesignateTimeValuesEndDate,
-            //     CashPaymentType = CashPaymentType,
-            //     HedgedExposureExist = HedgedExposureExist
-            // };
-            // 
-            // await Mediator.Send(command);
+            // Execute de-designation
+            var command = new DeDesignateHedgeRelationship.Command(
+                HedgeRelationshipId: HedgeId,
+                DedesignationDate: DedesignationDateDialog,
+                DedesignationReason: DedesignationReason,
+                Payment: DedesignatePayment,
+                TimeValuesStartDate: DedesignateTimeValuesStartDate,
+                TimeValuesEndDate: DedesignateTimeValuesEndDate,
+                CashPaymentType: CashPaymentType,
+                HedgedExposureExist: HedgedExposureExist,
+                BasisAdjustment: BasisAdjustment,
+                BasisAdjustmentBalance: BasisAdjustmentBalance);
+            
+            var response = await Mediator.Send(command);
 
-            await GetHedgeRelationship(HedgeId);
+            if (response.HasError)
+            {
+                await AlertService.ShowToast(response.ErrorMessage, AlertKind.Error, "De-designation Failed", showButton: true);
+                return;
+            }
+
+            // Update local hedge relationship
+            HedgeRelationship = response.Data;
+            
+            // Close the modal
+            OpenModal = string.Empty;
+            
             await AlertService.ShowToast("Hedge Relationship de-designated successfully.", AlertKind.Success, "Success", showButton: true);
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -1107,24 +1124,20 @@ public partial class HedgeRelationshipDetails
     {
         try
         {
-            // Redraft logic from legacy:
-            // 1. If there's a selected option time value amortization, delete it first
-            // 2. Call HedgeRelationship/Redraft API
-            // 3. Reload the hedge relationship
+            // Execute redraft
+            var response = await Mediator.Send(new RedraftHedgeRelationship.Command(HedgeId));
             
-            // API Call: Delete option time value amortization if exists
-            // if (hasSelectedOptionTimeValueAmort)
-            // {
-            //     await Mediator.Send(new DeleteOptionTimeValueAmort.Command(selectedAmortId));
-            // }
+            if (response.HasError)
+            {
+                await AlertService.ShowToast(response.ErrorMessage, AlertKind.Error, "Redraft Failed", showButton: true);
+                return;
+            }
 
-            // API Call: Redraft the hedge relationship
-            // var response = await Mediator.Send(new RedraftHedgeRelationship.Command(HedgeId));
+            // Update local hedge relationship
+            HedgeRelationship = response.Data;
             
-            // Reload the hedge relationship
-            await GetHedgeRelationship(HedgeId);
-            
-            await AlertService.ShowToast("Redraft completed. API call needs to be implemented.", AlertKind.Success, "Success", showButton: true);
+            await AlertService.ShowToast("Hedge Relationship successfully redrafted.", AlertKind.Success, "Success", showButton: true);
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -1136,38 +1149,45 @@ public partial class HedgeRelationshipDetails
     {
         try
         {
-            // Re-designate logic from legacy:
-            // 1. Check if document template exists
-            // 2. If exists, save current state first
-            // 3. Call HedgeRelationship/Redesignate/{id} to get re-designation data
-            // 4. Show Re-Designation dialog with the data
+            // Check if document template exists
+            var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeId));
             
-            // API Call: Check if document template exists
-            // var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeId));
-            // IsDocTemplateFound = findDocTemplateResponse.HasTemplate;
-            
-            // if (IsDocTemplateFound)
-            // {
-            //     // Save current state first
-            //     await SaveHedgeRelationshipAsync();
-            //     
-            //     // Reload hedge relationship
-            //     await GetHedgeRelationship(HedgeId);
-            // }
+            if (findDocTemplateResponse.HasError)
+            {
+                await AlertService.ShowToast(findDocTemplateResponse.ErrorMessage, AlertKind.Error, "Re-designation Failed", showButton: true);
+                return;
+            }
 
-            // API Call: Get re-designation data
-            // var redesignateResponse = await Mediator.Send(new GetRedesignateData.Query(HedgeId));
+            IsDocTemplateFound = findDocTemplateResponse.HasTemplate;
             
-            // Set model properties from response (mocking values for now):
-            RedesignationDate = DateTime.Today;
-            RedesignateTimeValuesStartDate = DateTime.Today;
-            RedesignateTimeValuesEndDate = DateTime.Today.AddMonths(6);
-            RedesignatePayment = 0;
-            // RedesignateDayCountConv = redesignateResponse.DayCountConv;
-            // RedesignatePayBusDayConv = redesignateResponse.PayBusDayConv;
-            // RedesignatePaymentFrequency = redesignateResponse.PaymentFrequency;
-            // RedesignateAdjustedDates = redesignateResponse.AdjustedDates;
-            // MarkAsAcquisition = redesignateResponse.MarkAsAcquisition;
+            if (IsDocTemplateFound)
+            {
+                // Save current state first
+                await SaveHedgeRelationshipAsync();
+                
+                // Reload hedge relationship
+                await GetHedgeRelationship(HedgeId);
+            }
+
+            // Get re-designation data
+            var redesignateResponse = await Mediator.Send(new GetReDesignateData.Query(HedgeId));
+            
+            if (redesignateResponse.HasError)
+            {
+                await AlertService.ShowToast(redesignateResponse.ErrorMessage, AlertKind.Error, "Re-designation Failed", showButton: true);
+                return;
+            }
+
+            // Set model properties from response
+            RedesignationDate = redesignateResponse.RedesignationDate;
+            RedesignateTimeValuesStartDate = redesignateResponse.TimeValuesStartDate;
+            RedesignateTimeValuesEndDate = redesignateResponse.TimeValuesEndDate;
+            RedesignatePayment = redesignateResponse.Payment;
+            RedesignateDayCountConv = redesignateResponse.DayCountConv;
+            RedesignatePayBusDayConv = redesignateResponse.PayBusDayConv;
+            RedesignatePaymentFrequency = redesignateResponse.PaymentFrequency;
+            RedesignateAdjustedDates = redesignateResponse.AdjustedDates;
+            MarkAsAcquisition = redesignateResponse.MarkAsAcquisition;
 
             // Show Re-Designation dialog
             OpenModal = MODAL_REDESIGNATE;
@@ -1183,25 +1203,35 @@ public partial class HedgeRelationshipDetails
     {
         try
         {
-            // API Call: Execute re-designation
-            // var command = new ReDesignateHedgeRelationship.Command
-            // {
-            //     HedgeRelationshipId = HedgeId,
-            //     RedesignationDate = RedesignationDate,
-            //     TimeValuesStartDate = RedesignateTimeValuesStartDate,
-            //     TimeValuesEndDate = RedesignateTimeValuesEndDate,
-            //     Payment = RedesignatePayment,
-            //     PaymentFrequency = RedesignatePaymentFrequency,
-            //     DayCountConv = RedesignateDayCountConv,
-            //     PayBusDayConv = RedesignatePayBusDayConv,
-            //     AdjustedDates = RedesignateAdjustedDates,
-            //     MarkAsAcquisition = MarkAsAcquisition
-            // };
-            // 
-            // await Mediator.Send(command);
+            // Execute re-designation
+            var command = new ReDesignateHedgeRelationship.Command(
+                HedgeRelationshipId: HedgeId,
+                RedesignationDate: RedesignationDate,
+                Payment: RedesignatePayment,
+                TimeValuesStartDate: RedesignateTimeValuesStartDate,
+                TimeValuesEndDate: RedesignateTimeValuesEndDate,
+                PaymentFrequency: RedesignatePaymentFrequency,
+                DayCountConv: RedesignateDayCountConv,
+                PayBusDayConv: RedesignatePayBusDayConv,
+                AdjustedDates: RedesignateAdjustedDates,
+                MarkAsAcquisition: MarkAsAcquisition);
+            
+            var response = await Mediator.Send(command);
 
-            await GetHedgeRelationship(HedgeId);
+            if (response.HasError)
+            {
+                await AlertService.ShowToast(response.ErrorMessage, AlertKind.Error, "Re-designation Failed", showButton: true);
+                return;
+            }
+
+            // Update local hedge relationship
+            HedgeRelationship = response.Data;
+            
+            // Close the modal
+            OpenModal = string.Empty;
+            
             await AlertService.ShowToast("Hedge Relationship re-designated successfully.", AlertKind.Success, "Success", showButton: true);
+            StateHasChanged();
         }
         catch (Exception ex)
         {
