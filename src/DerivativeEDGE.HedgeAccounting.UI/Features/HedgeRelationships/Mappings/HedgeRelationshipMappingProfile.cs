@@ -5,7 +5,9 @@ public class HedgeRelationshipMappingProfile : Profile
     public HedgeRelationshipMappingProfile()
     {
         CreateMap<DerivativeEDGEHAEntityHedgeRelationship, DerivativeEDGEHAApiViewModelsHedgeRelationshipVM>();
-        CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM, DerivativeEDGEHAEntityHedgeRelationship>();
+        CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM, DerivativeEDGEHAEntityHedgeRelationship>()
+            .ForMember(dest => dest.DesignationDate, opt => opt.MapFrom(src => ParseDateTimeOffset(src.DesignationDate)))
+            .ForMember(dest => dest.DedesignationDate, opt => opt.MapFrom(src => ParseNullableDateTimeOffset(src.DedesignationDate)));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRegressionBatch, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM, DerivativeEDGEHAEntityHedgeRegressionBatch>();
@@ -55,5 +57,41 @@ public class HedgeRelationshipMappingProfile : Profile
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipItemLeg, DerivativeEDGEHAApiViewModelsHedgeRelationshipItemLegVm>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemLegVm, DerivativeEDGEHAEntityHedgeRelationshipItemLeg>();
+    }
+
+    /// <summary>
+    /// Parses a string date to DateTimeOffset. Returns DateTimeOffset.MinValue if parsing fails or string is null/empty.
+    /// </summary>
+    private static DateTimeOffset ParseDateTimeOffset(string? dateString)
+    {
+        if (string.IsNullOrWhiteSpace(dateString))
+        {
+            return DateTimeOffset.MinValue;
+        }
+
+        if (DateTime.TryParse(dateString, out var parsedDate))
+        {
+            return new DateTimeOffset(parsedDate);
+        }
+
+        return DateTimeOffset.MinValue;
+    }
+
+    /// <summary>
+    /// Parses a string date to nullable DateTimeOffset. Returns null if parsing fails or string is null/empty.
+    /// </summary>
+    private static DateTimeOffset? ParseNullableDateTimeOffset(string? dateString)
+    {
+        if (string.IsNullOrWhiteSpace(dateString))
+        {
+            return null;
+        }
+
+        if (DateTime.TryParse(dateString, out var parsedDate))
+        {
+            return new DateTimeOffset(parsedDate);
+        }
+
+        return null;
     }
 }
