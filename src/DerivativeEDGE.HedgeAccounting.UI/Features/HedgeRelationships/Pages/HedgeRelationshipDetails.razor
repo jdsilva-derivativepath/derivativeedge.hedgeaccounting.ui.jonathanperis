@@ -386,7 +386,9 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                     <SfCheckBox CssClass="input-checkbox"
                                     Disabled="@(!CanEditCheckbox())"
                                     @bind-Checked="HedgeRelationship.ExcludeIntrinsicValue"
-                                    Label="Exclude Intrinsic Value" />
+                                    Label="Exclude Intrinsic Value">
+                                        <CheckBoxEvents TChecked="bool" ValueChange="OnExcludeIntrinsicValueChanged" />
+                                    </SfCheckBox>
                                 </div>
                             }
                             @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
@@ -453,7 +455,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                             @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated && HedgeRelationship.ExcludeIntrinsicValue)
                             {
                                 <div class="form-group dp-inputs min-w-100">
-                                    <SfDropDownList TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod"
+                                    <SfDropDownList TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod?"
                                     CssClass="dropdown-input"
                                     Enabled="true"
                                     @bind-Value="HedgeRelationship.IntrinsicMethod"
