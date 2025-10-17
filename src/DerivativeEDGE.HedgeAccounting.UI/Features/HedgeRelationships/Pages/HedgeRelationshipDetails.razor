@@ -985,8 +985,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                 <DialogPositionData X="center" Y="center"></DialogPositionData>
             </SfDialog>
         }
-
-        @if (IsDeDesignateModal)
+        else if (IsDeDesignateModal)
         {
             <DeDesignateDialog Visible="@IsDeDesignateModal"
                                VisibleChanged="@((value) => OpenModal = value ? MODAL_DEDESIGNATE : string.Empty)"
@@ -1006,8 +1005,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                IsDeDesignateDisabled="@IsDeDesignateDisabled"
                                OnDeDesignated="@OnDeDesignateConfirmed" />
         }
-
-        @if (IsReDesignateModal)
+        else if (IsReDesignateModal)
         {
             <ReDesignateDialog Visible="@IsReDesignateModal"
                                VisibleChanged="@((value) => OpenModal = value ? MODAL_REDESIGNATE : string.Empty)"
