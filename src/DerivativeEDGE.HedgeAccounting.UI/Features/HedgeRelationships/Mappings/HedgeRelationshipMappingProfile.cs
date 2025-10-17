@@ -7,8 +7,7 @@ public class HedgeRelationshipMappingProfile : Profile
         CreateMap<DerivativeEDGEHAEntityHedgeRelationship, DerivativeEDGEHAApiViewModelsHedgeRelationshipVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM, DerivativeEDGEHAEntityHedgeRelationship>()
             .ForMember(dest => dest.DesignationDate, opt => opt.MapFrom(src => ParseDateTimeOffset(src.DesignationDate)))
-            .ForMember(dest => dest.DedesignationDate, opt => opt.MapFrom(src => ParseNullableDateTimeOffset(src.DedesignationDate)))
-            .ForMember(dest => dest.RedesignationDate, opt => opt.MapFrom(src => ParseNullableDateTimeOffset(src.RedesignationDate)));
+            .ForMember(dest => dest.DedesignationDate, opt => opt.MapFrom(src => ParseNullableDateTimeOffset(src.DedesignationDate)));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRegressionBatch, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM, DerivativeEDGEHAEntityHedgeRegressionBatch>();
