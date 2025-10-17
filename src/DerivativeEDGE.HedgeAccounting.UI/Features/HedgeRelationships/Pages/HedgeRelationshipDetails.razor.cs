@@ -507,13 +507,9 @@ public partial class HedgeRelationshipDetails
             var query = new InceptionPackageService.Query(HedgeRelationship);
             var result = await Mediator.Send(query);
 
-            // Convert stream to byte array for download
-            using var memoryStream = new MemoryStream();
-            await result.ExcelStream.CopyToAsync(memoryStream);
-            var fileBytes = memoryStream.ToArray();
-
-            // Trigger file download
-            await JSRuntime.InvokeVoidAsync("downloadFile", result.FileName, Convert.ToBase64String(fileBytes));
+            // Use DotNetStreamReference for proper binary file download
+            using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
 
             await AlertService.ShowToast("Inception package generated successfully!", AlertKind.Success, "Success", showButton: true);
         }
@@ -552,13 +548,9 @@ public partial class HedgeRelationshipDetails
             var query = new DownloadSpecsAndChecksService.Query(HedgeRelationship);
             var result = await Mediator.Send(query);
 
-            // Convert stream to byte array for download
-            using var memoryStream = new MemoryStream();
-            await result.ExcelStream.CopyToAsync(memoryStream);
-            var fileBytes = memoryStream.ToArray();
-
-            // Trigger file download
-            await JSRuntime.InvokeVoidAsync("downloadFile", result.FileName, Convert.ToBase64String(fileBytes));
+            // Use DotNetStreamReference for proper binary file download
+            using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
 
             await AlertService.ShowToast("Specs and checks downloaded successfully!", AlertKind.Success, "Success", showButton: true);
         }
