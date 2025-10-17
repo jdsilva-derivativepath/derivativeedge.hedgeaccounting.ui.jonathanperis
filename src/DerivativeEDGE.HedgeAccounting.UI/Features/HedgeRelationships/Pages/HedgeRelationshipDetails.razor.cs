@@ -1175,12 +1175,22 @@ public partial class HedgeRelationshipDetails
         {
             HedgeRelationship.ExcludeIntrinsicValue = args.Checked;
             
-            // When unchecked, reset IntrinsicMethod to None and related options
             if (!args.Checked)
             {
+                // When unchecked, reset IntrinsicMethod to None and related options
                 HedgeRelationship.IntrinsicMethod = DerivativeEDGEHAEntityEnumIntrinsicMethod.None;
                 HedgeRelationship.AmortizeOptionPremimum = false;
                 HedgeRelationship.IsDeltaMatchOption = false;
+            }
+            else
+            {
+                // When checked, ensure IntrinsicMethod has a valid value
+                // Default to None if it's not already set to a valid method
+                if (HedgeRelationship.IntrinsicMethod == DerivativeEDGEHAEntityEnumIntrinsicMethod.None || 
+                    HedgeRelationship.IntrinsicMethod == default)
+                {
+                    HedgeRelationship.IntrinsicMethod = DerivativeEDGEHAEntityEnumIntrinsicMethod.None;
+                }
             }
             
             StateHasChanged();

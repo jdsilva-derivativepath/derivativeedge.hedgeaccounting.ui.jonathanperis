@@ -455,14 +455,14 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                             @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated && HedgeRelationship.ExcludeIntrinsicValue)
                             {
                                 <div class="form-group dp-inputs min-w-100">
-                                    <SfDropDownList TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod?"
+                                    <SfDropDownList TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod"
                                     CssClass="dropdown-input"
                                     Enabled="true"
                                     @bind-Value="HedgeRelationship.IntrinsicMethod"
                                     TItem="DropdownModel"
                                     Placeholder="Exclude Intrinsic Value"
                                     DataSource="@DropdownDataHelper.GetDropdownDatasource("intrinsicmethod")">
-                                        <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod?" TItem="DropdownModel" />
+                                        <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumIntrinsicMethod" TItem="DropdownModel" />
                                         <DropDownListFieldSettings Text="Text" Value="Value" />
                                     </SfDropDownList>
                                 </div>
