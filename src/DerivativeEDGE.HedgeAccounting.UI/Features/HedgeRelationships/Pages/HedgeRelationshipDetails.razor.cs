@@ -1174,13 +1174,65 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Checkbox Event Handlers
+    private void OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            // Legacy rule: IsAnOptionHedge and OffMarket are mutually exclusive
+            if (args.Checked && HedgeRelationship.OffMarket)
+            {
+                // Prevent checking the box if OffMarket is true
+                HedgeRelationship.IsAnOptionHedge = false;
+                return;
+            }
+            
+            HedgeRelationship.IsAnOptionHedge = args.Checked;
+            
+            // Legacy rule: When IsAnOptionHedge is unchecked, also clear related option hedge fields
+            if (!args.Checked)
+            {
+                HedgeRelationship.AmortizeOptionPremimum = false;
+                HedgeRelationship.IsDeltaMatchOption = false;
+                HedgeRelationship.ExcludeIntrinsicValue = false;
+            }
+            
+            StateHasChanged();
+        }
+    }
+    
+    private void OnOffMarketChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            // Legacy rule: IsAnOptionHedge and OffMarket are mutually exclusive
+            if (args.Checked && HedgeRelationship.IsAnOptionHedge)
+            {
+                // Prevent checking the box if IsAnOptionHedge is true
+                HedgeRelationship.OffMarket = false;
+                return;
+            }
+            
+            HedgeRelationship.OffMarket = args.Checked;
+            StateHasChanged();
+        }
+    }
+    
     private void OnExcludeIntrinsicValueChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
     {
         if (HedgeRelationship != null)
         {
-            HedgeRelationship.ExcludeIntrinsicValue = args.Checked;
+            // Legacy rule: ExcludeIntrinsicValue can only be true when IsAnOptionHedge is true
+            if (args.Checked && !HedgeRelationship.IsAnOptionHedge)
+            {
+                // Prevent checking the box if not an option hedge
+                HedgeRelationship.ExcludeIntrinsicValue = false;
+            }
+            else
+            {
+                HedgeRelationship.ExcludeIntrinsicValue = args.Checked;
+            }
             
-            if (!args.Checked)
+            if (!HedgeRelationship.ExcludeIntrinsicValue)
             {
                 // When unchecked, reset IntrinsicMethod to None and related options
                 HedgeRelationship.IntrinsicMethod = DerivativeEDGEHAEntityEnumIntrinsicMethod.None;
