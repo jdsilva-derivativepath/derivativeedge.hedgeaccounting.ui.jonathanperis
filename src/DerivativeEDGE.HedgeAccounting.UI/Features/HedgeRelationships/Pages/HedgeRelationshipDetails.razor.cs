@@ -825,14 +825,82 @@ public partial class HedgeRelationshipDetails
 
         try
         {
-            var response = await Mediator.Send(new RunRegression.Command(HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Backload));
-            if (!response.HasError) { HedgeRelationship = response.Data; GenerateEffectivenessChartData(); }
+            IsRunningRegression = true;
+            StateHasChanged();
 
-            await AlertService.ShowToast("Backload requested (API call pending implementation).", AlertKind.Success, "Success", showButton: true);
+            // Run the backload regression analysis
+            var response = await Mediator.Send(new RunRegression.Command(HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Backload));
+
+            if (response.HasError)
+            {
+                if (response.ValidationErrors?.Any() == true)
+                {
+                    var errorMessage = string.Join("; ", response.ValidationErrors);
+                    await AlertService.ShowToast($"Backload failed: {errorMessage}", AlertKind.Error, "Backload Error", showButton: true);
+                }
+                else
+                {
+                    await AlertService.ShowToast(response.ErrorMessage ?? "Failed to create Backload", AlertKind.Error, "Error", showButton: true);
+                }
+                return;
+            }
+
+            // Update the hedge relationship with the new data
+            if (response.Data != null)
+            {
+                HedgeRelationship = response.Data;
+
+                // Regenerate effectiveness chart data
+                GenerateEffectivenessChartData();
+
+                // Refresh the Instruments and Analysis tab if it's loaded
+                if (instrumentAnalysisTabRef != null)
+                {
+                    await instrumentAnalysisTabRef.RefreshGridData();
+                }
+
+                // Refresh the TestResultsTab with new data
+                if (testResultsTabRef != null)
+                {
+                    await testResultsTabRef.RefreshTestResultsData();
+                }
+
+                await AlertService.ShowToast("Backload completed successfully!", AlertKind.Success, "Success", showButton: true);
+
+                // Switch to the "Test Results" tab (Tab index 1 - Test Results)
+                if (hedgerelationshiptabRef != null)
+                {
+                    await hedgerelationshiptabRef.SelectAsync(1);
+                }
+            }
+            else
+            {
+                // If no data returned, refresh the hedge relationship from the API
+                await GetHedgeRelationship(HedgeId);
+
+                // Refresh the TestResultsTab after API refresh
+                if (testResultsTabRef != null)
+                {
+                    await testResultsTabRef.RefreshTestResultsData();
+                }
+
+                await AlertService.ShowToast("Backload completed successfully!", AlertKind.Success, "Success", showButton: true);
+
+                // Switch to the "Test Results" tab
+                if (hedgerelationshiptabRef != null)
+                {
+                    await hedgerelationshiptabRef.SelectAsync(1);
+                }
+            }
         }
         catch (Exception ex)
         {
             await AlertService.ShowToast($"Failed to create Backload: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            IsRunningRegression = false;
+            StateHasChanged();
         }
     }
 
