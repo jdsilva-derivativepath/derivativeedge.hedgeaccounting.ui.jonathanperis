@@ -67,15 +67,51 @@ public sealed class DownloadSpecsAndChecksService
             {
                 return "SpecsAndChecks.xlsx";
             }
-            // naive parse for filename= pattern
+
+            // Try to extract filename* first (RFC 5987 encoded filename)
+            const string encodedToken = "filename*=";
+            var encodedIdx = contentDisposition.IndexOf(encodedToken, StringComparison.OrdinalIgnoreCase);
+            if (encodedIdx >= 0)
+            {
+                var start = encodedIdx + encodedToken.Length;
+                var remainder = contentDisposition[start..];
+                
+                // Find the end of this parameter (semicolon or end of string)
+                var endIdx = remainder.IndexOf(';');
+                var encodedValue = endIdx >= 0 ? remainder[..endIdx].Trim() : remainder.Trim();
+                
+                // RFC 5987 format: charset'lang'filename (e.g., UTF-8''filename.xlsx)
+                var parts = encodedValue.Split('\'');
+                if (parts.Length >= 3)
+                {
+                    var fileName = string.Join("'", parts.Skip(2));
+                    fileName = Uri.UnescapeDataString(fileName);
+                    if (!string.IsNullOrWhiteSpace(fileName))
+                    {
+                        return fileName;
+                    }
+                }
+            }
+
+            // Fall back to filename= parameter
             const string token = "filename=";
             var idx = contentDisposition.IndexOf(token, StringComparison.OrdinalIgnoreCase);
             if (idx < 0)
             {
                 return "SpecsAndChecks.xlsx";
             }
-            var remainder = contentDisposition[(idx + token.Length)..].Trim().Trim('"');
-            return string.IsNullOrWhiteSpace(remainder) ? "SpecsAndChecks.xlsx" : remainder;
+
+            var startPos = idx + token.Length;
+            var value = contentDisposition[startPos..];
+            
+            // Find the end of this parameter (semicolon or end of string)
+            var semicolonIdx = value.IndexOf(';');
+            var result = semicolonIdx >= 0 ? value[..semicolonIdx].Trim() : value.Trim();
+            
+            // Remove surrounding quotes if present
+            result = result.Trim('"');
+            
+            return string.IsNullOrWhiteSpace(result) ? "SpecsAndChecks.xlsx" : result;
         }
     }
 }
