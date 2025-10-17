@@ -760,6 +760,9 @@ public partial class HedgeRelationshipDetails
     private bool HasRequiredRole() =>
         CheckUserRole("24") || CheckUserRole("17") || CheckUserRole("5");
 
+    private bool CanEditCheckbox() =>
+        HedgeRelationship?.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft || CheckUserRole("24");
+
     private bool IsSaveDisabled() =>
         HedgeRelationship == null ||
         IsInProgress ||
