@@ -371,20 +371,24 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                     <SfCheckBox CssClass="input-checkbox"
                                     Disabled="@(!CanEditCheckbox())"
                                     @bind-Checked="HedgeRelationship.IsAnOptionHedge"
-                                    Label="Hedge is an Option" />
+                                    Label="Hedge is an Option">
+                                        <CheckBoxEvents TChecked="bool" ValueChange="OnIsAnOptionHedgeChanged" />
+                                    </SfCheckBox>
                                 </div>
                             }
                             <div class="dp-inputs">
                                 <SfCheckBox CssClass="input-checkbox"
-                                Disabled="@(!CanEditCheckbox())"
+                                Disabled="@(!CanEditCheckbox() || HedgeRelationship.IsAnOptionHedge)"
                                 @bind-Checked="HedgeRelationship.OffMarket"
-                                Label="Off-Market" />
+                                Label="Off-Market">
+                                    <CheckBoxEvents TChecked="bool" ValueChange="OnOffMarketChanged" />
+                                </SfCheckBox>
                             </div>
                             @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated && HedgeRelationship.IsHAOptIntEnabled)
                             {
                                 <div class="dp-inputs">
                                     <SfCheckBox CssClass="input-checkbox"
-                                    Disabled="@(!CanEditCheckbox())"
+                                    Disabled="@(!CanEditCheckbox() || !HedgeRelationship.IsAnOptionHedge)"
                                     @bind-Checked="HedgeRelationship.ExcludeIntrinsicValue"
                                     Label="Exclude Intrinsic Value">
                                         <CheckBoxEvents TChecked="bool" ValueChange="OnExcludeIntrinsicValueChanged" />
