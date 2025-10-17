@@ -1168,6 +1168,36 @@ public partial class HedgeRelationshipDetails
     }
     #endregion
 
+    #region Checkbox Event Handlers
+    private void OnExcludeIntrinsicValueChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            HedgeRelationship.ExcludeIntrinsicValue = args.Checked;
+            
+            if (!args.Checked)
+            {
+                // When unchecked, reset IntrinsicMethod to None and related options
+                HedgeRelationship.IntrinsicMethod = DerivativeEDGEHAEntityEnumIntrinsicMethod.None;
+                HedgeRelationship.AmortizeOptionPremimum = false;
+                HedgeRelationship.IsDeltaMatchOption = false;
+            }
+            else
+            {
+                // When checked, ensure IntrinsicMethod has a valid value
+                // Default to None if it's not already set to a valid method
+                if (HedgeRelationship.IntrinsicMethod == DerivativeEDGEHAEntityEnumIntrinsicMethod.None || 
+                    HedgeRelationship.IntrinsicMethod == default)
+                {
+                    HedgeRelationship.IntrinsicMethod = DerivativeEDGEHAEntityEnumIntrinsicMethod.None;
+                }
+            }
+            
+            StateHasChanged();
+        }
+    }
+    #endregion
+
     #region Helper Methods
     public static List<HedgingInstrumentStructureOption> GetHedgingInstrumentStructureOptions() => new()
     {
