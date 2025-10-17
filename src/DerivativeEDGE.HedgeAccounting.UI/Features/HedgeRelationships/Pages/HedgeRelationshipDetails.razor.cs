@@ -98,7 +98,6 @@ public partial class HedgeRelationshipDetails
     public bool IsDownloadingSpecsAndChecks { get; set; }
     public bool IsSavingHedgeRelationship { get; set; }
     public bool IsRunningRegression { get; set; }
-    private bool InProgress = false;
 
     private bool IsInProgress =>
         IsLoadingHedgeRelationship ||
