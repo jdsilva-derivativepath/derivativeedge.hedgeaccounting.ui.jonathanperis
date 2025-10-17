@@ -1,206 +1,173 @@
-<SfDialog Width="600px"
-          Height="auto"
-          CssClass="dp-dialog"
-          IsModal="true"
-          AllowDragging="false"
+<SfDialog Width="33rem" 
+          Height="auto" 
+          CssClass="dp-dialog" 
+          IsModal="true" 
+          AllowDragging="true" 
           EnableResize="false"
-          ShowCloseIcon="true"
           @bind-Visible="Visible">
     <DialogTemplates>
-        <Header>
-            <div class="custom-dialog-header">
-                <div class="header-text">
-                    <span class="header-title">De-Designation Workflow</span>
-                </div>
-                <i class="header-icon fa-solid fa-xmark" @onclick="HandleClose"></i>
-            </div>
-        </Header>
+        <Header>De-Designation Workflow</Header>
         <Content>
-            <div class="overflow-auto" style="max-height: 70vh;">
-                @if (!string.IsNullOrEmpty(UserMessage))
-                {
-                    <div class="px-2.5 py-2">
-                        <SfMessage Severity="@(IsError ? MessageSeverity.Error : MessageSeverity.Warning)">
-                            @UserMessage
-                        </SfMessage>
-                    </div>
-                }
+            @if (!string.IsNullOrEmpty(UserMessage))
+            {
+                <div style="margin-bottom: 1rem;">
+                    <SfMessage Severity="@(IsError ? MessageSeverity.Error : MessageSeverity.Warning)">
+                        @UserMessage
+                    </SfMessage>
+                </div>
+            }
+            
+            <div class="form-group dp-inputs">
+                <span class="input-label">Dedesignation Reason</span>
+                <div class="custom-radio-container">
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="int" 
+                                   Name="reason" 
+                                   Value="0" 
+                                   Label="Termination" 
+                                   @bind-Checked="DedesignationReason"
+                                   ValueChange="@(() => HandleReasonChange(0))" />
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="int" 
+                                   Name="reason" 
+                                   Value="1" 
+                                   Label="Ineffectiveness" 
+                                   @bind-Checked="DedesignationReason"
+                                   ValueChange="@(() => HandleReasonChange(1))" />
+                </div>
+            </div>
 
-                <div class="p-4">
-                    <!-- Dedesignation Reason Section -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Dedesignation Reason</label>
-                        <div class="flex gap-4">
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="termination" 
-                                       name="reason" 
-                                       checked="@(DedesignationReason == 0)"
-                                       @onchange="@(() => HandleReasonChange(0))"
-                                       class="mr-2" />
-                                <label for="termination" class="text-sm text-gray-700">Termination</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="ineffectiveness" 
-                                       name="reason" 
-                                       checked="@(DedesignationReason == 1)"
-                                       @onchange="@(() => HandleReasonChange(1))"
-                                       class="mr-2" />
-                                <label for="ineffectiveness" class="text-sm text-gray-700">Ineffectiveness</label>
-                            </div>
-                        </div>
-                    </div>
+            <div class="form-group dp-inputs">
+                <span class="input-label">Dedesignation Date</span>
+                <SfDatePicker TValue="DateTime?"
+                              CssClass="calendar-datepicker" 
+                              Enabled="true" 
+                              Format="MM/dd/yyyy" 
+                              Placeholder="mm/dd/yyyy" 
+                              ShowClearButton="true"
+                              @bind-Value="DedesignationDate">
+                </SfDatePicker>
+            </div>
 
-                    <!-- Dedesignation Date -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-normal text-gray-700 mb-2">Dedesignation Date</label>
-                        <SfDatePicker CssClass="calendar-datepicker"
-                                      TValue="DateTime?"
-                                      @bind-Value="DedesignationDate"
-                                      Format="MM/dd/yyyy"
-                                      Placeholder="mm/dd/yyyy"
-                                      Enabled="true" />
-                    </div>
+            <div class="form-group dp-inputs">
+                <span class="input-label">Cash Payment Type</span>
+                <div class="custom-radio-container">
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="int" 
+                                   Name="cashPayment" 
+                                   Value="0" 
+                                   Label="Full Cash Payment" 
+                                   @bind-Checked="CashPaymentType"
+                                   ValueChange="@(() => HandleCashPaymentTypeChange(0))" />
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="int" 
+                                   Name="cashPayment" 
+                                   Value="1" 
+                                   Label="Partial Cash Payment" 
+                                   @bind-Checked="CashPaymentType"
+                                   ValueChange="@(() => HandleCashPaymentTypeChange(1))" />
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="int" 
+                                   Name="cashPayment" 
+                                   Value="2" 
+                                   Label="No Cash Payment" 
+                                   @bind-Checked="CashPaymentType"
+                                   ValueChange="@(() => HandleCashPaymentTypeChange(2))" />
+                </div>
+            </div>
 
-                    <!-- Cash Payment Type Section -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Cash Payment Type</label>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="fullPayment" 
-                                       name="cashPayment" 
-                                       checked="@(CashPaymentType == 0)"
-                                       @onchange="@(() => HandleCashPaymentTypeChange(0))"
-                                       class="mr-2" />
-                                <label for="fullPayment" class="text-sm text-gray-700">Full Cash Payment</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="partialPayment" 
-                                       name="cashPayment" 
-                                       checked="@(CashPaymentType == 1)"
-                                       @onchange="@(() => HandleCashPaymentTypeChange(1))"
-                                       class="mr-2" />
-                                <label for="partialPayment" class="text-sm text-gray-700">Partial Cash Payment</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="noPayment" 
-                                       name="cashPayment" 
-                                       checked="@(CashPaymentType == 2)"
-                                       @onchange="@(() => HandleCashPaymentTypeChange(2))"
-                                       class="mr-2" />
-                                <label for="noPayment" class="text-sm text-gray-700">No Cash Payment</label>
-                            </div>
-                        </div>
-                    </div>
+            <div class="form-group dp-inputs">
+                <span class="input-label">Payment Amount</span>
+                <SfNumericTextBox TValue="decimal?"
+                                  CssClass="input-numeric" 
+                                  Placeholder="0.00" 
+                                  Enabled="@PaymentFieldsEnabled"
+                                  Format="C2"
+                                  @bind-Value="Payment" />
+            </div>
 
-                    <!-- Payment Amount -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-normal text-gray-700 mb-2">Payment Amount</label>
-                        <SfNumericTextBox CssClass="input-textbox"
-                                          TValue="decimal?"
-                                          @bind-Value="Payment"
-                                          Format="C2"
-                                          Placeholder="0.00"
-                                          Enabled="@PaymentFieldsEnabled" />
-                    </div>
+            <div class="custom-datepicker-container">
+                <div class="dp-inputs">
+                    <label class="input-label">Start Date</label>
+                    <SfDatePicker TValue="DateTime?"
+                                  CssClass="calendar-datepicker" 
+                                  Enabled="@DateFieldsEnabled" 
+                                  Format="MM/dd/yyyy" 
+                                  Placeholder="mm/dd/yyyy" 
+                                  ShowClearButton="true"
+                                  @bind-Value="TimeValuesStartDate">
+                    </SfDatePicker>
+                </div>
+                <div class="dp-inputs">
+                    <label class="input-label">End Date</label>
+                    <SfDatePicker TValue="DateTime?"
+                                  CssClass="calendar-datepicker" 
+                                  Enabled="@DateFieldsEnabled"
+                                  Format="MM/dd/yyyy" 
+                                  Placeholder="mm/dd/yyyy" 
+                                  ShowClearButton="true"
+                                  @bind-Value="TimeValuesEndDate">
+                    </SfDatePicker>
+                </div>
+            </div>
 
-                    <!-- Time Values Date Range -->
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-normal text-gray-700 mb-2">Start Date</label>
-                            <SfDatePicker CssClass="calendar-datepicker"
-                                          TValue="DateTime?"
-                                          @bind-Value="TimeValuesStartDate"
-                                          Format="MM/dd/yyyy"
-                                          Placeholder="mm/dd/yyyy"
-                                          Enabled="@DateFieldsEnabled" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-normal text-gray-700 mb-2">End Date</label>
-                            <SfDatePicker CssClass="calendar-datepicker"
-                                          TValue="DateTime?"
-                                          @bind-Value="TimeValuesEndDate"
-                                          Format="MM/dd/yyyy"
-                                          Placeholder="mm/dd/yyyy"
-                                          Enabled="@DateFieldsEnabled" />
-                        </div>
-                    </div>
+            <div class="form-group dp-inputs">
+                <span class="input-label">Accrual</span>
+                <SfTextBox CssClass="input-textbox"
+                           Value="@Accrual?.ToString("C2")"
+                           Enabled="false" />
+            </div>
 
-                    <!-- Accrual (Read-only) -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-normal text-gray-700 mb-2">Accrual</label>
-                        <SfTextBox CssClass="input-textbox"
-                                   Value="@Accrual?.ToString("C2")"
-                                   Enabled="false" />
-                    </div>
+            @if (ShowBasisAdjustmentBalance)
+            {
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Basis Adjustment</span>
+                    <SfNumericTextBox TValue="decimal?"
+                                      CssClass="input-numeric" 
+                                      Placeholder="0.00" 
+                                      Enabled="false"
+                                      Format="C2"
+                                      @bind-Value="BasisAdjustment" />
+                </div>
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Basis Adjustment Balance</span>
+                    <SfNumericTextBox TValue="decimal?"
+                                      CssClass="input-numeric" 
+                                      Placeholder="0.00" 
+                                      Enabled="false"
+                                      Format="C2"
+                                      @bind-Value="BasisAdjustmentBalance" />
+                </div>
+            }
 
-                    <!-- Basis Adjustment Section (if applicable) -->
-                    @if (ShowBasisAdjustmentBalance)
-                    {
-                        <div class="mb-4">
-                            <label class="block text-sm font-normal text-gray-700 mb-2">Basis Adjustment</label>
-                            <SfNumericTextBox CssClass="input-textbox"
-                                              TValue="decimal?"
-                                              @bind-Value="BasisAdjustment"
-                                              Format="C2"
-                                              Enabled="false" />
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-normal text-gray-700 mb-2">Basis Adjustment Balance</label>
-                            <SfNumericTextBox CssClass="input-textbox"
-                                              TValue="decimal?"
-                                              @bind-Value="BasisAdjustmentBalance"
-                                              Format="C2"
-                                              Enabled="false" />
-                        </div>
-                    }
+            <div class="form-group dp-inputs">
+                <span class="input-label">Hedged Exposure</span>
+                <div class="custom-radio-container">
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="bool" 
+                                   Name="exposure" 
+                                   Value="true" 
+                                   Label="Exists" 
+                                   @bind-Checked="HedgedExposureExist"
+                                   ValueChange="@(() => HandleHedgedExposureChange(true))" />
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="bool" 
+                                   Name="exposure" 
+                                   Value="false" 
+                                   Label="Does Not Exist" 
+                                   @bind-Checked="HedgedExposureExist"
+                                   ValueChange="@(() => HandleHedgedExposureChange(false))" />
+                </div>
+            </div>
 
-                    <!-- Hedged Exposure Existence -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Hedged Exposure</label>
-                        <div class="flex gap-4">
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="exposureExists" 
-                                       name="exposure" 
-                                       checked="@HedgedExposureExist"
-                                       @onchange="@(() => HandleHedgedExposureChange(true))"
-                                       class="mr-2" />
-                                <label for="exposureExists" class="text-sm text-gray-700">Exists</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="radio" 
-                                       id="exposureNotExists" 
-                                       name="exposure" 
-                                       checked="@(!HedgedExposureExist)"
-                                       @onchange="@(() => HandleHedgedExposureChange(false))"
-                                       class="mr-2" />
-                                <label for="exposureNotExists" class="text-sm text-gray-700">Does Not Exist</label>
-                            </div>
-                        </div>
-                    </div>
+            <div class="custom-action-container">
+                <div class="dp-buttons">
+                    <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
+                    <SfButton CssClass="button-primary button-default" Content="De-Designate" IsPrimary="true" Disabled="@IsDeDesignateDisabled" OnClick="@HandleDeDesignate" />
                 </div>
             </div>
         </Content>
     </DialogTemplates>
-    <DialogButtons>
-        <DialogButton CssClass="button-link button-default"
-                      Content="Cancel"
-                      IsPrimary="false"
-                      OnClick="@HandleClose" />
-        <DialogButton CssClass="button-primary button-default"
-                      Content="De-Designate"
-                      IsPrimary="true"
-                      Disabled="@IsDeDesignateDisabled"
-                      OnClick="@HandleDeDesignate" />
-    </DialogButtons>
     <DialogPositionData X="center" Y="center" />
 </SfDialog>
 
-@code {
-
-}
