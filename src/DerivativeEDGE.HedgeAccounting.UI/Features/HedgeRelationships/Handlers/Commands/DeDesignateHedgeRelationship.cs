@@ -1,6 +1,7 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
+using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
@@ -57,18 +58,22 @@ public sealed class DeDesignateHedgeRelationship
             {
                 _logger.LogInformation("Sending request to dedesignate hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
 
-                // Get the current hedge relationship
                 var currentHedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
 
-                // Validate dedesignation requirements
                 var validationErrors = DeDesignateValidator.Validate(
                     currentHedgeRelationship, 
                     request.DedesignationDate, 
                     request.DedesignationReason);
-                    
-                if (validationErrors.Any())
+
+                // Additional validation for enum casting
+                if (!Enum.IsDefined(typeof(DerivativeEDGEHAEntityEnumCashPaymentType), request.CashPaymentType))
+                {
+                    validationErrors.Add($"Invalid CashPaymentType value: {request.CashPaymentType}");
+                }
+
+                if (validationErrors.Count != 0)
                 {
                     var errorMessage = string.Join("; ", validationErrors);
                     _logger.LogWarning("De-designation validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 
@@ -76,21 +81,19 @@ public sealed class DeDesignateHedgeRelationship
                     return new Response(true, errorMessage);
                 }
 
-                // Map to entity and update dedesignation properties
                 var hedgeRelationshipEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);
                 
-                // Set dedesignation specific properties
-                hedgeRelationshipEntity.DedesignationDate = request.DedesignationDate.ToString("MM/dd/yyyy");
+                // Cast DateTime to DateTimeOffset / nullable DateTimeOffset without string formatting
+                hedgeRelationshipEntity.DedesignationDate = new DateTimeOffset(request.DedesignationDate.Date, TimeSpan.Zero);
                 hedgeRelationshipEntity.DedesignationReason = (DerivativeEDGEHAEntityEnumDedesignationReason)request.DedesignationReason;
                 hedgeRelationshipEntity.Payment = (double)request.Payment;
-                hedgeRelationshipEntity.TimeValuesStartDate = request.TimeValuesStartDate.ToString("MM/dd/yyyy");
-                hedgeRelationshipEntity.TimeValuesEndDate = request.TimeValuesEndDate.ToString("MM/dd/yyyy");
-                hedgeRelationshipEntity.CashPaymentType = request.CashPaymentType;
+                hedgeRelationshipEntity.TimeValuesStartDate = new DateTimeOffset(request.TimeValuesStartDate.Date, TimeSpan.Zero);
+                hedgeRelationshipEntity.TimeValuesEndDate = new DateTimeOffset(request.TimeValuesEndDate.Date, TimeSpan.Zero);
+                hedgeRelationshipEntity.CashPaymentType = (DerivativeEDGEHAEntityEnumCashPaymentType)request.CashPaymentType;
                 hedgeRelationshipEntity.HedgedExposureExist = request.HedgedExposureExist;
                 hedgeRelationshipEntity.BasisAdjustment = (double)request.BasisAdjustment;
                 hedgeRelationshipEntity.BasisAdjustmentBalance = (double)request.BasisAdjustmentBalance;
 
-                // Call the Dedesignate API endpoint
                 var dedesignatedHedgeRelationship = await _hedgeAccountingApiClient.DedesignatePOSTAsync(
                     hedgeRelationshipEntity,
                     cancellationToken);

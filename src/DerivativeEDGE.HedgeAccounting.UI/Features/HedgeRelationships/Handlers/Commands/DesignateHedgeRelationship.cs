@@ -1,6 +1,7 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
+using ApiException = DerivativeEDGE.Identity.API.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
@@ -89,7 +90,7 @@ public sealed class DesignateHedgeRelationship
                 // Step 5: Generate inception package
                 _logger.LogInformation("Generating inception package for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 var inceptionPackageResponse = await _mediator.Send(
-                    new GenerateInceptionPackage.Command(hedgeRelationship, preview: false),
+                    new GenerateInceptionPackage.Command(hedgeRelationship, Preview: false),
                     cancellationToken);
 
                 if (inceptionPackageResponse.HasError)

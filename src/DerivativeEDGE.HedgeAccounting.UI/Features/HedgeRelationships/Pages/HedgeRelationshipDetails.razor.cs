@@ -1087,15 +1087,15 @@ public partial class HedgeRelationshipDetails
             // Execute de-designation
             var command = new DeDesignateHedgeRelationship.Command(
                 HedgeRelationshipId: HedgeId,
-                DedesignationDate: DedesignationDateDialog,
+                DedesignationDate: DedesignationDateDialog.GetValueOrDefault(),
                 DedesignationReason: DedesignationReason,
-                Payment: DedesignatePayment,
-                TimeValuesStartDate: DedesignateTimeValuesStartDate,
-                TimeValuesEndDate: DedesignateTimeValuesEndDate,
+                Payment: DedesignatePayment.GetValueOrDefault(),
+                TimeValuesStartDate: DedesignateTimeValuesStartDate.GetValueOrDefault(),
+                TimeValuesEndDate: DedesignateTimeValuesEndDate.GetValueOrDefault(),
                 CashPaymentType: CashPaymentType,
                 HedgedExposureExist: HedgedExposureExist,
-                BasisAdjustment: BasisAdjustment,
-                BasisAdjustmentBalance: BasisAdjustmentBalance);
+                BasisAdjustment: BasisAdjustment.GetValueOrDefault(),
+                BasisAdjustmentBalance: BasisAdjustmentBalance.GetValueOrDefault());
             
             var response = await Mediator.Send(command);
 
@@ -1206,10 +1206,10 @@ public partial class HedgeRelationshipDetails
             // Execute re-designation
             var command = new ReDesignateHedgeRelationship.Command(
                 HedgeRelationshipId: HedgeId,
-                RedesignationDate: RedesignationDate,
-                Payment: RedesignatePayment,
-                TimeValuesStartDate: RedesignateTimeValuesStartDate,
-                TimeValuesEndDate: RedesignateTimeValuesEndDate,
+                RedesignationDate: RedesignationDate.GetValueOrDefault(),
+                Payment: RedesignatePayment.GetValueOrDefault(),
+                TimeValuesStartDate: RedesignateTimeValuesStartDate.GetValueOrDefault(),
+                TimeValuesEndDate: RedesignateTimeValuesEndDate.GetValueOrDefault(),
                 PaymentFrequency: RedesignatePaymentFrequency,
                 DayCountConv: RedesignateDayCountConv,
                 PayBusDayConv: RedesignatePayBusDayConv,

@@ -1,5 +1,6 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
+using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
 
@@ -63,22 +64,15 @@ public sealed class GetReDesignateData
                 // Map the redesignation data properties to response
                 if (redesignationData != null)
                 {
-                    // Parse dates from the API response
-                    if (DateTime.TryParse(redesignationData.RedesignationDate, out var redesignDate))
-                    {
-                        response.RedesignationDate = redesignDate;
-                        response.TimeValuesStartDate = redesignDate;
-                    }
+                    // Convert DateTimeOffset to DateTime
+                    response.RedesignationDate = redesignationData.RedesignationDate.DateTime;
+                    response.TimeValuesStartDate = redesignationData.RedesignationDate.DateTime;
+                    response.TimeValuesEndDate = redesignationData.TimeValuesEndDate.DateTime;
                     
-                    if (DateTime.TryParse(redesignationData.TimeValuesEndDate, out var timeValueEndDate))
-                    {
-                        response.TimeValuesEndDate = timeValueEndDate;
-                    }
-                    
-                    response.Payment = (decimal)(redesignationData.Payment ?? 0);
-                    response.DayCountConv = redesignationData.DayCountConv?.ToString();
-                    response.PayBusDayConv = redesignationData.PayBusDayConv?.ToString();
-                    response.PaymentFrequency = redesignationData.PaymentFrequency?.ToString();
+                    // response.Payment = (decimal)(redesignationData.Payment ?? 0);
+                    response.DayCountConv = redesignationData.DayCountConv.ToString();
+                    response.PayBusDayConv = redesignationData.PayBusDayConv.ToString();
+                    response.PaymentFrequency = redesignationData.PaymentFrequency.ToString();
                     response.AdjustedDates = redesignationData.AdjustedDates;
                     response.MarkAsAcquisition = redesignationData.MarkAsAcquisition;
                 }

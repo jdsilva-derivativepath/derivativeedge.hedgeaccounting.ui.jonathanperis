@@ -1,6 +1,7 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
+using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 

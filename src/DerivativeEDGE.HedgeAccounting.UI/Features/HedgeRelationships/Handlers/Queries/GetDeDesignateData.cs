@@ -1,5 +1,6 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
+using ApiException = DerivativeEDGE.Identity.API.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
 
@@ -63,23 +64,17 @@ public sealed class GetDeDesignateData
                 // Map the dedesignation data properties to response
                 if (dedesignationData != null)
                 {
-                    // Parse dates from the API response
-                    if (DateTime.TryParse(dedesignationData.DedesignationDate, out var dedesignDate))
-                    {
-                        response.DedesignationDate = dedesignDate;
-                        response.TimeValuesStartDate = dedesignDate;
-                    }
-                    
-                    if (DateTime.TryParse(dedesignationData.TimeValuesEndDate, out var timeValueEndDate))
-                    {
-                        response.TimeValuesEndDate = timeValueEndDate;
-                    }
-                    
-                    response.Payment = (decimal)(dedesignationData.Payment ?? 0);
+                    // Directly map DateTimeOffset -> DateTime (UTC)
+                    response.DedesignationDate = dedesignationData.DedesignationDate.UtcDateTime;
+                    response.TimeValuesStartDate = response.DedesignationDate;
+
+                    response.TimeValuesEndDate = dedesignationData.TimeValuesEndDate.UtcDateTime;
+
+                    // Safely convert numeric values (handles nullable/non-nullable double)
+                    response.Payment = Convert.ToDecimal(dedesignationData?.Payment ?? 0d);
                     response.ShowBasisAdjustmentBalance = dedesignationData.ShowBasisAdjustmentBalance;
-                    response.BasisAdjustment = (decimal)(dedesignationData.BasisAdjustment ?? 0);
-                    response.BasisAdjustmentBalance = (decimal)(dedesignationData.BasisAdjustmentBalance ?? 0);
-                    response.ErrorMessage = dedesignationData.UserMessage;
+                    response.BasisAdjustment = Convert.ToDecimal(dedesignationData?.BasisAdjustment ?? 0d);
+                    response.BasisAdjustmentBalance = Convert.ToDecimal(dedesignationData?.BasisAdjustmentBalance ?? 0d);
                 }
 
                 _logger.LogInformation("Successfully fetched dedesignation data for hedge relationship ID: {HedgeRelationshipId}", 

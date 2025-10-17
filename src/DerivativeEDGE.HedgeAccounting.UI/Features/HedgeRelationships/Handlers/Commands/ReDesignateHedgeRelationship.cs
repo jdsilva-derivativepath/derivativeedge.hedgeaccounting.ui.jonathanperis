@@ -1,6 +1,7 @@
 using DerivativeEdge.HedgeAccounting.Api.Client;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
 using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
+using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
@@ -79,10 +80,10 @@ public sealed class ReDesignateHedgeRelationship
                 var hedgeRelationshipEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);
                 
                 // Set redesignation specific properties
-                hedgeRelationshipEntity.RedesignationDate = request.RedesignationDate.ToString("MM/dd/yyyy");
+                hedgeRelationshipEntity.RedesignationDate = new DateTimeOffset(request.RedesignationDate);
                 hedgeRelationshipEntity.Payment = (double)request.Payment;
-                hedgeRelationshipEntity.TimeValuesStartDate = request.TimeValuesStartDate.ToString("MM/dd/yyyy");
-                hedgeRelationshipEntity.TimeValuesEndDate = request.TimeValuesEndDate.ToString("MM/dd/yyyy");
+                hedgeRelationshipEntity.TimeValuesStartDate = new DateTimeOffset(request.TimeValuesStartDate);
+                hedgeRelationshipEntity.TimeValuesEndDate = new DateTimeOffset(request.TimeValuesEndDate);
                 
                 // Parse enum values
                 if (Enum.TryParse<DerivativeEDGEDomainEntitiesEnumsPaymentFrequency>(request.PaymentFrequency, out var paymentFreq))
