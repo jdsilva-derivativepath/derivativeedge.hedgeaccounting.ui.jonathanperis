@@ -76,73 +76,6 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.DedesignationDate = value?.ToString("MM/dd/yyyy");
         }
     }
-    private DateTime? AmortizationStartDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.StartDate)
-               ? DateTime.Parse(AmortizationModel.StartDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.StartDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    private DateTime? AmortizationEndDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.EndDate)
-               ? DateTime.Parse(AmortizationModel.EndDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.EndDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    private DateTime? AmortizationFrontRollDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.FrontRollDate)
-               ? DateTime.Parse(AmortizationModel.FrontRollDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.FrontRollDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    private DateTime? AmortizationBackRollDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.BackRollDate)
-               ? DateTime.Parse(AmortizationModel.BackRollDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.BackRollDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    private List<string> AmortizationFinancialCenters { get; set; }
-    private DateTime? OptionAmortizationStartDate
-    {
-        get => !string.IsNullOrEmpty(OptionAmortizationModel?.StartDate)
-               ? DateTime.Parse(OptionAmortizationModel.StartDate)
-               : null;
-        set
-        {
-            if (OptionAmortizationModel != null)
-                OptionAmortizationModel.StartDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    private DateTime? OptionAmortizationEndDate
-    {
-        get => !string.IsNullOrEmpty(OptionAmortizationModel?.EndDate)
-               ? DateTime.Parse(OptionAmortizationModel.EndDate)
-               : null;
-        set
-        {
-            if (OptionAmortizationModel != null)
-                OptionAmortizationModel.EndDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
     #endregion
 
     #region Data Collections
@@ -206,7 +139,6 @@ public partial class HedgeRelationshipDetails
     private bool AdjustDates { get; set; }
     private bool Straightline { get; set; }
     private bool IncludeInRegression { get; set; }
-    private bool AmortizeOptionPremium { get; set; }
 
     // De-Designate Dialog Properties
     private int DedesignationReason { get; set; } = 0;
@@ -546,11 +478,6 @@ public partial class HedgeRelationshipDetails
     private void NewMenuOnItemSelected(MenuEventArgs args)
     {
         OpenModal = args.Item.Text;
-    }
-
-    private void NewMenuDlgButtonOnClose()
-    {
-        OpenModal = string.Empty; // This closes any open modal
     }
 
     public async void OnSelectedTab(SelectEventArgs args)
@@ -1240,96 +1167,23 @@ public partial class HedgeRelationshipDetails
     }
     #endregion
 
-    #region Form Submission Methods
-    private async Task OnSubmitAmortization(EditContext context)
+    #region Modal Callbacks
+    private async Task OnAmortizationSaved()
     {
-        try
-        {
-            AmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
-            AmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.Amortization;
-
-            if (AmortizationFinancialCenters != null)
-            {
-                AmortizationModel.FinancialCenters = AmortizationFinancialCenters
-                    .Select(s => Enum.TryParse<DerivativeEDGEDomainEntitiesEnumsFinancialCenter>(s, out var result) ? result : default)
-                    .Where(fc => fc != default)
-                    .ToList();
-            }
-
-            var isUpdate = AmortizationModel.ID > 0;
-            var successMessage = isUpdate ? "Success! Amortization Updated." : "Success! Amortization Created.";
-
-            var response = await Mediator.Send(new CreateHedgeRelationshipOptionTimeValueAmort.Command(AmortizationModel, HedgeRelationship));
-
-            await AlertService.ShowToast(successMessage, AlertKind.Success, "Success", showButton: true);
-
-            OpenModal = string.Empty;
-        }
-        catch (Exception ex)
-        {
-            await AlertService.ShowToast($"Error saving Amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
-        }
+        // Refresh the hedge relationship data after saving amortization
+        await GetHedgeRelationship(HedgeId);
+        StateHasChanged();
     }
 
-    private async Task OnSubmitOptionAmortization(EditContext context)
+    private async Task OnOptionAmortizationSaved()
     {
-        try
-        {
-            AmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
-            AmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue;
-
-            var isUpdate = AmortizationModel.ID > 0;
-            var successMessage = isUpdate ? "Success! Option Amortization Updated." : "Success! Option Amortization Created.";
-
-            var response = await Mediator.Send(new CreateHedgeRelationshipOptionTimeValueAmort.Command(AmortizationModel, HedgeRelationship));
-
-            await AlertService.ShowToast(successMessage, AlertKind.Success, "Success", showButton: true);
-
-            OpenModal = string.Empty;
-        }
-        catch (Exception ex)
-        {
-            await AlertService.ShowToast($"Error saving Option Amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
-        }
+        // Refresh the hedge relationship data after saving option amortization
+        await GetHedgeRelationship(HedgeId);
+        StateHasChanged();
     }
     #endregion
 
     #region Helper Methods
-    private void OnAmortizationComboBoxCreated(object args)
-    {
-        // Set the first item as the default when available
-        if (AmortizationGLAccounts?.Any() == true && AmortizationModel.GLAccountID == 0)
-        {
-            AmortizationModel.GLAccountID = AmortizationGLAccounts.First().Id;
-            StateHasChanged();
-        }
-
-        // Set the first item as the default when available
-        if (AmortizationContraAccounts?.Any() == true && AmortizationModel.ContraAccountID == 0)
-        {
-            AmortizationModel.ContraAccountID = AmortizationContraAccounts.First().Id;
-            StateHasChanged();
-        }
-    }
-
-    private void OnOptionAmortizationComboBoxCreated(object args)
-    {
-        // Set the first item as the default when available
-        if (OptionAmortizationGLAccounts?.Any() == true && OptionAmortizationModel.GLAccountID == 0)
-        {
-            OptionAmortizationModel.GLAccountID = OptionAmortizationGLAccounts.First().Id;
-            StateHasChanged();
-        }
-
-        // Set the first item as the default when available
-        if (OptionAmortizationContraAccounts?.Any() == true && OptionAmortizationModel.ContraAccountID == 0)
-        {
-            OptionAmortizationModel.ContraAccountID = OptionAmortizationContraAccounts.First().Id;
-            StateHasChanged();
-        }
-    }
-
-    public static List<HedgingInstrumentStructureOption> GetHedgingInstrumentStructureOptions() => new()
     {
         new() { Value = HedgingInstrumentStructure.SingleInstrument, Text = HedgingInstrumentStructure.SingleInstrument.GetDescription() },
         new() { Value = HedgingInstrumentStructure.StructuredProduct, Text = HedgingInstrumentStructure.StructuredProduct.GetDescription() },

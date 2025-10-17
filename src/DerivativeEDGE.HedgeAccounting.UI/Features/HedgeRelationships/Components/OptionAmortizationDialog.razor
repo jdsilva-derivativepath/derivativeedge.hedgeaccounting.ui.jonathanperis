@@ -1,0 +1,146 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using DerivativeEdge.HedgeAccounting.Api.Client
+@using Microsoft.AspNetCore.Components.Forms
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
+
+<SfDialog Width="@(IsAnOptionHedge ? "41rem" : "30rem")" 
+          Height="auto" 
+          CssClass="dp-dialog" 
+          IsModal="true" 
+          AllowDragging="true" 
+          EnableResize="false"
+          @bind-Visible="Visible">
+    <DialogTemplates>
+        <Header>Option Amortization</Header>
+        <Content>
+            <EditForm Model="Model" OnSubmit="OnSubmitOptionAmortization" Context="optionAmortizationFormContext">
+                <div class="dp-inputs">
+                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizeOptionPremium" Label="Amortize Option Premium" />
+                </div>
+                <div class="flex-1 min-w-[18.75rem] flex flex-col p-0">
+                    <div class="flex-grow">
+                        <div class="flex gap-4 justify-between">
+                            <div class="flex-1">
+                                <div class="form-group dp-inputs">
+                                    <span class="input-label">GL Account</span>
+                                    <SfComboBox TValue="long"
+                                                CssClass="dropdown-input"
+                                                Enabled="true"
+                                                TItem="DerivativeEDGEHAEntityGLAccount"
+                                                Placeholder="GL Account"
+                                                @bind-Value="OptionAmortizationModel.GLAccountID"
+                                                DataSource="AmortizationGLAccounts">
+                                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                        <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                    </SfComboBox>
+                                </div>
+                                <div class="form-group dp-inputs">
+                                    <span class="input-label">Contra</span>
+                                    <SfComboBox TValue="long"
+                                                CssClass="dropdown-input"
+                                                Enabled="true"
+                                                TItem="DerivativeEDGEHAEntityGLAccount"
+                                                Placeholder="Contra"
+                                                @bind-Value="OptionAmortizationModel.ContraAccountID"
+                                                DataSource="AmortizationContraAccounts">
+                                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                        <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                    </SfComboBox>
+                                </div>
+                                <div class="form-group dp-inputs">
+                                    <span class="input-label">Amortization Method</span>
+                                    <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
+                                                CssClass="dropdown-input"
+                                                TItem="AmortizationMethodOption"
+                                                Placeholder="Amortization Method"
+                                                @bind-Value="OptionAmortizationModel.AmortizationMethod"
+                                                DataSource="@AmortizationMethodOptions">
+                                        <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
+                                        <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
+                                    </SfComboBox>
+                                </div>
+                                <div class="form-group dp-inputs">
+                                    <span class="input-label">Total Amount</span>
+                                    <NumericHotKeys>
+                                        <SfNumericTextBox TValue="double"
+                                                          CssClass="input-numeric"
+                                                          Placeholder="Total Amount"
+                                                          Enabled="true"
+                                                          @bind-Value="OptionAmortizationModel.TotalAmount" />
+                                    </NumericHotKeys>
+                                </div>
+                            </div>
+                            @if (IsAnOptionHedge)
+                            {
+                                <div class="flex-1">
+                                    <div class="form-group dp-inputs">
+                                        <span class="input-label">Intrinsic Value GL Account</span>
+                                        <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value GL Account">
+                                            <ComboBoxEvents TValue="string" TItem="DropdownModel" />
+                                            <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                        </SfComboBox>
+                                    </div>
+                                    <div class="form-group dp-inputs">
+                                        <span class="input-label">Intrinsic Value Contra</span>
+                                        <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Contra">
+                                            <ComboBoxEvents TValue="string" TItem="DropdownModel" />
+                                            <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                        </SfComboBox>
+                                    </div>
+                                    <div class="form-group dp-inputs">
+                                        <span class="input-label">Intrinsic Value Amortization Method</span>
+                                        <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Amortization Method">
+                                            <ComboBoxEvents TValue="string" TItem="DropdownModel" />
+                                            <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                        </SfComboBox>
+                                    </div>
+                                    <div class="form-group dp-inputs">
+                                        <span class="input-label">Intrinsic Value</span>
+                                        <NumericHotKeys>
+                                            <SfNumericTextBox CssClass="input-numeric" Placeholder="Intrinsic Value" Enabled="true" TValue="long?" />
+                                        </NumericHotKeys>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-datepicker-container">
+                    <div class="dp-inputs" style="width: 100%">
+                        <label class="input-label">Start Date</label>
+                        <SfDatePicker TValue="DateTime?"
+                                      CssClass="calendar-datepicker"
+                                      Enabled="true"
+                                      Format="MM/dd/yyyy"
+                                      Placeholder="mm/dd/yyyy"
+                                      ShowClearButton="true"
+                                      @bind-Value="OptionAmortizationStartDate">
+                        </SfDatePicker>
+                    </div>
+                    <div class="dp-inputs" style="width: 100%">
+                        <label class="input-label">End Date</label>
+                        <SfDatePicker TValue="DateTime?"
+                                      CssClass="calendar-datepicker"
+                                      Enabled="true"
+                                      Format="MM/dd/yyyy"
+                                      Placeholder="mm/dd/yyyy"
+                                      ShowClearButton="true"
+                                      @bind-Value="OptionAmortizationEndDate">
+                        </SfDatePicker>
+                    </div>
+                </div>
+                <div class="custom-action-container ">
+                    <div class="dp-buttons">
+                        <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
+                        <SfButton CssClass="button-primary button-default" Content="Generate" IsPrimary="true" />
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+    <DialogPositionData X="center" Y="center"></DialogPositionData>
+</SfDialog>
