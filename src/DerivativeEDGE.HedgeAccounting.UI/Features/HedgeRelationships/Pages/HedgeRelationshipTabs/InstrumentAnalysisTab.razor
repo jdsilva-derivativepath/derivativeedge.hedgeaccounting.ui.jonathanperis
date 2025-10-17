@@ -3,7 +3,7 @@
         <div class="left-section"></div>
         <div class="right-section">
             <div class="dp-buttons">
-                <SfButton CssClass="button-secondary button-default" Content="Select Existing Trade" OnClick='()=> SelectExistingTradeHandler("HedgeItem")' />
+                <SfButton CssClass="button-secondary button-default" Content="Select Existing Trade" OnClick='() => SelectExistingTradeHandler("HedgeItem")' />
                 <SfDropDownButton id="dp-dropdown-menu-style" CssClass="dp-dropdown-menu-style dropdown-menu-secondary" Content="New Trade">
                     <DropDownButtonEvents ItemSelected="OnNewTradeMenuItemSelected" />
                     <DropDownMenuItems>
@@ -17,21 +17,21 @@
         </div>
     </div>
     <DefaultGrid DataSource="@HedgedItems"
-    TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM"
-    Height="100%"
-    AllowPaging="false"
-    AllowSorting="true"
-    AllowGrouping="false"
-    AllowFiltering="false"
-    AllowSelection="false"
-    EnableVirtualization="false"
-    EnableGlobalSearch="true"
-    ShowColumnMenu="false"
-    ShowToolBar="false"
-    ShowExcelExportButton="false"
-    ShowColumnPickerButton="false"
-    OnDataBound="@OnHedgedItemChanged"
-    OnRowDataBound="@OnHedgedItemChanged">
+                 TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM"
+                 Height="100%"
+                 AllowPaging="false"
+                 AllowSorting="true"
+                 AllowGrouping="false"
+                 AllowFiltering="false"
+                 AllowSelection="false"
+                 EnableVirtualization="false"
+                 EnableGlobalSearch="true"
+                 ShowColumnMenu="false"
+                 ShowToolBar="false"
+                 ShowExcelExportButton="false"
+                 ShowColumnPickerButton="false"
+                 OnDataBound="@OnHedgedItemChanged"
+                 OnRowDataBound="@OnHedgedItemChanged">
         <GridColumns>
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.ItemID)" HeaderText="Hedged Item ID" Width="160" />
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
@@ -85,7 +85,7 @@
         <div class="left-section"></div>
         <div class="right-section">
             <div class="dp-buttons">
-                <SfButton CssClass="button-secondary button-default" Content="Select Existing Trade" OnClick='()=> SelectExistingTradeHandler("HedgingItem")' />
+                <SfButton CssClass="button-secondary button-default" Content="Select Existing Trade" OnClick='() => SelectExistingTradeHandler("HedgingItem")' />
                 <SfDropDownButton CssClass="dp-dropdown-menu-style dropdown-menu-secondary" Content="New Trade">
                     <DropDownButtonEvents ItemSelected="OnNewTradeMenuItemSelected" />
                     <DropDownMenuItems>
@@ -99,21 +99,21 @@
         </div>
     </div>
     <DefaultGrid DataSource="@HedgingItems"
-    TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM"
-    Height="100%"
-    AllowPaging="false"
-    AllowSorting="true"
-    AllowGrouping="false"
-    AllowFiltering="false"
-    AllowSelection="false"
-    EnableVirtualization="false"
-    EnableGlobalSearch="true"
-    ShowColumnMenu="false"
-    ShowToolBar="false"
-    ShowExcelExportButton="false"
-    ShowColumnPickerButton="false"
-    OnDataBound="@OnHedgingItemChanged"
-    OnRowDataBound="@OnHedgingItemChanged">
+                 TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM"
+                 Height="100%"
+                 AllowPaging="false"
+                 AllowSorting="true"
+                 AllowGrouping="false"
+                 AllowFiltering="false"
+                 AllowSelection="false"
+                 EnableVirtualization="false"
+                 EnableGlobalSearch="true"
+                 ShowColumnMenu="false"
+                 ShowToolBar="false"
+                 ShowExcelExportButton="false"
+                 ShowColumnPickerButton="false"
+                 OnDataBound="@OnHedgingItemChanged"
+                 OnRowDataBound="@OnHedgingItemChanged">
         <GridColumns>
             <GridColumn Field="@nameof(HedgingItem.ItemID)" HeaderText="Hedging Item ID" Width="160" />
             <GridColumn Field="@nameof(HedgingItem.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
@@ -173,12 +173,12 @@
                 <div class="form-group custom-dropdown-css dp-inputs">
                     <span class="input-label">Prospective Assessment Method</span>
                     <SfDropDownList TValue="long?"
-                    CssClass="dropdown-input"
-                    Enabled="true"
-                    TItem="DropdownModel"
-                    Placeholder="Select"
-                    @bind-Value="HedgeRelationship.ProspectiveEffectivenessMethodID"
-                    DataSource="@GetDropdownDatasource("assessmentmethod")">
+                                    CssClass="dropdown-input"
+                                    Enabled="true"
+                                    TItem="DropdownModel"
+                                    Placeholder="Select"
+                                    @bind-Value="HedgeRelationship.ProspectiveEffectivenessMethodID"
+                                    DataSource="@GetDropdownDatasource("assessmentmethod")">
                         <DropDownListEvents TValue="long?" TItem="DropdownModel" ValueChange="@OnEffectivenessSettingsChanged" />
                         <DropDownListFieldSettings Text="Text" Value="ID" />
                     </SfDropDownList>
@@ -186,12 +186,12 @@
                 <div class="form-group custom-dropdown-css dp-inputs">
                     <span class="input-label">Retrospective Assessment Method</span>
                     <SfDropDownList TValue="long?"
-                    CssClass="dropdown-input"
-                    Enabled="true"
-                    TItem="DropdownModel"
-                    Placeholder="Retrospective Assessment Method"
-                    @bind-Value="HedgeRelationship.RetrospectiveEffectivenessMethodID"
-                    DataSource="@GetDropdownDatasource("assessmentmethod")">
+                                    CssClass="dropdown-input"
+                                    Enabled="true"
+                                    TItem="DropdownModel"
+                                    Placeholder="Retrospective Assessment Method"
+                                    @bind-Value="HedgeRelationship.RetrospectiveEffectivenessMethodID"
+                                    DataSource="@GetDropdownDatasource("assessmentmethod")">
                         <DropDownListEvents TValue="long?" TItem="DropdownModel" ValueChange="@OnEffectivenessSettingsChanged" />
                         <DropDownListFieldSettings Text="Text" Value="ID" />
                     </SfDropDownList>
@@ -201,27 +201,27 @@
                 <div class="form-group custom-small-dropdown dp-inputs">
                     <span class="input-label">Report Currency</span>
                     <SfDropDownList TValue="string"
-                        CssClass="dropdown-input"
-                        Enabled="true"
-                        TItem="HedgeCurrencyDropdownItem"
-                        Placeholder="Select"
-                        @bind-Value="HedgeRelationship.ReportCurrency"
-                        DataSource="@Currency">
-                            <DropDownListEvents TValue="string" TItem="HedgeCurrencyDropdownItem" ValueChange="@OnEffectivenessSettingsChanged" />
-                            <DropDownListFieldSettings Text="LongName" Value="ShortName" />
+                                    CssClass="dropdown-input"
+                                    Enabled="true"
+                                    TItem="HedgeCurrencyDropdownItem"
+                                    Placeholder="Select"
+                                    @bind-Value="HedgeRelationship.ReportCurrency"
+                                    DataSource="@Currency">
+                        <DropDownListEvents TValue="string" TItem="HedgeCurrencyDropdownItem" ValueChange="@OnEffectivenessSettingsChanged" />
+                        <DropDownListFieldSettings Text="LongName" Value="ShortName" />
                     </SfDropDownList>
                 </div>
                 <div class="form-group custom-small-dropdown dp-inputs">
                     <span class="input-label">Report Frequency</span>
                     <SfDropDownList TValue="DerivativeEDGEHAEntityEnumReportingFrequency?"
-                        CssClass="dropdown-input"
-                        Enabled="true"
-                        TItem="ReportFrequencyDropdownModel"
-                        Placeholder="Select"
-                        Value="HedgeRelationship.ReportingFrequency"
-                        DataSource="@GetReportFrequencyOptions()">
-                            <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumReportingFrequency?" TItem="ReportFrequencyDropdownModel" ValueChange="@OnReportingFrequencyChanged" />
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    CssClass="dropdown-input"
+                                    Enabled="true"
+                                    TItem="ReportFrequencyDropdownModel"
+                                    Placeholder="Select"
+                                    Value="HedgeRelationship.ReportingFrequency"
+                                    DataSource="@GetReportFrequencyOptions()">
+                        <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumReportingFrequency?" TItem="ReportFrequencyDropdownModel" ValueChange="@OnReportingFrequencyChanged" />
+                        <DropDownListFieldSettings Text="Text" Value="Value" />
                     </SfDropDownList>
                 </div>
             </div>
@@ -239,14 +239,14 @@
                         <div class="form-group custom-small-dropdown dp-inputs">
                             <span class="input-label">@HedgeRelationship.PeriodSize</span>
                             <SfDropDownList TValue="DerivativeEDGEHAEntityEnumPeriodSize"
-                                CssClass="dropdown-input"
-                                Enabled="true"
-                                TItem="DropdownModel"
-                                Placeholder="Select"
-                                @bind-Value="HedgeRelationship.PeriodSize"
-                                DataSource="@GetDropdownDatasource("periodsize")">
+                                            CssClass="dropdown-input"
+                                            Enabled="true"
+                                            TItem="DropdownModel"
+                                            Placeholder="Select"
+                                            @bind-Value="HedgeRelationship.PeriodSize"
+                                            DataSource="@GetDropdownDatasource("periodsize")">
                                 <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumPeriodSize" TItem="DropdownModel" ValueChange="@OnEffectivenessSettingsChanged" />
-                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                <DropDownListFieldSettings Text="Text" Value="Value" />
                             </SfDropDownList>
                         </div>
                     </div>
@@ -256,15 +256,15 @@
                     <div class="section-row">
                         <div class="space-x-4 dp-inputs">
                             <SfRadioButton CssClass="input-radiobutton"
-                            Label="Cumulative Changes"
-                            Name="regressionType"
-                            Value="cumulative"
-                            @bind-Checked="@RegressionType" />
+                                           Label="Cumulative Changes"
+                                           Name="regressionType"
+                                           Value="cumulative"
+                                           @bind-Checked="@RegressionType" />
                             <SfRadioButton CssClass="input-radiobutton"
-                            Label="Periodic Changes"
-                            Name="regressionType"
-                            Value="periodic"
-                            @bind-Checked="@RegressionType" />
+                                           Label="Periodic Changes"
+                                           Name="regressionType"
+                                           Value="periodic"
+                                           @bind-Checked="@RegressionType" />
                             <SfCheckBox CssClass="input-checkbox" @bind-Checked="HedgeRelationship.EOM" Label="End Of Month" />
                         </div>
                     </div>
@@ -287,19 +287,19 @@
             {
                 <div style="height: calc(100vh - 15.75rem)">
                     <DefaultGrid DataSource="@SelectExistingTrade"
-                    TRowItem="TradeDto"
-                    Height="100%"
-                    AllowPaging="true"
-                    AllowSorting="true"
-                    AllowGrouping="false"
-                    AllowFiltering="false"
-                    AllowSelection="false"
-                    EnableVirtualization="false"
-                    EnableGlobalSearch="true"
-                    ShowColumnMenu="false"
-                    ShowExcelExportButton="false"
-                    ShowColumnPickerButton="false"
-                    ShowToolBar="true">
+                                 TRowItem="TradeDto"
+                                 Height="100%"
+                                 AllowPaging="true"
+                                 AllowSorting="true"
+                                 AllowGrouping="false"
+                                 AllowFiltering="false"
+                                 AllowSelection="false"
+                                 EnableVirtualization="false"
+                                 EnableGlobalSearch="true"
+                                 ShowColumnMenu="false"
+                                 ShowExcelExportButton="false"
+                                 ShowColumnPickerButton="false"
+                                 ShowToolBar="true">
                         <GridColumns>
                             <GridColumn Field="@nameof(TradeDto.Name)" HeaderText="Deal Name" Width="160" />
                             <GridColumn Field="@nameof(TradeDto.CounterpartyName)" HeaderText="Counterparty Name" Width="200" />
@@ -343,7 +343,3 @@
         </div>
     </FooterContent>
 </DpFullscreenModal>
-
-@code {
-
-}

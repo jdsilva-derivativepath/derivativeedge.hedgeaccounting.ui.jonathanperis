@@ -2,13 +2,13 @@
 
 public partial class HedgeRelationshipGrid
 {
-    private DefaultGrid<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> _grid = null!;
+    private DefaultGrid<HedgeRelationshipRecordViewModel> _grid = null!;
 
     [Parameter] public bool IsLoading { get; set; }
-    [Parameter] public IEnumerable<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> Data { get; set; } = Array.Empty<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM>();
+    [Parameter] public IEnumerable<HedgeRelationshipRecordViewModel> Data { get; set; } = Array.Empty<HedgeRelationshipRecordViewModel>();
     [Parameter] public List<GridViewModel> GridViewItems { get; set; } = new();
     [Parameter] public EventCallback<GridViewModel> ViewCrudEvent { get; set; }
-    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM?> OnRowClicked { get; set; }
+    [Parameter] public EventCallback<HedgeRelationshipRecordViewModel?> OnRowClicked { get; set; }
     [Parameter] public EventCallback<long> OnDeleteRequested { get; set; }
 
     public void SetView(string filter) => _grid?.SetView(filter);
@@ -19,7 +19,7 @@ public partial class HedgeRelationshipGrid
             await ViewCrudEvent.InvokeAsync(view);
     }
 
-    private void HandleRowClicked(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM? item)
+    private void HandleRowClicked(HedgeRelationshipRecordViewModel? item)
     {
         if (OnRowClicked.HasDelegate)
             OnRowClicked.InvokeAsync(item);

@@ -427,115 +427,25 @@ public partial class InstrumentAnalysisTab
         JS.InvokeVoidAsync("window.open", url, "_blank");
     }
 
-    private void OpenNewTrade(string type, string itemType)
+    private string GetNewTradeUrl(string type)
     {
-        var url = "";
-        var oppId = "0";
-        var entityId = HedgeRelationship?.BankEntityID != null && HedgeRelationship.BankEntityID != 0
-            ? HedgeRelationship.BankEntityID.ToString()
-            : HedgeRelationship?.ClientID.ToString() ?? "0";
-        var title = "";
-        var securityType = "";
-
-        // Set the item type for the current operation
-        CurrentHedgeRelationshipItemType = itemType;
-
-        switch (type.ToLower())
+        var clientId = HedgeRelationship?.ClientID.ToString() ?? "0";
+        return type.ToLower() switch
         {
-            case "callabledebt":
-                url = $"/CallableDebt/ShowAddCallableDebt?id={entityId}&oppId={oppId}";
-                title = "Callable Debt";
-                securityType = "CallableDebt";
-                break;
-            case "cancelable":
-                url = $"/Cancelable/ShowAddCancelable?id={entityId}&oppId={oppId}";
-                title = "Cancelable";
-                securityType = "Cancelable";
-                break;
-            case "cap":
-                url = $"/CapFloor/ShowAddCapFloor?id={entityId}&oppId={oppId}";
-                title = "Cap Floor";
-                securityType = "CapFloor";
-                break;
-            case "collar":
-                url = $"/Collar/Add?cId={entityId}&returnPartial=true";
-                title = "Collar";
-                securityType = "Collar";
-                break;
-            case "debt":
-                url = $"/Debt/AddDebt?cId={entityId}&returnPartial=true";
-                title = "Debt";
-                securityType = "Debt";
-                break;
-            case "debtoption":
-                url = $"/DebtOption/ShowAddDebtOption?id={entityId}&oppId={oppId}";
-                title = "Debt Option";
-                securityType = "DebtOption";
-                break;
-            case "swap":
-                url = $"/Swap/ShowAddSwap?id={entityId}&oppId={oppId}";
-                title = "Swap";
-                securityType = "Swap";
-                break;
-            case "swapwithoption":
-                url = $"/SwapEmbeddedOption/Add?cId={entityId}&returnPartial=true";
-                title = "Swap With Option";
-                securityType = "SwapWithOption";
-                break;
-            case "swaption":
-                url = $"/Swaption/ShowAddSwaption?id={entityId}&oppId={oppId}";
-                title = "Swaption";
-                securityType = "Swaption";
-                break;
-            case "corridor":
-                url = $"/Corridor/Add?cId={entityId}&returnPartial=true";
-                title = "Corridor";
-                securityType = "Corridor";
-                break;
-            case "fxforward":
-                url = $"/FxSingle/Add?cId={entityId}&type=11&returnPartial=true";
-                title = "FX Forward";
-                securityType = "FxForward";
-                break;
-            default:
-                // Handle unknown trade type
-                Console.WriteLine($"Unknown trade type: {type}");
-                return;
-        }
-
-        OpenNgDialogForTrade(url, title, securityType);
+            "callabledebt" => $"/CallableDebt/Add?cId={clientId}",
+            "cancelable" => $"/Cancelable/Add?cId={clientId}",
+            "cap" => $"/CapFloor/AddCapFloor?clientId={clientId}",
+            "collar" => $"/Collar/Add?cId={clientId}",
+            "debt" => $"/Debt/AddDebt?cId={clientId}",
+            "debtoption" => $"/DebtOption/Add?cId={clientId}",
+            "swap" => $"/Swap/AddSwap?cId={clientId}",
+            "swapwithoption" => $"/SwapEmbeddedOption/Add?cId={clientId}",
+            "swaption" => $"/Swaption/AddSwaption?cId={clientId}",
+            "corridor" => $"/Corridor/Add?cId={clientId}",
+            "fxforward" => $"/FxSingle/Add?cId={clientId}&type=11",
+            _ => null
+        };
     }
-
-    private void OpenNgDialogForTrade(string url, string title, string securityType)
-    {
-        var dialogTitle = "Trade Information";
-        if (!string.IsNullOrEmpty(title))
-        {
-            dialogTitle = $"{dialogTitle} - {title}";
-        }
-
-        // TODO: Implement the actual dialog opening logic based on your Blazor dialog system
-        // This is where you would integrate with your modal/dialog component
-
-        // For now, just logging the parameters - replace this with your actual dialog implementation
-        Console.WriteLine($"Opening dialog: {dialogTitle}");
-        Console.WriteLine($"URL: {url}");
-        Console.WriteLine($"Security Type: {securityType}");
-        Console.WriteLine($"Item Type: {CurrentHedgeRelationshipItemType}");
-
-        // Example of how you might implement this with a custom modal component:
-        // await ModalService.OpenAsync<TradeInformationDialog>(
-        //     new Dictionary<string, object>
-        //     {
-        //         { "Url", url },
-        //         { "Title", dialogTitle },
-        //         { "SecurityType", securityType },
-        //         { "ItemType", CurrentHedgeRelationshipItemType }
-        //     });
-    }
-
-    // Property to track the current item type for trade operations
-    private string CurrentHedgeRelationshipItemType { get; set; } = "HedgedItem";
     #endregion
 
     #region Models
@@ -551,25 +461,8 @@ public partial class InstrumentAnalysisTab
         public DerivativeEDGEHAEntityEnumReportingFrequency? Value { get; set; }
         public string Text { get; set; }
     }
-    #endregion
 
-    private string GetNewTradeUrl(string type)
-    {
-        var clientId = HedgeRelationship?.ClientID.ToString() ?? "0";
-        return type.ToLower() switch
-        {
-            "callabledebt" => $"/CallableDebt/Add?clientId={clientId}",
-            "cancelable" => $"/Cancelable/Add?clientId={clientId}",
-            "cap" => $"/CapFloor/Add?clientId={clientId}",
-            "collar" => $"/Collar/Add?clientId={clientId}",
-            "debt" => $"/Debt/Add?clientId={clientId}",
-            "debtoption" => $"/DebtOption/Add?clientId={clientId}",
-            "swap" => $"/Swap/Add?clientId={clientId}",
-            "swapwithoption" => $"/SwapEmbeddedOption/Add?clientId={clientId}",
-            "swaption" => $"/Swaption/Add?clientId={clientId}",
-            "corridor" => $"/Corridor/Add?clientId={clientId}",
-            "fxforward" => $"/FxSingle/Add?clientId={clientId}",
-            _ => null
-        };
-    }
+    // Property to track the current item type for trade operations
+    private string CurrentHedgeRelationshipItemType { get; set; } = "HedgedItem";
+    #endregion
 }

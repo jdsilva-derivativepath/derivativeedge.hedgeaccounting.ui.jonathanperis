@@ -27,7 +27,7 @@ public partial class HedgeRelationshipRecords
     private bool _clientDropdownInitialized;
     private HedgeRelationshipGrid _gridWrapper = null!;
     private List<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> _hedgeRelationships { get; set; } = new();
-    private List<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> _filteredHedgeRelationship { get; set; } = new();
+    private List<HedgeRelationshipRecordViewModel> _filteredHedgeRelationship { get; set; } = new();
     private readonly List<GridViewModel> _gridViewItems = new();
     private HedgeRelationshipCreate? _newRelationshipModal { get; set; }
     private Dictionary<string, Func<Task>> _actionMap = new();
@@ -251,9 +251,13 @@ public partial class HedgeRelationshipRecords
     private void FilterHedgeRelationshipsByClient()
     {
         var data = _hedgeRelationships ?? new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM>();
-        _filteredHedgeRelationship = (SelectedClientId == null || SelectedClientId == 0)
+        var filteredData = (SelectedClientId == null || SelectedClientId == 0)
             ? data
-            : data.Where(u => u.ClientID == SelectedClientId).ToList();
+            : data.Where(u => u.ClientID == SelectedClientId);
+
+        _filteredHedgeRelationship = filteredData
+            .Select(x => new HedgeRelationshipRecordViewModel(x))
+            .ToList();
     }
     #endregion
 
@@ -357,7 +361,7 @@ public partial class HedgeRelationshipRecords
     #endregion
 
     #region Row Click Navigation
-    private void OnRowClickedHandler(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM selectedRecord)
+    private void OnRowClickedHandler(HedgeRelationshipRecordViewModel selectedRecord)
     {
         if (selectedRecord is null) return;
         NavManager.NavigateTo($"{NavManager.BaseUri}hedgerelationship?Id={selectedRecord.ID}");
