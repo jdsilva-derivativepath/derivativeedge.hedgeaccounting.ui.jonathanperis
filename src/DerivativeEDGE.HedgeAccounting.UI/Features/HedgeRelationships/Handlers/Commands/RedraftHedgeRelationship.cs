@@ -75,12 +75,18 @@ public sealed class RedraftHedgeRelationship
             {
                 _logger.LogError(apiEx, "API error occurred while redrafting hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
                     request.HedgeRelationshipId, apiEx.StatusCode, apiEx.Response);
-                return new Response(true, $"Failed to redraft hedge relationship: {apiEx.Message}");
+                
+                // Return the actual API error message to the user
+                var errorMessage = !string.IsNullOrEmpty(apiEx.Response) 
+                    ? $"Failed to redraft hedge relationship: {apiEx.Response}" 
+                    : $"Failed to redraft hedge relationship. Status code: {apiEx.StatusCode}";
+                
+                return new Response(true, errorMessage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while redrafting hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
-                return new Response(true, "Failed to redraft hedge relationship due to an unexpected error");
+                return new Response(true, $"Failed to redraft hedge relationship: {ex.Message}");
             }
         }
     }

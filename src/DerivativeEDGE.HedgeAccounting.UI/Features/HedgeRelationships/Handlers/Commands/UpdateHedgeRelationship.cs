@@ -50,10 +50,22 @@ public sealed class UpdateHedgeRelationship
                 _logger.LogInformation("Successfully updated hedge relationship ID {Id}.", request.HedgeRelationship.ID);
                 return new Response(false, "Successfully updated hedge relationship", updatedApiVm);
             }
+            catch (ApiException apiEx)
+            {
+                _logger.LogError(apiEx, "API error while updating hedge relationship ID {Id}. Status: {StatusCode}, Response: {Response}", 
+                    request.HedgeRelationship.ID, apiEx.StatusCode, apiEx.Response);
+                
+                // Return the actual API error message to the user
+                var errorMessage = !string.IsNullOrEmpty(apiEx.Response) 
+                    ? $"Failed to update hedge relationship: {apiEx.Response}" 
+                    : $"Failed to update hedge relationship. Status code: {apiEx.StatusCode}";
+                
+                return new Response(true, errorMessage);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating hedge relationship ID {Id}.", request.HedgeRelationship.ID);
-                return new Response(true, "Failed to update hedge relationship");
+                return new Response(true, $"Failed to update hedge relationship: {ex.Message}");
             }
         }
     }
