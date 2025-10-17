@@ -26,6 +26,7 @@ public static class DropdownDataHelper
             "contractualrate" => GetContractualRateOptions(),
             "hedgeditemtype" => GetHedgedItemTypeOptions(),
             "hedgeditem" => GetHedgedItemOptions(),
+            "standard" => GetStandardOptions(),
             _ => throw new ArgumentException($"Invalid data set: {dataSet}", nameof(dataSet))
         };
 
@@ -107,5 +108,11 @@ public static class DropdownDataHelper
         new() { Value = "None", Text = "None" },
         new() { Value = "Asset", Text = "Asset" },
         new() { Value = "Liability", Text = "Liability" }
+    };
+
+    private static List<DropdownModel> GetStandardOptions() => new()
+    {
+        new() { Value = "None", Text = "None" },
+        new() { Value = "ASC815", Text = "ASC815" }
     };
 }
