@@ -41,13 +41,9 @@ public sealed class RunRegression
             {
                 _logger.LogInformation("Sending request to run regression for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
 
-                // Minimal body needed for regression (send ID + Notional + Description)
-                var body = new DerivativeEDGEHAEntityHedgeRelationship
-                {
-                    ID = request.HedgeRelationship.ID,
-                    Notional = (double)request.HedgeRelationship.Notional,
-                    Description = request.HedgeRelationship.Description,
-                };
+                // Map the full HedgeRelationshipVM to HedgeRelationship entity (following UpdateHedgeRelationship pattern)
+                // The API needs the complete hedge relationship data including hedged items, hedging items, effectiveness methods, etc.
+                var body = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
                 var apiResponse = await _hedgeAccountingApiClient.RegressAsync(request.HedgeResultType, body, cancellationToken);
 
