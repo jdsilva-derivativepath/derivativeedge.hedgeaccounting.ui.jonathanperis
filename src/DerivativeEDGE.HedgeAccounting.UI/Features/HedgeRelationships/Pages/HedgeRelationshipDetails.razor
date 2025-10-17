@@ -550,7 +550,10 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                             {
                                 <DropDownMenuItem Text="Amortization"></DropDownMenuItem>
                             }
-                            <DropDownMenuItem Text="Option Amortization"></DropDownMenuItem>
+                            @if (HedgeRelationship.IsAnOptionHedge)
+                            {
+                                <DropDownMenuItem Text="Option Amortization"></DropDownMenuItem>
+                            }
                         </DropDownMenuItems>
                     </SfDropDownButton>
                 </div>
@@ -608,15 +611,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <HedgeRelationshipLogsTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches" />
                     </ContentTemplate>
                 </TabItem>
-                @* <TabItem Visible="@HedgeRelationship.IsAnOptionHedge">
-                    <ChildContent>
-                        <TabHeader Text="Option Amortization"></TabHeader>
-                    </ChildContent>
-                    <ContentTemplate>
-                        <OptionAmortizationTab @bind-HedgeRelationshipOptionTimeValues="@HedgeRelationship.HedgeRelationshipOptionTimeValues" />
-                    </ContentTemplate>
-                </TabItem> *@
-                <TabItem>
+                <TabItem Visible="@(HedgeRelationship.IsAnOptionHedge && HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)">
                     <ChildContent>
                         <TabHeader Text="Option Amortization"></TabHeader>
                     </ChildContent>
