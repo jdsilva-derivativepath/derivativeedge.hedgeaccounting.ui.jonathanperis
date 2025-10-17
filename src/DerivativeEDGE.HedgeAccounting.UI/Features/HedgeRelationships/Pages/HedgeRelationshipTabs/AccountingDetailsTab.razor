@@ -4,7 +4,7 @@
         <div class="dp-inputs" style="width: 15rem;">
             <span class="input-label">Standard</span>
             <SfDropDownList CssClass="dropdown-input"
-                            Enabled="true"
+                            Enabled="@(HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)"
                             TItem="DropdownModel"
                             TValue="DerivativeEDGEHAEntityEnumStandard"
                             PopupHeight="100px"
