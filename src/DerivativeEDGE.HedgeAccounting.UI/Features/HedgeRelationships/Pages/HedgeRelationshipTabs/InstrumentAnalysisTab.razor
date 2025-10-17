@@ -115,9 +115,9 @@
                  OnDataBound="@OnHedgingItemChanged"
                  OnRowDataBound="@OnHedgingItemChanged">
         <GridColumns>
-            <GridColumn Field="@nameof(HedgingItem.ItemID)" HeaderText="Hedging Item ID" Width="160" />
-            <GridColumn Field="@nameof(HedgingItem.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
-            <GridColumn Field="@nameof(HedgingItem.Notional)" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="200">
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.ItemID)" HeaderText="Hedging Item ID" Width="160" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Notional)" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="200">
                 <Template>
                     @{
                         var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM)context;
