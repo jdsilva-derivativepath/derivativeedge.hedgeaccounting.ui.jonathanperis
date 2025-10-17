@@ -1,33 +1,4 @@
-﻿@using DerivativeEdge.HedgeAccounting.Api.Client
-@using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Components.Forms
-
-@using MediatR
-
-@using Syncfusion.Blazor.Navigations
-@using Syncfusion.Blazor.Popups
-@using Syncfusion.Blazor.SplitButtons
-
-@using System.Linq
-@using System.Text.RegularExpressions
-
-@using DerivativeEdge.Blazor.ComponentLibrary.Enums
-@using DerivativeEdge.Blazor.ComponentLibrary.Services
-
-@using DerivativeEDGE.HedgeAccounting.UI.Constants
-@using DerivativeEDGE.HedgeAccounting.UI.Extensions
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components
-
-@using DerivativeEDGE.Identity.API.Client
-
-<PageTitle>Hedge Relationships</PageTitle>
+﻿<PageTitle>Hedge Relationships</PageTitle>
 
 @if (IsLoadingHedgeRelationship)
 {
@@ -674,44 +645,39 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                     VisibleChanged="@((value) => OpenModal = value ? MODAL_HEDGE_DOCUMENT_PREVIEW : string.Empty)"
                                     HedgeDocumentContent="@HedgeRelationship?.Objective" />
 
-        @if (IsDeDesignateModal)
-        {
-            <DeDesignateDialog Visible="@IsDeDesignateModal"
-                               VisibleChanged="@((value) => OpenModal = value ? MODAL_DEDESIGNATE : string.Empty)"
-                               DedesignationReason="@DedesignationReason"
-                               DedesignationDate="@DedesignationDateDialog"
-                               CashPaymentType="@CashPaymentType"
-                               Payment="@DedesignatePayment"
-                               Accrual="@DedesignateAccrual"
-                               BasisAdjustment="@BasisAdjustment"
-                               BasisAdjustmentBalance="@BasisAdjustmentBalance"
-                               ShowBasisAdjustmentBalance="@ShowBasisAdjustmentBalance"
-                               TimeValuesStartDate="@DedesignateTimeValuesStartDate"
-                               TimeValuesEndDate="@DedesignateTimeValuesEndDate"
-                               HedgedExposureExist="@HedgedExposureExist"
-                               UserMessage="@DedesignateUserMessage"
-                               IsError="@DedesignateIsError"
-                               IsDeDesignateDisabled="@IsDeDesignateDisabled"
-                               OnDeDesignated="@OnDeDesignateConfirmed" />
-        }
-        else if (IsReDesignateModal)
-        {
-            <ReDesignateDialog Visible="@IsReDesignateModal"
-                               VisibleChanged="@((value) => OpenModal = value ? MODAL_REDESIGNATE : string.Empty)"
-                               RedesignationDate="@RedesignationDate"
-                               TimeValuesStartDate="@RedesignateTimeValuesStartDate"
-                               TimeValuesEndDate="@RedesignateTimeValuesEndDate"
-                               Payment="@RedesignatePayment"
-                               PaymentFrequency="@RedesignatePaymentFrequency"
-                               DayCountConv="@RedesignateDayCountConv"
-                               PayBusDayConv="@RedesignatePayBusDayConv"
-                               AdjustedDates="@RedesignateAdjustedDates"
-                               MarkAsAcquisition="@MarkAsAcquisition"
-                               IsDocTemplateFound="@IsDocTemplateFound"
-                               AvailablePaymentFrequencies="@AvailablePaymentFrequencies"
-                               AvailableDayCountConventions="@AvailableDayCountConventions"
-                               AvailablePayBusDayConventions="@AvailablePayBusDayConventions"
-                               OnReDesignated="@OnReDesignateConfirmed" />
-        }
+        <DeDesignateDialog Visible="@IsDeDesignateModal"
+                           VisibleChanged="@((value) => OpenModal = value ? MODAL_DEDESIGNATE : string.Empty)"
+                           DedesignationReason="@DedesignationReason"
+                           DedesignationDate="@DedesignationDateDialog"
+                           CashPaymentType="@CashPaymentType"
+                           Payment="@DedesignatePayment"
+                           Accrual="@DedesignateAccrual"
+                           BasisAdjustment="@BasisAdjustment"
+                           BasisAdjustmentBalance="@BasisAdjustmentBalance"
+                           ShowBasisAdjustmentBalance="@ShowBasisAdjustmentBalance"
+                           TimeValuesStartDate="@DedesignateTimeValuesStartDate"
+                           TimeValuesEndDate="@DedesignateTimeValuesEndDate"
+                           HedgedExposureExist="@HedgedExposureExist"
+                           UserMessage="@DedesignateUserMessage"
+                           IsError="@DedesignateIsError"
+                           IsDeDesignateDisabled="@IsDeDesignateDisabled"
+                           OnDeDesignated="@OnDeDesignateConfirmed" />
+
+        <ReDesignateDialog Visible="@IsReDesignateModal"
+                           VisibleChanged="@((value) => OpenModal = value ? MODAL_REDESIGNATE : string.Empty)"
+                           RedesignationDate="@RedesignationDate"
+                           TimeValuesStartDate="@RedesignateTimeValuesStartDate"
+                           TimeValuesEndDate="@RedesignateTimeValuesEndDate"
+                           Payment="@RedesignatePayment"
+                           PaymentFrequency="@RedesignatePaymentFrequency"
+                           DayCountConv="@RedesignateDayCountConv"
+                           PayBusDayConv="@RedesignatePayBusDayConv"
+                           AdjustedDates="@RedesignateAdjustedDates"
+                           MarkAsAcquisition="@MarkAsAcquisition"
+                           IsDocTemplateFound="@IsDocTemplateFound"
+                           AvailablePaymentFrequencies="@AvailablePaymentFrequencies"
+                           AvailableDayCountConventions="@AvailableDayCountConventions"
+                           AvailablePayBusDayConventions="@AvailablePayBusDayConventions"
+                           OnReDesignated="@OnReDesignateConfirmed" />
     </EditForm>
 }

@@ -1,6 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Configuration;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Configuration;
 
 public static class HttpClientRegistrationExtensions
 {

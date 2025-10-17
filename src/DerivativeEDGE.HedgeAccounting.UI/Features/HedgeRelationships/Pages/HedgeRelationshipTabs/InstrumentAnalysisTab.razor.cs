@@ -1,9 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
-using Microsoft.JSInterop;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
 
 public partial class InstrumentAnalysisTab
 {

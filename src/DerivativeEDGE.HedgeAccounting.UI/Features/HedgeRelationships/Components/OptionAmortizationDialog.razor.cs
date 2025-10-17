@@ -1,11 +1,3 @@
-using DerivativeEdge.HedgeAccounting.Api.Client;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
-using MediatR;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
 
 public partial class OptionAmortizationDialog

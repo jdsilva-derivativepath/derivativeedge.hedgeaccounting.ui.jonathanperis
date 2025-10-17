@@ -1,33 +1,59 @@
-﻿﻿@using AutoMapper
-
+﻿@using AnimationEffect = Syncfusion.Blazor.AnimationEffect
+@using AutoMapper
+@using Blazored.LocalStorage
+@using DerivativeEdge.Blazor.ComponentLibrary
+@using DerivativeEdge.Blazor.ComponentLibrary.Buttons
+@using DerivativeEdge.Blazor.ComponentLibrary.Cards
+@using DerivativeEdge.Blazor.ComponentLibrary.DpModal
+@using DerivativeEdge.Blazor.ComponentLibrary.DpToast
+@using DerivativeEdge.Blazor.ComponentLibrary.DropDowns
 @using DerivativeEdge.Blazor.ComponentLibrary.Enums
-
-@using MediatR
-
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components.Web.Virtualization
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
-@using Microsoft.JSInterop
-﻿@using System.Net.Http
-@using System.Text.RegularExpressions
-
+@using DerivativeEdge.Blazor.ComponentLibrary.Grids
+@using DerivativeEdge.Blazor.ComponentLibrary.Grids.DefaultGrid
+@using DerivativeEdge.Blazor.ComponentLibrary.Grids.Shared
+@using DerivativeEdge.Blazor.ComponentLibrary.Helpers
+@using DerivativeEdge.Blazor.ComponentLibrary.Models
+@using DerivativeEdge.Blazor.ComponentLibrary.Navigation
+@using DerivativeEdge.Blazor.ComponentLibrary.Navigation.MidGen
+@using DerivativeEdge.Blazor.ComponentLibrary.PortalLauncher.Enums
+@using DerivativeEdge.Blazor.ComponentLibrary.PortalLauncher.TopBar
+@using DerivativeEdge.Blazor.ComponentLibrary.Services
+@using DerivativeEdge.Blazor.ComponentLibrary.TextBoxes
+@using DerivativeEdge.Blazor.ComponentLibrary.Utilities
+@using DerivativeEdge.HedgeAccounting.Api.Client
 @using DerivativeEDGE.HedgeAccounting.UI
 @using DerivativeEDGE.HedgeAccounting.UI.Components
 @using DerivativeEDGE.HedgeAccounting.UI.Components.DocumentContent
 @using DerivativeEDGE.HedgeAccounting.UI.Components.DocumentTemplate
 @using DerivativeEDGE.HedgeAccounting.UI.Components.HedgeRelationship
+@using DerivativeEDGE.HedgeAccounting.UI.Constants
+@using DerivativeEDGE.HedgeAccounting.UI.Extensions
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation
 @using DerivativeEDGE.HedgeAccounting.UI.Handlers.Commands
 @using DerivativeEDGE.HedgeAccounting.UI.Models
+@using DerivativeEDGE.HedgeAccounting.UI.Pages
+@using DerivativeEDGE.HedgeAccounting.UI.Pages.HedgeRelationship
 @using DerivativeEDGE.HedgeAccounting.UI.Shared
 @using DerivativeEDGE.HedgeAccounting.UI.Shared.Layout
-@using DerivativeEDGE.HedgeAccounting.UI.Pages
-
-@using DerivativeEDGE.HedgeAccounting.UI.Pages.HedgeRelationship
-
+@using DerivativeEDGE.Identity.API.Client
+@using MediatR
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
 @using Syncfusion.Blazor
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Calendars
@@ -44,31 +70,10 @@
 @using Syncfusion.Blazor.RichTextEditor
 @using Syncfusion.Blazor.Spinner
 @using Syncfusion.Blazor.SplitButtons
-@using AnimationEffect = Syncfusion.Blazor.AnimationEffect
-
-@using DerivativeEdge.Blazor.ComponentLibrary
-@using DerivativeEdge.Blazor.ComponentLibrary.Buttons
-@using DerivativeEdge.Blazor.ComponentLibrary.DpToast
-
-@using DerivativeEdge.Blazor.ComponentLibrary.Cards
-
-@using DerivativeEdge.Blazor.ComponentLibrary.Grids
-@using DerivativeEdge.Blazor.ComponentLibrary.Grids.DefaultGrid
-@using DerivativeEdge.Blazor.ComponentLibrary.Grids.Shared
-
-@using DerivativeEdge.Blazor.ComponentLibrary.DropDowns
-@using DerivativeEdge.Blazor.ComponentLibrary.Services
-
-@using DerivativeEdge.Blazor.ComponentLibrary.Helpers
-@using DerivativeEdge.Blazor.ComponentLibrary.Models
-@using DerivativeEdge.Blazor.ComponentLibrary.Navigation
-@using DerivativeEdge.Blazor.ComponentLibrary.Navigation.MidGen
-@using DerivativeEdge.Blazor.ComponentLibrary.TextBoxes;
-
-@using DerivativeEdge.Blazor.ComponentLibrary.PortalLauncher.Enums
-@using DerivativeEdge.Blazor.ComponentLibrary.PortalLauncher.TopBar
-
-@using Tailwind;
-
-@* Hedge Relationships Feature *@
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages
+@using System.ComponentModel.DataAnnotations
+@using System.Linq
+@using System.Net.Http
+@using System.Text
+@using System.Text.RegularExpressions
+@using Tailwind
+@using static Microsoft.AspNetCore.Components.Web.RenderMode

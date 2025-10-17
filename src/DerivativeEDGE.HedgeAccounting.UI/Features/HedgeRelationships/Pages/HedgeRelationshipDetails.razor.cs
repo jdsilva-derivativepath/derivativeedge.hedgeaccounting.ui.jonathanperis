@@ -1,16 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-using DerivativeEDGE.Common.Extensions;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
-using Microsoft.JSInterop;
-using Syncfusion.Blazor.DropDowns;
-using Syncfusion.Blazor.Navigations;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages;
 
 public partial class HedgeRelationshipDetails
 {
@@ -174,13 +162,6 @@ public partial class HedgeRelationshipDetails
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM AmortizationModel { get; set; } = new();
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM OptionAmortizationModel { get; set; } = new();
     private List<DropDownMenuItem> WorkflowItems = new();
-
-    public class ChartDataModel
-    {
-        public string Date { get; set; }
-        public double R2Value { get; set; }
-        public double Slope { get; set; }
-    }
 
     // Dynamic chart data from HedgeRegressionBatches
     private List<ChartDataModel> EffectivenessChartData { get; set; } = new();
@@ -1191,12 +1172,6 @@ public partial class HedgeRelationshipDetails
         new() { Value = HedgingInstrumentStructure.MultipleInstruments, Text = HedgingInstrumentStructure.MultipleInstruments.GetDescription() }
     };
 
-    public class HedgingInstrumentStructureOption
-    {
-        public HedgingInstrumentStructure Value { get; set; }
-        public string Text { get; set; }
-    }
-
     public static List<FinancialCenterOption> GetFinancialCenterOptions() => new()
     {
         new() { Value = FinancialCenter.BEBR, Text = FinancialCenter.BEBR.GetDescription() },
@@ -1268,12 +1243,6 @@ public partial class HedgeRelationshipDetails
         new() { Value = FinancialCenter.PELI, Text = FinancialCenter.PELI.GetDescription() }
     };
 
-    public class FinancialCenterOption
-    {
-        public FinancialCenter Value { get; set; }
-        public string Text { get; set; }
-    }
-
     private static List<PaymentFrequencyOption> GetPaymentFrequencyOptions() => new()
     {
         new() { Value = PaymentFrequency.Monthly,     Text = PaymentFrequency.Monthly.GetDescription() },
@@ -1286,12 +1255,6 @@ public partial class HedgeRelationshipDetails
         new() { Value = PaymentFrequency.FiveYear,    Text = PaymentFrequency.FiveYear.GetDescription() }
     };
 
-    public class PaymentFrequencyOption
-    {
-        public PaymentFrequency Value { get; set; }
-        public string Text { get; set; }
-    }
-
     public static List<DayCountConvOption> GetDayCountConvOptions() => new()
     {
         new() { Value = DayCountConv.ACT_360,      Text = DayCountConv.ACT_360.GetDescription() },
@@ -1300,12 +1263,6 @@ public partial class HedgeRelationshipDetails
         new() { Value = DayCountConv._30_360,      Text = DayCountConv._30_360.GetDescription() },
         new() { Value = DayCountConv._30E_360,     Text = DayCountConv._30E_360.GetDescription() }
     };
-
-    public class DayCountConvOption
-    {
-        public DayCountConv Value { get; set; }
-        public string Text { get; set; }
-    }
 
     private static List<PayBusDayConvOption> GetPayBusDayConvOptions() => new()
     {
@@ -1316,12 +1273,6 @@ public partial class HedgeRelationshipDetails
         new() { Value = PayBusDayConv.FRN,          Text = PayBusDayConv.FRN.GetDescription() }
     };
 
-    public class PayBusDayConvOption
-    {
-        public PayBusDayConv Value { get; set; }
-        public string Text { get; set; }
-    }
-
     public static List<AmortizationMethodOption> GetAmortizationMethodOptions() => new()
     {
         new() { Value = AmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },
@@ -1331,12 +1282,6 @@ public partial class HedgeRelationshipDetails
         new() { Value = AmortizationMethod.Swaplet, Text = AmortizationMethod.Swaplet.GetDescription() }
     };
 
-    public class AmortizationMethodOption
-    {
-        public AmortizationMethod Value { get; set; }
-        public string Text { get; set; }
-    }
-
     public static List<IntrinsicAmortizationMethodOption> GetIntrinsicAmortizationMethodOptions() => new()
     {
         new() { Value = AmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },
@@ -1345,11 +1290,5 @@ public partial class HedgeRelationshipDetails
         new() { Value = AmortizationMethod.IntrinsicValueMethod, Text = AmortizationMethod.IntrinsicValueMethod.GetDescription() },
         new() { Value = AmortizationMethod.Swaplet, Text = AmortizationMethod.Swaplet.GetDescription() }
     };
-
-    public class IntrinsicAmortizationMethodOption
-    {
-        public AmortizationMethod Value { get; set; }
-        public string Text { get; set; }
-    }
     #endregion
 }

@@ -1,7 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
 
 public sealed class UploadRegressionSummaryAllClient
 {

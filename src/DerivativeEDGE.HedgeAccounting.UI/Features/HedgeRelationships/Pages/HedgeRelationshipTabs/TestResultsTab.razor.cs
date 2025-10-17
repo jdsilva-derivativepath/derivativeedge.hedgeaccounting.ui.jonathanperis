@@ -1,7 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-using Microsoft.JSInterop;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
 
 public partial class TestResultsTab
 {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-
-namespace DerivativeEDGE.HedgeAccounting.UI;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI;
 
 public class Instrumentation : IDisposable
 {
