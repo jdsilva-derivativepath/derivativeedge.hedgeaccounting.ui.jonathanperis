@@ -1,25 +1,26 @@
-﻿<div class="accounting-details-container">
-    <div class="dp-inputs" style="width: 15rem;">
-        <span class="input-label">Standard</span>
-        <SfDropDownList CssClass="dropdown-input"
-                        Enabled="true"
-                        TItem="StandardOption"
-                        TValue="string"
-                        PopupHeight="100px"
-                        Placeholder="Standard"
-                        @bind-Value="@SelectedStandardValue"
-                        DataSource="@StandardOptions">
-            <DropDownListEvents TItem="StandardOption" TValue="string" />
-            <DropDownListFieldSettings Text="Text" Value="ID" />
-        </SfDropDownList>
-    </div>
-    <div class="dp-inputs">
-        <SfCheckBox CssClass="input-checkbox"
-                    @bind-Checked="IsChecked"
-                    Label="Hedge for Tax Purposes" />
-    </div>
-</div>
+@using DerivativeEDGE.HedgeAccounting.Api.Client
 
-@code {
-
+@if (HedgeRelationship != null)
+{
+    <div class="accounting-details-container">
+        <div class="dp-inputs" style="width: 15rem;">
+            <span class="input-label">Standard</span>
+            <SfDropDownList CssClass="dropdown-input"
+                            Enabled="true"
+                            TItem="DropdownModel"
+                            TValue="DerivativeEDGEHAEntityEnumStandard"
+                            PopupHeight="100px"
+                            Placeholder="Standard"
+                            @bind-Value="@HedgeRelationship.Standard"
+                            DataSource="@DropdownDataHelper.GetDropdownDatasource("standard")">
+                <DropDownListEvents TItem="DropdownModel" TValue="DerivativeEDGEHAEntityEnumStandard" />
+                <DropDownListFieldSettings Text="Text" Value="Value" />
+            </SfDropDownList>
+        </div>
+        <div class="dp-inputs">
+            <SfCheckBox CssClass="input-checkbox"
+                        @bind-Checked="@HedgeRelationship.TaxPurposes"
+                        Label="Hedge for Tax Purposes" />
+        </div>
+    </div>
 }

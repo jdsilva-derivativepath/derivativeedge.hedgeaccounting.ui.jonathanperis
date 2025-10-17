@@ -588,7 +588,14 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                         LatestHedgeRegressionBatch="@HedgeRelationship.LatestHedgeRegressionBatch" />
                     </ContentTemplate>
                 </TabItem>
-                @* Accounting Details Tab? *@
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Accounting Details"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <AccountingDetailsTab @bind-HedgeRelationship="@HedgeRelationship" />
+                    </ContentTemplate>
+                </TabItem>
                 <TabItem>
                     <ChildContent>
                         <TabHeader Text="Amortization"></TabHeader>
