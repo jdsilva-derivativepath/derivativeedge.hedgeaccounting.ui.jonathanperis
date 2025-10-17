@@ -1184,6 +1184,7 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Helper Methods
+    public static List<HedgingInstrumentStructureOption> GetHedgingInstrumentStructureOptions() => new()
     {
         new() { Value = HedgingInstrumentStructure.SingleInstrument, Text = HedgingInstrumentStructure.SingleInstrument.GetDescription() },
         new() { Value = HedgingInstrumentStructure.StructuredProduct, Text = HedgingInstrumentStructure.StructuredProduct.GetDescription() },
