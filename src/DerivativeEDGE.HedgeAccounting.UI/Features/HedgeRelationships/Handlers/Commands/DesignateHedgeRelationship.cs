@@ -47,22 +47,12 @@ public sealed class DesignateHedgeRelationship
             {
                 _logger.LogInformation("Starting designation process for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
 
-                // Step 1: Check if document template exists
-                var documentTemplateResponse = await _mediator.Send(
-                    new FindDocumentTemplate.Query(request.HedgeRelationshipId), 
-                    cancellationToken);
-
-                if (documentTemplateResponse.HasError)
-                {
-                    return new Response(true, documentTemplateResponse.ErrorMessage);
-                }
-
-                // Step 2: Get the current hedge relationship
+                // Step 1: Get the current hedge relationship
                 var hedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
 
-                // Step 3: Run regression for inception
+                // Step 2: Run regression for inception
                 _logger.LogInformation("Running regression for inception for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 var regressionResponse = await _mediator.Send(
                     new RunRegression.Command(hedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Inception),
@@ -76,7 +66,7 @@ public sealed class DesignateHedgeRelationship
                 // Update hedge relationship with regression results
                 hedgeRelationship = regressionResponse.Data;
 
-                // Step 4: Check analytics availability
+                // Step 3: Check analytics availability
                 var analyticsAvailable = await _hedgeAccountingApiClient.IsAnalyticsAvailableAsync(cancellationToken);
                 
                 if (!analyticsAvailable)
@@ -84,7 +74,7 @@ public sealed class DesignateHedgeRelationship
                     _logger.LogWarning("Analytics are not available for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 }
 
-                // Step 5: Generate inception package
+                // Step 4: Generate inception package (this designates the relationship on the backend)
                 _logger.LogInformation("Generating inception package for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 var inceptionPackageResponse = await _mediator.Send(
                     new GenerateInceptionPackage.Command(hedgeRelationship, Preview: false),
@@ -95,7 +85,7 @@ public sealed class DesignateHedgeRelationship
                     return new Response(true, $"Failed to generate inception package: {inceptionPackageResponse.ErrorMessage}");
                 }
 
-                // Step 6: Reload the hedge relationship to get the updated state
+                // Step 5: Reload the hedge relationship to get the updated state
                 hedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
