@@ -1,4 +1,6 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
+﻿using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
 public sealed class UpdateHedgeRelationship
 {
