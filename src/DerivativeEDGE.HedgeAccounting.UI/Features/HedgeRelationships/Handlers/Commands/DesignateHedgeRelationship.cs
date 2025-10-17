@@ -107,12 +107,18 @@ public sealed class DesignateHedgeRelationship
             {
                 _logger.LogError(apiEx, "API error occurred during designation for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}",
                     request.HedgeRelationshipId, apiEx.StatusCode, apiEx.Response);
-                return new Response(true, $"Failed to designate hedge relationship: {apiEx.Message}");
+                
+                // Return the actual API error message to the user
+                var errorMessage = !string.IsNullOrEmpty(apiEx.Response) 
+                    ? $"Failed to designate hedge relationship: {apiEx.Response}" 
+                    : $"Failed to designate hedge relationship. Status code: {apiEx.StatusCode}";
+                
+                return new Response(true, errorMessage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred during designation for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
-                return new Response(true, "Failed to designate hedge relationship due to an unexpected error");
+                return new Response(true, $"Failed to designate hedge relationship: {ex.Message}");
             }
         }
     }

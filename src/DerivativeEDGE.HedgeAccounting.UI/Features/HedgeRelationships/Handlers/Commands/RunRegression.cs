@@ -54,10 +54,22 @@ public sealed class RunRegression
                 _logger.LogInformation("Successfully completed regression analysis for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
                 return new Response(false, "Regression analysis completed successfully", apiResponse);
             }
+            catch (ApiException apiEx)
+            {
+                _logger.LogError(apiEx, "API error while running regression analysis for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
+                    request.HedgeRelationship.ID, apiEx.StatusCode, apiEx.Response);
+                
+                // Return the actual API error message to the user
+                var errorMessage = !string.IsNullOrEmpty(apiEx.Response) 
+                    ? $"Failed to run regression analysis: {apiEx.Response}" 
+                    : $"Failed to run regression analysis. Status code: {apiEx.StatusCode}";
+                
+                return new Response(true, errorMessage);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while running regression analysis for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
-                return new Response(true, "Failed to run regression analysis due to an unexpected error");
+                return new Response(true, $"Failed to run regression analysis: {ex.Message}");
             }
         }
     }
