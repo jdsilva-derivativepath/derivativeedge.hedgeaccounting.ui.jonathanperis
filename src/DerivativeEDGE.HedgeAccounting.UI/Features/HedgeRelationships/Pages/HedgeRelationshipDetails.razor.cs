@@ -755,7 +755,12 @@ public partial class HedgeRelationshipDetails
         if (string.IsNullOrEmpty(role) || UserAuthData?.Roles == null)
             return false;
 
-        return UserAuthData.Roles.Any(userRole => userRole.ToString() == role);
+        // Parse string role ID to integer and cast to EdgeRole enum
+        if (!int.TryParse(role, out var roleId))
+            return false;
+
+        var edgeRole = (DerivativeEDGE.Authorization.AuthClaims.EdgeRole)roleId;
+        return UserAuthData.Roles.Contains(edgeRole);
     }
 
     private bool HasRequiredRole() =>
