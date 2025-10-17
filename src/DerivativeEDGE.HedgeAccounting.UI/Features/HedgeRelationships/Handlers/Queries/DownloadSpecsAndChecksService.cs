@@ -42,7 +42,7 @@ public sealed class DownloadSpecsAndChecksService
                 // NSwag FileResponse pattern: contains Stream and a Headers collection
                 var fileName = fileResponse.Headers?.TryGetValue("Content-Disposition", out var values) == true
                     ? ExtractFileName(values.FirstOrDefault())
-                    : "SpecsAndChecks.xlsx";
+                    : GenerateDefaultFileName();
 
                 var stream = fileResponse.Stream;
                 if (stream.CanSeek)
@@ -61,11 +61,19 @@ public sealed class DownloadSpecsAndChecksService
             }
         }
 
+        private static string GenerateDefaultFileName()
+        {
+            // Legacy format: HRSpecsAndChecks + MMDDYYYYHHmm + .xlsx
+            // Example: HRSpecsAndChecks101720251312.xlsx (October 17, 2025 13:12)
+            var timestamp = DateTime.Now.ToString("MMddyyyyHHmm");
+            return $"HRSpecsAndChecks{timestamp}.xlsx";
+        }
+
         private static string ExtractFileName(string contentDisposition)
         {
             if (string.IsNullOrWhiteSpace(contentDisposition))
             {
-                return "SpecsAndChecks.xlsx";
+                return GenerateDefaultFileName();
             }
 
             // Try to extract filename* first (RFC 5987 encoded filename)
@@ -98,7 +106,7 @@ public sealed class DownloadSpecsAndChecksService
             var idx = contentDisposition.IndexOf(token, StringComparison.OrdinalIgnoreCase);
             if (idx < 0)
             {
-                return "SpecsAndChecks.xlsx";
+                return GenerateDefaultFileName();
             }
 
             var startPos = idx + token.Length;
@@ -111,7 +119,7 @@ public sealed class DownloadSpecsAndChecksService
             // Remove surrounding quotes if present
             result = result.Trim('"');
             
-            return string.IsNullOrWhiteSpace(result) ? "SpecsAndChecks.xlsx" : result;
+            return string.IsNullOrWhiteSpace(result) ? GenerateDefaultFileName() : result;
         }
     }
 }
