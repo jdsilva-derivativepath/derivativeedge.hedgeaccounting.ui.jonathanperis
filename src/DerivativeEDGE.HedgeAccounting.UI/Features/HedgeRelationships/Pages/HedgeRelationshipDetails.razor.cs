@@ -877,8 +877,24 @@ public partial class HedgeRelationshipDetails
 
         try
         {
-            // Save current state before designation
-            await SaveHedgeRelationshipAsync();
+            // Check if document template exists (matching legacy behavior)
+            var documentTemplateResponse = await Mediator.Send(
+                new FindDocumentTemplate.Query(HedgeId));
+
+            if (documentTemplateResponse.HasError)
+            {
+                await AlertService.ShowToast(documentTemplateResponse.ErrorMessage, AlertKind.Error, "Designation Failed", showButton: true);
+                return;
+            }
+
+            // If document template exists, save current state before designation (legacy: submit → init → designate)
+            if (documentTemplateResponse.HasTemplate)
+            {
+                await SaveHedgeRelationshipAsync();
+                
+                // Reload the hedge relationship after save
+                await GetHedgeRelationship(HedgeId);
+            }
 
             // Execute designation workflow
             var response = await Mediator.Send(new DesignateHedgeRelationship.Command(HedgeId));
