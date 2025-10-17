@@ -1,6 +1,4 @@
-﻿using static DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipDetails;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
 
 public partial class ReDesignateDialog
 {

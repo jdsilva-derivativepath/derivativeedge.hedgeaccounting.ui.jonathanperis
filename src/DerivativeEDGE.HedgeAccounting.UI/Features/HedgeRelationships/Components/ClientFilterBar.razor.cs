@@ -1,6 +1,4 @@
-﻿using Syncfusion.Blazor.Calendars;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
 
 public partial class ClientFilterBar
 {

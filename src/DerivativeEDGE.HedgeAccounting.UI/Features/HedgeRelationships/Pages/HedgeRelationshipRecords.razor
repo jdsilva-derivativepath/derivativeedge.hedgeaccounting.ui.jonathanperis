@@ -1,30 +1,5 @@
 ﻿@page "/hedgerelationship"
 
-@* --- System/Framework --- *@
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries
-@using DerivativeEdge.HedgeAccounting.Api.Client
-@using Microsoft.AspNetCore.Components
-@using Microsoft.JSInterop
-
-@* --- Third-party libraries --- *@
-@using Blazored.LocalStorage
-@using MediatR
-@using Syncfusion.Blazor.Popups
-
-@* --- Component Library --- *@
-@using DerivativeEdge.Blazor.ComponentLibrary.Enums
-@using DerivativeEdge.Blazor.ComponentLibrary.Models
-@using DerivativeEdge.Blazor.ComponentLibrary.Utilities
-
-@* --- Project: Models, Services, Handlers, Components --- *@
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
-
-@* --- Local Components --- *@
-@using DerivativeEDGE.HedgeAccounting.UI.Shared
-
 @inject ILocalStorageService LocalStorage
 @inject IAlertService AlertService
 @inject IMediator Mediator

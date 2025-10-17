@@ -1,0 +1,184 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using DerivativeEdge.HedgeAccounting.Api.Client
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
+@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
+@using Microsoft.AspNetCore.Components.Forms
+
+<SfDialog Width="33rem" 
+          Height="auto" 
+          CssClass="dp-dialog" 
+          IsModal="true" 
+          AllowDragging="true" 
+          EnableResize="false"
+          @bind-Visible="Visible">
+    <DialogTemplates>
+        <Header>Add/Edit Amortization</Header>
+        <Content>
+            <EditForm Model="AmortizationModel" OnSubmit="OnSubmitAmortization" Context="amortizationFormContext">
+                <DataAnnotationsValidator />
+                <ValidationMessage For="@(() => AmortizationModel.GLAccountID)" />
+                <ValidationMessage For="@(() => AmortizationModel.ContraAccountID)" />
+                <ValidationMessage For="@(() => AmortizationModel.StartDate)" />
+                <div class="form-group dp-inputs">
+                    <span class="input-label">GL Account</span>
+                    <SfComboBox TValue="long"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="DerivativeEDGEHAEntityGLAccount"
+                                Placeholder="GL Account"
+                                @bind-Value="AmortizationModel.GLAccountID"
+                                DataSource="AmortizationGLAccounts">
+                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
+                        <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                    </SfComboBox>
+                </div>
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Contra</span>
+                    <SfComboBox TValue="long" 
+                                CssClass="dropdown-input" 
+                                Enabled="true" 
+                                TItem="DerivativeEDGEHAEntityGLAccount" 
+                                Placeholder="Contra"
+                                @bind-Value="AmortizationModel.ContraAccountID"
+                                DataSource="AmortizationContraAccounts">
+                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
+                        <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                    </SfComboBox>
+                </div>
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Financial Centers</span>
+                    <SfMultiSelect TValue="List<string>"
+                                   CssClass="dropdown-input"
+                                   Enabled="true"
+                                   TItem="FinancialCenterOption"
+                                   Placeholder="Financial Centers"
+                                   @bind-Value="AmortizationFinancialCenters"
+                                   DataSource="@FinancialCenterOptions">
+                        <MultiSelectFieldSettings Value="@nameof(FinancialCenterOption.Value)" Text="@nameof(FinancialCenterOption.Text)" />
+                    </SfMultiSelect>
+                </div>
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Payment Frequency</span>
+                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency"
+                                CssClass="dropdown-input"
+                                Enabled="true"
+                                TItem="PaymentFrequencyOption"
+                                Placeholder="Payment Frequency"
+                                @bind-Value="AmortizationModel.PaymentFrequency"
+                                DataSource="@PaymentFrequencyOptions">
+                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency" TItem="PaymentFrequencyOption" />
+                        <ComboBoxFieldSettings Value="@nameof(PaymentFrequencyOption.Value)" Text="@nameof(PaymentFrequencyOption.Text)" />
+                    </SfComboBox>
+                </div>
+                <div class="custom-datepicker-container">
+                    <div class="form-group dp-inputs">
+                        <span class="input-label">Day Count Convention</span>
+                        <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv"
+                                    CssClass="dropdown-input"
+                                    Enabled="true"
+                                    TItem="DayCountConvOption"
+                                    Placeholder="Day Count Convention"
+                                    @bind-Value="AmortizationModel.DayCountConv"
+                                    DataSource="@DayCountConvOptions">
+                            <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv" TItem="DayCountConvOption" />
+                            <ComboBoxFieldSettings Value="@nameof(DayCountConvOption.Value)" Text="@nameof(DayCountConvOption.Text)" />
+                        </SfComboBox>
+                    </div>
+                    <div class="form-group dp-inputs">
+                        <span class="input-label">Payment Convention</span>
+                        <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv"
+                                    CssClass="dropdown-input"
+                                    Enabled="@(AmortizationModel.ID != 0)"
+                                    TItem="PayBusDayConvOption"
+                                    Placeholder="Payment Convention"
+                                    @bind-Value="AmortizationModel.PayBusDayConv"
+                                    DataSource="@PayBusDayConvOptions">
+                            <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv" TItem="PayBusDayConvOption" />
+                            <ComboBoxFieldSettings Value="@nameof(PayBusDayConvOption.Value)" Text="@nameof(PayBusDayConvOption.Text)" />
+                        </SfComboBox>
+                    </div>
+                </div>
+                <div class="custom-datepicker-container">
+                    <div class="dp-inputs">
+                        <label class="input-label">Start Date</label>
+                        <SfDatePicker TValue="DateTime?"
+                                      CssClass="calendar-datepicker" 
+                                      Enabled="true" 
+                                      Format="MM/dd/yyyy" 
+                                      Placeholder="mm/dd/yyyy" 
+                                      ShowClearButton="true"
+                                      @bind-Value="AmortizationStartDate">
+                        </SfDatePicker>
+                    </div>
+                    <div class="dp-inputs">
+                        <label class="input-label">End Date</label>
+                        <SfDatePicker TValue="DateTime?"
+                                      CssClass="calendar-datepicker" 
+                                      Enabled="true" 
+                                      Format="MM/dd/yyyy" 
+                                      Placeholder="mm/dd/yyyy" 
+                                      ShowClearButton="true"
+                                      @bind-Value="AmortizationEndDate">
+                        </SfDatePicker>
+                    </div>
+                </div>
+                <div class="custom-datepicker-container">
+                    <div class="dp-inputs">
+                        <label class="input-label">Front Roll Date</label>
+                        <SfDatePicker TValue="DateTime?"
+                                      CssClass="calendar-datepicker" 
+                                      Enabled="true" 
+                                      Format="MM/dd/yyyy" 
+                                      Placeholder="mm/dd/yyyy" 
+                                      ShowClearButton="true"
+                                      @bind-Value="AmortizationFrontRollDate">
+                        </SfDatePicker>
+                    </div>
+                    <div class="dp-inputs">
+                        <label class="input-label">Back Roll Date</label>
+                        <SfDatePicker TValue="DateTime?"
+                                      CssClass="calendar-datepicker" 
+                                      Enabled="true"
+                                      Format="MM/dd/yyyy" 
+                                      Placeholder="mm/dd/yyyy" 
+                                      ShowClearButton="true"
+                                      @bind-Value="AmortizationBackRollDate">
+                        </SfDatePicker>
+                    </div>
+                </div>
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Total Amount</span>
+                    <NumericHotKeys>
+                        <SfNumericTextBox TValue="double"
+                                          CssClass="input-numeric" 
+                                          Placeholder="Total Amount" 
+                                          Enabled="true"
+                                          @bind-Value="AmortizationModel.TotalAmount" />
+                    </NumericHotKeys>
+                </div>
+                <div class="custom-checkbox-container">
+                    <div class="dp-inputs">
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.AdjDates" Label="Adj Dates" />
+                    </div>
+                    <div class="dp-inputs">
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.Straightline" Label="Straightline" />
+                    </div>
+                    <div class="dp-inputs">
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.IncludeInRegression" Label="Include In Regression" />
+                    </div>
+                </div>
+                <div class="custom-action-container ">
+                    <div class="dp-buttons">
+                        <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
+                        <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" />
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+    <DialogPositionData X="center" Y="center" />
+</SfDialog>

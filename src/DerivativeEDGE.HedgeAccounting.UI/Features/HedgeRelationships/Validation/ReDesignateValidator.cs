@@ -1,5 +1,3 @@
-using DerivativeEdge.HedgeAccounting.Api.Client;
-
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
 /// <summary>

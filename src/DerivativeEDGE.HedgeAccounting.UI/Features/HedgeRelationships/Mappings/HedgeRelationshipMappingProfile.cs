@@ -1,6 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Mappings;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Mappings;
 
 public class HedgeRelationshipMappingProfile : Profile
 {

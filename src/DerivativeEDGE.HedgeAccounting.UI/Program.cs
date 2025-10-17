@@ -1,6 +1,3 @@
-using DerivativeEDGE.HedgeAccounting.UI.Extensions;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
-
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(ComponentLibraryConstants.SyncfusionKey);
 
 var builder = WebApplication.CreateBuilder(args);

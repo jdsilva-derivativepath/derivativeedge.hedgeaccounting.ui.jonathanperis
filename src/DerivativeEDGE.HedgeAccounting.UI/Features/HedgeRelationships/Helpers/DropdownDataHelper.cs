@@ -1,7 +1,4 @@
-﻿using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
 
 public static class DropdownDataHelper
 {

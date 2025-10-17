@@ -1,6 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
 
 public sealed class GetTradesForHedging
 {

@@ -1,33 +1,4 @@
-﻿@using DerivativeEdge.HedgeAccounting.Api.Client
-@using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Components.Forms
-
-@using MediatR
-
-@using Syncfusion.Blazor.Navigations
-@using Syncfusion.Blazor.Popups
-@using Syncfusion.Blazor.SplitButtons
-
-@using System.Linq
-@using System.Text.RegularExpressions
-
-@using DerivativeEdge.Blazor.ComponentLibrary.Enums
-@using DerivativeEdge.Blazor.ComponentLibrary.Services
-
-@using DerivativeEDGE.HedgeAccounting.UI.Constants
-@using DerivativeEDGE.HedgeAccounting.UI.Extensions
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Helpers;
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
-@using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components
-
-@using DerivativeEDGE.Identity.API.Client
-
-<PageTitle>Hedge Relationships</PageTitle>
+﻿<PageTitle>Hedge Relationships</PageTitle>
 
 @if (IsLoadingHedgeRelationship)
 {
@@ -648,381 +619,65 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
             </TabItems>
         </SfTab>
 
-        @if (IsAmortizationModal)
-        {
-            <SfDialog Width="@STANDARD_MODAL_WIDTH" Height="auto" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false">
-                <DialogTemplates>
-                    <Header>Add/Edit Amortization</Header>
-                    <Content>
-                        <EditForm Model="AmortizationModel" OnSubmit="OnSubmitAmortization" Context="amortizationFormContext">
-                            <DataAnnotationsValidator />
-                            <ValidationMessage For="@(() => AmortizationModel.GLAccountID)" />
-                            <ValidationMessage For="@(() => AmortizationModel.ContraAccountID)" />
-                            <ValidationMessage For="@(() => AmortizationModel.StartDate)" />
-                            <div class="form-group dp-inputs">
-                                <span class="input-label">GL Account</span>
-                                <SfComboBox TValue="long"
-                                            CssClass="dropdown-input"
-                                            Enabled="true"
-                                            TItem="DerivativeEDGEHAEntityGLAccount"
-                                            Placeholder="GL Account"
-                                            @bind-Value="AmortizationModel.GLAccountID"
-                                            DataSource="AmortizationGLAccounts">
-                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
-                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
-                                </SfComboBox>
-                            </div>
-                            <div class="form-group dp-inputs">
-                                <span class="input-label">Contra</span>
-                                <SfComboBox TValue="long" 
-                                            CssClass="dropdown-input" 
-                                            Enabled="true" 
-                                            TItem="DerivativeEDGEHAEntityGLAccount" 
-                                            Placeholder="Contra"
-                                            @bind-Value="AmortizationModel.ContraAccountID"
-                                            DataSource="AmortizationContraAccounts">
-                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
-                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
-                                </SfComboBox>
-                            </div>
-                            <div class="form-group dp-inputs">
-                                <span class="input-label">Financial Centers</span>
-                                <SfMultiSelect TValue="List<string>"
-                                               CssClass="dropdown-input"
-                                               Enabled="true"
-                                               TItem="FinancialCenterOption"
-                                               Placeholder="Financial Centers"
-                                               @bind-Value="AmortizationFinancialCenters"
-                                               DataSource="@GetFinancialCenterOptions()">
-                                    <MultiSelectFieldSettings Value="@nameof(FinancialCenterOption.Value)" Text="@nameof(FinancialCenterOption.Text)" />
-                                </SfMultiSelect>
-                            </div>
-                            <div class="form-group dp-inputs">
-                                <span class="input-label">Payment Frequency</span>
-                                <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency"
-                                            CssClass="dropdown-input"
-                                            Enabled="true"
-                                            TItem="PaymentFrequencyOption"
-                                            Placeholder="Payment Frequency"
-                                            @bind-Value="AmortizationModel.PaymentFrequency"
-                                            DataSource="@GetPaymentFrequencyOptions()">
-                                    <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency" TItem="PaymentFrequencyOption" />
-                                    <ComboBoxFieldSettings Value="@nameof(PaymentFrequencyOption.Value)" Text="@nameof(PaymentFrequencyOption.Text)" />
-                                </SfComboBox>
-                            </div>
-                            <div class="custom-datepicker-container">
-                                <div class="form-group dp-inputs">
-                                    <span class="input-label">Day Count Convention</span>
-                                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv"
-                                                CssClass="dropdown-input"
-                                                Enabled="true"
-                                                TItem="DayCountConvOption"
-                                                Placeholder="Day Count Convention"
-                                                @bind-Value="AmortizationModel.DayCountConv"
-                                                DataSource="@GetDayCountConvOptions()">
-                                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv" TItem="DayCountConvOption" />
-                                        <ComboBoxFieldSettings Value="@nameof(DayCountConvOption.Value)" Text="@nameof(DayCountConvOption.Text)" />
-                                    </SfComboBox>
-                                </div>
-                                <div class="form-group dp-inputs">
-                                    <span class="input-label">Payment Convention</span>
-                                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv"
-                                                CssClass="dropdown-input"
-                                                Enabled="@(AmortizationModel.ID != 0)"
-                                                TItem="PayBusDayConvOption"
-                                                Placeholder="Payment Convention"
-                                                @bind-Value="AmortizationModel.PayBusDayConv"
-                                                DataSource="@GetPayBusDayConvOptions()">
-                                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv" TItem="PayBusDayConvOption" />
-                                        <ComboBoxFieldSettings Value="@nameof(PayBusDayConvOption.Value)" Text="@nameof(PayBusDayConvOption.Text)" />
-                                    </SfComboBox>
-                                </div>
-                            </div>
-                            <div class="custom-datepicker-container">
-                                <div class="dp-inputs">
-                                    <label class="input-label">Start Date</label>
-                                    <SfDatePicker TValue="DateTime?"
-                                                  CssClass="calendar-datepicker" 
-                                                  Enabled="true" 
-                                                  Format="MM/dd/yyyy" 
-                                                  Placeholder="mm/dd/yyyy" 
-                                                  ShowClearButton="true"
-                                                  @bind-Value="AmortizationStartDate">
-                                    </SfDatePicker>
-                                </div>
-                                <div class="dp-inputs">
-                                    <label class="input-label">End Date</label>
-                                    <SfDatePicker TValue="DateTime?"
-                                                  CssClass="calendar-datepicker" 
-                                                  Enabled="true" 
-                                                  Format="MM/dd/yyyy" 
-                                                  Placeholder="mm/dd/yyyy" 
-                                                  ShowClearButton="true"
-                                                  @bind-Value="AmortizationEndDate">
-                                    </SfDatePicker>
-                                </div>
-                            </div>
-                            <div class="custom-datepicker-container">
-                                <div class="dp-inputs">
-                                    <label class="input-label">Front Roll Date</label>
-                                    <SfDatePicker TValue="DateTime?"
-                                                  CssClass="calendar-datepicker" 
-                                                  Enabled="true" 
-                                                  Format="MM/dd/yyyy" 
-                                                  Placeholder="mm/dd/yyyy" 
-                                                  ShowClearButton="true"
-                                                  @bind-Value="AmortizationFrontRollDate">
-                                    </SfDatePicker>
-                                </div>
-                                <div class="dp-inputs">
-                                    <label class="input-label">Back Roll Date</label>
-                                    <SfDatePicker TValue="DateTime?"
-                                                  CssClass="calendar-datepicker" 
-                                                  Enabled="true"
-                                                  Format="MM/dd/yyyy" 
-                                                  Placeholder="mm/dd/yyyy" 
-                                                  ShowClearButton="true"
-                                                  @bind-Value="AmortizationBackRollDate">
-                                    </SfDatePicker>
-                                </div>
-                            </div>
-                            <div class="form-group dp-inputs">
-                                <span class="input-label">Total Amount</span>
-                                <NumericHotKeys>
-                                    <SfNumericTextBox TValue="double"
-                                                      CssClass="input-numeric" 
-                                                      Placeholder="Total Amount" 
-                                                      Enabled="true"
-                                                      @bind-Value="AmortizationModel.TotalAmount" />
-                                </NumericHotKeys>
-                            </div>
-                            <div class="custom-checkbox-container">
-                                <div class="dp-inputs">
-                                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.AdjDates" Label="Adj Dates" />
-                                </div>
-                                <div class="dp-inputs">
-                                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.Straightline" Label="Straightline" />
-                                </div>
-                                <div class="dp-inputs">
-                                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.IncludeInRegression" Label="Include In Regression" />
-                                </div>
-                            </div>
-                            <div class="custom-action-container ">
-                                <div class="dp-buttons">
-                                    <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@NewMenuDlgButtonOnClose" IsPrimary="false" />
-                                    <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" />
-                                </div>
-                            </div>
-                        </EditForm>
-                    </Content>
-                </DialogTemplates>
-                <DialogPositionData X="center" Y="center" />
-            </SfDialog>
-        }
-        else if (IsOptionAmortizationModal)
-        {
-            <SfDialog Width="@(HedgeRelationship.IsAnOptionHedge ? WIDE_MODAL_WIDTH : NARROW_MODAL_WIDTH)" Height="auto" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false">
-                <DialogTemplates>
-                    <Header> Option Amortization</Header>
-                    <Content>
-                        <EditForm Model="Model" OnSubmit="OnSubmitOptionAmortization" Context="optionAmortizationFormContext">
-                            <div class="dp-inputs">
-                                <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizeOptionPremium" Label="Amortize Option Premium" />
-                            </div>
-                            <div class="flex-1 min-w-[18.75rem] flex flex-col p-0">
-                                <div class="flex-grow">
-                                    <div class="flex gap-4 justify-between">
-                                        <div class="flex-1">
-                                            <div class="form-group dp-inputs">
-                                                <span class="input-label">GL Account</span>
-                                                <SfComboBox TValue="long"
-                                                            CssClass="dropdown-input"
-                                                            Enabled="true"
-                                                            TItem="DerivativeEDGEHAEntityGLAccount"
-                                                            Placeholder="GL Account"
-                                                            @bind-Value="OptionAmortizationModel.GLAccountID"
-                                                            DataSource="AmortizationGLAccounts">
-                                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
-                                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
-                                                </SfComboBox>
-                                            </div>
-                                            <div class="form-group dp-inputs">
-                                                <span class="input-label">Contra</span>
-                                                <SfComboBox TValue="long"
-                                                            CssClass="dropdown-input"
-                                                            Enabled="true"
-                                                            TItem="DerivativeEDGEHAEntityGLAccount"
-                                                            Placeholder="Contra"
-                                                            @bind-Value="AmortizationModel.ContraAccountID"
-                                                            DataSource="AmortizationContraAccounts">
-                                                    <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
-                                                    <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
-                                                </SfComboBox>
-                                            </div>
-                                            <div class="form-group dp-inputs">
-                                                <span class="input-label">Amortization Method</span>
-                                                <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
-                                                            CssClass="dropdown-input"
-                                                            TItem="AmortizationMethodOption"
-                                                            Placeholder="Amortization Method"
-                                                            @bind-Value="OptionAmortizationModel.AmortizationMethod"
-                                                            DataSource="@GetAmortizationMethodOptions()">
-                                                    <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
-                                                    <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
-                                                </SfComboBox>
-                                            </div>
-                                            <div class="form-group dp-inputs">
-                                                <span class="input-label">Total Amount</span>
-                                                <NumericHotKeys>
-                                                    <SfNumericTextBox TValue="double"
-                                                                      CssClass="input-numeric"
-                                                                      Placeholder="Total Amount"
-                                                                      Enabled="true"
-                                                                      @bind-Value="OptionAmortizationModel.TotalAmount" />
-                                                </NumericHotKeys>
-                                            </div>
-                                        </div>
-                                        @if (HedgeRelationship.IsAnOptionHedge)
-                                        {
-                                            <div class="flex-1">
-                                                <div class="form-group dp-inputs">
-                                                    <span class="input-label">Intrinsic Value GL Account</span>
-                                                    <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value GL Account">
-                                                        <ComboBoxEvents TValue="string" TItem="DropdownModel" />
-                                                        <ComboBoxFieldSettings Text="Text" Value="ID" />
-                                                    </SfComboBox>
-                                                </div>
-                                                <div class="form-group dp-inputs">
-                                                    <span class="input-label">Intrinsic Value Contra</span>
-                                                    <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Contra">
-                                                        <ComboBoxEvents TValue="string" TItem="DropdownModel" />
-                                                        <ComboBoxFieldSettings Text="Text" Value="ID" />
-                                                    </SfComboBox>
-                                                </div>
-                                                <div class="form-group dp-inputs">
-                                                    <span class="input-label">Intrinsic Value Amortization Method</span>
-                                                    <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Amortization Method">
-                                                        <ComboBoxEvents TValue="string" TItem="DropdownModel" />
-                                                        <ComboBoxFieldSettings Text="Text" Value="ID" />
-                                                    </SfComboBox>
-                                                </div>
-                                                <div class="form-group dp-inputs">
-                                                    <span class="input-label">Intrinsic Value</span>
-                                                    <NumericHotKeys>
-                                                        <SfNumericTextBox CssClass="input-numeric" Placeholder="Intrinsic Value" Enabled="true" TValue="long?" />
-                                                    </NumericHotKeys>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="custom-datepicker-container">
-                                <div class="dp-inputs" style="width: 100%">
-                                    <label class="input-label">Start Date</label>
-                                    <SfDatePicker TValue="DateTime?"
-                                                  CssClass="calendar-datepicker"
-                                                  Enabled="true"
-                                                  Format="MM/dd/yyyy"
-                                                  Placeholder="mm/dd/yyyy"
-                                                  ShowClearButton="true"
-                                                  @bind-Value="OptionAmortizationStartDate">
-                                    </SfDatePicker>
-                                </div>
-                                <div class="dp-inputs" style="width: 100%">
-                                    <label class="input-label">End Date</label>
-                                    <SfDatePicker TValue="DateTime?"
-                                                  CssClass="calendar-datepicker"
-                                                  Enabled="true"
-                                                  Format="MM/dd/yyyy"
-                                                  Placeholder="mm/dd/yyyy"
-                                                  ShowClearButton="true"
-                                                  @bind-Value="OptionAmortizationEndDate">
-                                    </SfDatePicker>
-                                </div>
-                            </div>
-                            <div class="custom-action-container ">
-                                <div class="dp-buttons">
-                                    <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@NewMenuDlgButtonOnClose" IsPrimary="false" />
-                                    <SfButton CssClass="button-primary button-default" Content="Generate" IsPrimary="true" />
-                                </div>
-                            </div>
-                        </EditForm>
-                    </Content>
-                </DialogTemplates>
-                <DialogPositionData X="center" Y="center"></DialogPositionData>
-            </SfDialog>
-        }
-        else if (IsHedgeDocumentPreviewModal)
-        {
-            <SfDialog Width="@WIDE_MODAL_WIDTH" Height="auto" CssClass="dp-dialog" IsModal="true" AllowDragging="true" EnableResize="false">
-                <DialogTemplates>
-                    <Header>Hedge Document</Header>
-                    <Content>
-                        <div class="max-h-[400px] overflow-y-auto p-4 border border-gray-200 rounded-md bg-gray-100">
-                            @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.Objective))
-                            {
-                                <div class="leading-relaxed text-gray-900 [&>p]:mb-4 [&>p:last-child]:mb-0">
-                                    @((MarkupString)(HedgeRelationship.Objective))
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="text-center p-8">
-                                    <p class="text-gray-500">No hedge document content available.</p>
-                                </div>
-                            }
-                        </div>
+        <AmortizationDialog Visible="@IsAmortizationModal"
+                            VisibleChanged="@((value) => OpenModal = value ? MODAL_AMORTIZATION : string.Empty)"
+                            AmortizationModel="@AmortizationModel"
+                            HedgeRelationship="@HedgeRelationship"
+                            AmortizationGLAccounts="@AmortizationGLAccounts"
+                            AmortizationContraAccounts="@AmortizationContraAccounts"
+                            FinancialCenterOptions="@AvailableFinancialCenters"
+                            PaymentFrequencyOptions="@AvailablePaymentFrequencies"
+                            DayCountConvOptions="@AvailableDayCountConventions"
+                            PayBusDayConvOptions="@AvailablePayBusDayConventions"
+                            OnAmortizationSaved="@OnAmortizationSaved" />
 
-                        <div class="flex float-right gap-2 pt-4 border-t border-gray-200 mt-3">
-                            <div class="dp-buttons">
-                                <SfButton CssClass="button-secondary button-default" Content="Close"
-                                OnClick="@(() => OpenModal = string.Empty)" IsPrimary="false" />
-                            </div>
-                        </div>
-                    </Content>
-                </DialogTemplates>
-                <DialogPositionData X="center" Y="center"></DialogPositionData>
-            </SfDialog>
-        }
-        else if (IsDeDesignateModal)
-        {
-            <DeDesignateDialog Visible="@IsDeDesignateModal"
-                               VisibleChanged="@((value) => OpenModal = value ? MODAL_DEDESIGNATE : string.Empty)"
-                               DedesignationReason="@DedesignationReason"
-                               DedesignationDate="@DedesignationDateDialog"
-                               CashPaymentType="@CashPaymentType"
-                               Payment="@DedesignatePayment"
-                               Accrual="@DedesignateAccrual"
-                               BasisAdjustment="@BasisAdjustment"
-                               BasisAdjustmentBalance="@BasisAdjustmentBalance"
-                               ShowBasisAdjustmentBalance="@ShowBasisAdjustmentBalance"
-                               TimeValuesStartDate="@DedesignateTimeValuesStartDate"
-                               TimeValuesEndDate="@DedesignateTimeValuesEndDate"
-                               HedgedExposureExist="@HedgedExposureExist"
-                               UserMessage="@DedesignateUserMessage"
-                               IsError="@DedesignateIsError"
-                               IsDeDesignateDisabled="@IsDeDesignateDisabled"
-                               OnDeDesignated="@OnDeDesignateConfirmed" />
-        }
-        else if (IsReDesignateModal)
-        {
-            <ReDesignateDialog Visible="@IsReDesignateModal"
-                               VisibleChanged="@((value) => OpenModal = value ? MODAL_REDESIGNATE : string.Empty)"
-                               RedesignationDate="@RedesignationDate"
-                               TimeValuesStartDate="@RedesignateTimeValuesStartDate"
-                               TimeValuesEndDate="@RedesignateTimeValuesEndDate"
-                               Payment="@RedesignatePayment"
-                               PaymentFrequency="@RedesignatePaymentFrequency"
-                               DayCountConv="@RedesignateDayCountConv"
-                               PayBusDayConv="@RedesignatePayBusDayConv"
-                               AdjustedDates="@RedesignateAdjustedDates"
-                               MarkAsAcquisition="@MarkAsAcquisition"
-                               IsDocTemplateFound="@IsDocTemplateFound"
-                               AvailablePaymentFrequencies="@AvailablePaymentFrequencies"
-                               AvailableDayCountConventions="@AvailableDayCountConventions"
-                               AvailablePayBusDayConventions="@AvailablePayBusDayConventions"
-                               OnReDesignated="@OnReDesignateConfirmed" />
-        }
+        <OptionAmortizationDialog Visible="@IsOptionAmortizationModal"
+                                  VisibleChanged="@((value) => OpenModal = value ? MODAL_OPTION_AMORTIZATION : string.Empty)"
+                                  OptionAmortizationModel="@OptionAmortizationModel"
+                                  HedgeRelationship="@HedgeRelationship"
+                                  IsAnOptionHedge="@HedgeRelationship.IsAnOptionHedge"
+                                  AmortizationGLAccounts="@AmortizationGLAccounts"
+                                  AmortizationContraAccounts="@AmortizationContraAccounts"
+                                  AmortizationMethodOptions="@GetAmortizationMethodOptions()"
+                                  OnOptionAmortizationSaved="@OnOptionAmortizationSaved" />
+
+        <HedgeDocumentPreviewDialog Visible="@IsHedgeDocumentPreviewModal"
+                                    VisibleChanged="@((value) => OpenModal = value ? MODAL_HEDGE_DOCUMENT_PREVIEW : string.Empty)"
+                                    HedgeDocumentContent="@HedgeRelationship?.Objective" />
+
+        <DeDesignateDialog Visible="@IsDeDesignateModal"
+                           VisibleChanged="@((value) => OpenModal = value ? MODAL_DEDESIGNATE : string.Empty)"
+                           DedesignationReason="@DedesignationReason"
+                           DedesignationDate="@DedesignationDateDialog"
+                           CashPaymentType="@CashPaymentType"
+                           Payment="@DedesignatePayment"
+                           Accrual="@DedesignateAccrual"
+                           BasisAdjustment="@BasisAdjustment"
+                           BasisAdjustmentBalance="@BasisAdjustmentBalance"
+                           ShowBasisAdjustmentBalance="@ShowBasisAdjustmentBalance"
+                           TimeValuesStartDate="@DedesignateTimeValuesStartDate"
+                           TimeValuesEndDate="@DedesignateTimeValuesEndDate"
+                           HedgedExposureExist="@HedgedExposureExist"
+                           UserMessage="@DedesignateUserMessage"
+                           IsError="@DedesignateIsError"
+                           IsDeDesignateDisabled="@IsDeDesignateDisabled"
+                           OnDeDesignated="@OnDeDesignateConfirmed" />
+
+        <ReDesignateDialog Visible="@IsReDesignateModal"
+                           VisibleChanged="@((value) => OpenModal = value ? MODAL_REDESIGNATE : string.Empty)"
+                           RedesignationDate="@RedesignationDate"
+                           TimeValuesStartDate="@RedesignateTimeValuesStartDate"
+                           TimeValuesEndDate="@RedesignateTimeValuesEndDate"
+                           Payment="@RedesignatePayment"
+                           PaymentFrequency="@RedesignatePaymentFrequency"
+                           DayCountConv="@RedesignateDayCountConv"
+                           PayBusDayConv="@RedesignatePayBusDayConv"
+                           AdjustedDates="@RedesignateAdjustedDates"
+                           MarkAsAcquisition="@MarkAsAcquisition"
+                           IsDocTemplateFound="@IsDocTemplateFound"
+                           AvailablePaymentFrequencies="@AvailablePaymentFrequencies"
+                           AvailableDayCountConventions="@AvailableDayCountConventions"
+                           AvailablePayBusDayConventions="@AvailablePayBusDayConventions"
+                           OnReDesignated="@OnReDesignateConfirmed" />
     </EditForm>
 }

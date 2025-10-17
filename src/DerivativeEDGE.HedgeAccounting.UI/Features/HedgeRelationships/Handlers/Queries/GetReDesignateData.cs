@@ -1,5 +1,3 @@
-using DerivativeEdge.HedgeAccounting.Api.Client;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
 using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;

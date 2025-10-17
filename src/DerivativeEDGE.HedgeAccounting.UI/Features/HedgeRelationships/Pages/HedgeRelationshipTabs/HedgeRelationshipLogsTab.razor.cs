@@ -1,6 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
 
 public partial class HedgeRelationshipLogsTab
 {

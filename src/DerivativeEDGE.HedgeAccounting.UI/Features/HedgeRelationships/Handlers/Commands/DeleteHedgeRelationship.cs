@@ -1,6 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
 public sealed class DeleteHedgeRelationship
 {

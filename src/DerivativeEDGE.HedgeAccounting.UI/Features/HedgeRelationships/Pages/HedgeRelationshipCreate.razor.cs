@@ -1,9 +1,4 @@
-﻿using DerivativeEdge.HedgeAccounting.Api.Client;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
-using Microsoft.JSInterop;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages;
 
 public partial class HedgeRelationshipCreate
 {
