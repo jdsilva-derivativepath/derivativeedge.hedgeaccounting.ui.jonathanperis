@@ -433,8 +433,10 @@ public partial class HedgeRelationshipDetails
         }
         else if (state == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)
         {
-            // Dedesignated state: Show only Redraft (DE-2731)
+            // Dedesignated state: Show Redraft and De-Designate (DE-2731)
+            // Old JS logic: removes "Re-Designate", then replaces "Designate" with "Redraft", leaving ["Redraft", "De-Designate"]
             WorkflowItems.Add(new DropDownMenuItem { Text = "Redraft", Disabled = !hasWorkflowPermission });
+            WorkflowItems.Add(new DropDownMenuItem { Text = "De-Designate", Disabled = !hasWorkflowPermission });
         }
     }
 
