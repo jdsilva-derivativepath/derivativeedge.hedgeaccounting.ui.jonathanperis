@@ -1,0 +1,403 @@
+﻿using DerivativeEdge.HedgeAccounting.Api.Client;
+using Microsoft.JSInterop;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
+
+public partial class TestResultsTab
+{
+    #region Constants
+    private const string CHART_BACKGROUND_COLOR = "#66666e";
+    private const string CHART_PLOT_BACKGROUND_COLOR = "#4e4e55";
+    private const string CHART_GRID_COLOR = "#f1f1f1";
+    private const string CHART_SCATTER_COLOR = "#87bfe3";
+    private const string CHART_TRENDLINE_COLOR = "#ff6600";
+    private const string STAT_PASS_CLASS = "stat-pass";
+    private const string STAT_FAIL_CLASS = "stat-fail";
+    private const string NOT_AVAILABLE = "N/A";
+    private const int CHART_HEIGHT = 400;
+    private const int CHART_MARKER_SIZE = 10;
+    private const int TRENDLINE_WIDTH = 2;
+    #endregion
+
+    #region Parameters
+    [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HedgeRegressionBatches { get; set; }
+    [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>> HedgeRegressionBatchesChanged { get; set; }
+
+    // *** ADD THIS NEW PARAMETER ***
+    [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM LatestHedgeRegressionBatch { get; set; }
+    #endregion
+
+    #region Injected Services
+    [Inject] private IMediator Mediator { get; set; }
+    [Inject] private ILogger<TestResultsTab> Logger { get; set; }
+    #endregion
+
+    #region Private Fields
+    private bool _disposed = false;
+    #endregion
+
+    #region Public Properties
+    public List<ChartDataModel> ChartData { get; set; } = new();
+    public List<ChartDataModel> TrendlineData { get; set; } = new();
+    public double ChartMinValue { get; set; } = 0;
+    public double ChartMaxValue { get; set; } = 0;
+    #endregion
+
+    private DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM LatestBatch =>
+        LatestHedgeRegressionBatch ??
+        HedgeRegressionBatches?.FirstOrDefault(x => x.Enabled);
+
+    #region Lifecycle Methods
+    protected override void OnInitialized()
+    {
+        try
+        {
+            Logger?.LogInformation("TestResultsTab initialized");
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, "Error initializing TestResultsTab");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_disposed) return;
+
+        Logger?.LogInformation("OnParametersSetAsync called");
+        Logger?.LogInformation($"LatestHedgeRegressionBatch: {LatestHedgeRegressionBatch != null}");
+        Logger?.LogInformation($"HedgeRegressionBatches count: {HedgeRegressionBatches?.Count ?? 0}");
+
+        await LoadData();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed && disposing)
+        {
+            try
+            {
+                Logger?.LogInformation("TestResultsTab disposed");
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error disposing TestResultsTab");
+            }
+            finally
+            {
+                _disposed = true;
+            }
+        }
+    }
+    #endregion
+
+    #region Public Methods
+    /// <summary>
+    /// Public method to refresh test results data - called when new regression data is available
+    /// </summary>
+    public async Task RefreshTestResultsData()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            Logger?.LogInformation("Refreshing test results data...");
+
+            await InvokeAsync(() =>
+            {
+                GenerateChartData();
+                StateHasChanged();
+            });
+
+            Logger?.LogInformation("Test results data refreshed successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, "Error refreshing test results data");
+        }
+    }
+
+    // Add this method if you need JS interop
+    [JSInvokable]
+    public async Task OnChartRendered()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            Logger?.LogInformation("Chart rendered successfully");
+            // Add any post-render logic here if needed
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, "Error in OnChartRendered");
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task LoadData()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            GenerateChartData();
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, "Error loading data");
+        }
+    }
+
+    private void GenerateChartData()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            Logger?.LogInformation($"Generating chart data. LatestBatch is null: {LatestBatch == null}");
+
+            if (LatestBatch?.HedgeRegressionBatchResults?.Any() != true)
+            {
+                Logger?.LogWarning("No regression batch results available for chart generation");
+                Logger?.LogInformation($"LatestHedgeRegressionBatch: {LatestHedgeRegressionBatch != null}");
+                Logger?.LogInformation($"HedgeRegressionBatches count: {HedgeRegressionBatches?.Count ?? 0}");
+                Logger?.LogInformation($"HedgeRegressionBatches with results: {HedgeRegressionBatches?.Count(b => b.HedgeRegressionBatchResults?.Any() == true) ?? 0}");
+
+                ResetChartData();
+                return;
+            }
+
+            Logger?.LogInformation($"Found {LatestBatch.HedgeRegressionBatchResults.Count} regression batch results");
+
+            // Check if all adjusted values are zeros (matching original logic)
+            var allZeros = LatestBatch.HedgeRegressionBatchResults.All(item => item.AdjustedValue == 0);
+
+            var graphData = new List<ChartDataModel>();
+            var xValues = new List<double>();
+            var yValues = new List<double>();
+
+            foreach (var item in LatestBatch.HedgeRegressionBatchResults)
+            {
+                var xValue = (double)item.HedgedFairValueChanged;
+                var yValue = allZeros ? (double)item.HedgingFairValueChanged : (double)item.AdjustedValue;
+
+                graphData.Add(new ChartDataModel
+                {
+                    XValue = xValue,
+                    YValue = yValue
+                });
+
+                xValues.Add(xValue);
+                yValues.Add(yValue);
+            }
+
+            ChartData = graphData;
+            SetChartAxisLimits(xValues, yValues);
+            GenerateTrendlineData(graphData);
+
+            Logger?.LogInformation($"Generated chart data with {ChartData.Count} points. AllZeros: {allZeros}");
+            Logger?.LogInformation($"Chart axis limits: Min={ChartMinValue:F2}, Max={ChartMaxValue:F2}");
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, "Error generating chart data");
+            ResetChartData();
+        }
+    }
+
+    private void SetChartAxisLimits(List<double> xValues, List<double> yValues)
+    {
+        if (_disposed) return;
+
+        if (xValues.Any() && yValues.Any())
+        {
+            var minXY = Math.Min(xValues.Min(), yValues.Min());
+            var maxXY = Math.Max(xValues.Max(), yValues.Max());
+
+            // Add some padding to the chart limits
+            var range = maxXY - minXY;
+            var padding = range * 0.1; // 10% padding
+
+            ChartMinValue = minXY - padding;
+            ChartMaxValue = maxXY + padding;
+        }
+        else
+        {
+            ChartMinValue = 0;
+            ChartMaxValue = 0;
+        }
+    }
+
+    private void GenerateTrendlineData(List<ChartDataModel> graphData)
+    {
+        if (_disposed) return;
+
+        if (graphData.Count > 1 && LatestBatch != null)
+        {
+            var slope = LatestBatch.Slope;
+            var intercept = LatestBatch.YIntercept;
+
+            // Sort data by X value for proper line rendering
+            var sortedData = graphData.OrderBy(d => d.XValue).ToList();
+
+            TrendlineData = new List<ChartDataModel>
+            {
+                new() { XValue = sortedData.First().XValue, YValue = slope * sortedData.First().XValue + intercept },
+                new() { XValue = sortedData.Last().XValue, YValue = slope * sortedData.Last().XValue + intercept }
+            };
+        }
+        else
+        {
+            TrendlineData = new List<ChartDataModel>();
+        }
+    }
+
+    private void ResetChartData()
+    {
+        if (_disposed) return;
+
+        ChartData = new List<ChartDataModel>();
+        TrendlineData = new List<ChartDataModel>();
+        ChartMinValue = 0;
+        ChartMaxValue = 0;
+    }
+    #endregion
+
+    #region Event Handlers
+    private async Task OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
+    {
+        if (_disposed) return;
+
+        try
+        {
+            Logger?.LogInformation($"Menu item '{args.Item.Text}' selected for batch ID: {data.ID}");
+
+            switch (args.Item.Text)
+            {
+                case "Download Excel":
+                    await HandleExcelDownload(data);
+                    break;
+                case "Delete":
+                    await HandleDelete(data);
+                    break;
+                default:
+                    Logger?.LogWarning($"Unknown menu action: {args.Item.Text}");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, $"Error handling menu action '{args.Item.Text}' for batch {data.ID}");
+        }
+    }
+
+    private async Task HandleExcelDownload(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
+    {
+        if (_disposed) return;
+
+        // TODO: Implement Excel download functionality
+        Logger?.LogInformation($"Excel download requested for batch {data.ID}");
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleDelete(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
+    {
+        if (_disposed) return;
+
+        // TODO: Implement delete functionality with confirmation
+        Logger?.LogInformation($"Delete requested for batch {data.ID}");
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Helper Methods
+    // Helper methods for displaying statistical values with enhanced null safety
+    private string GetSlopeValue() =>
+        _disposed ? NOT_AVAILABLE : (LatestBatch?.Slope != null ? Math.Round(LatestBatch.Slope, 2).ToString("F2") : NOT_AVAILABLE);
+
+    private string GetRValue() =>
+        _disposed ? NOT_AVAILABLE : (LatestBatch?.R != null ? Math.Round(LatestBatch.R, 2).ToString("F2") : NOT_AVAILABLE);
+
+    private string GetRSquaredValue() =>
+        _disposed ? NOT_AVAILABLE : (LatestBatch?.RSquared != null ? Math.Round(LatestBatch.RSquared, 2).ToString("F2") : NOT_AVAILABLE);
+
+    private string GetStandardErrorValue() =>
+        _disposed ? NOT_AVAILABLE : (LatestBatch?.StandardError != null ? Math.Round(LatestBatch.StandardError, 2).ToString("F2") : NOT_AVAILABLE);
+
+    private string GetObservationValue()
+    {
+        if (_disposed || LatestBatch?.HedgeRegressionBatchResults == null) return NOT_AVAILABLE;
+
+        // Count the number of observation events (true values)
+        var observationCount = LatestBatch.HedgeRegressionBatchResults.Count(x => x.ObservationEvent);
+        return observationCount.ToString();
+    }
+
+    private string GetYInterceptValue() =>
+        _disposed ? NOT_AVAILABLE : (LatestBatch?.YIntercept != null ? Math.Round(LatestBatch.YIntercept, 2).ToString("F2") : NOT_AVAILABLE);
+
+    private string GetTTestValue()
+    {
+        if (_disposed || LatestBatch == null) return NOT_AVAILABLE;
+
+        var tTestValue = Math.Round(LatestBatch.B1tStat, 2).ToString("N2");
+        var analytics = LatestBatch.B1tStatAnalytics ?? "Unknown";
+        var statusClass = analytics.Equals("pass", StringComparison.OrdinalIgnoreCase) ? STAT_PASS_CLASS : STAT_FAIL_CLASS;
+
+        return $"{tTestValue}/<span class=\"{statusClass}\">{analytics}</span>";
+    }
+
+    private string GetFStatValue()
+    {
+        if (_disposed || LatestBatch == null) return NOT_AVAILABLE;
+
+        var fStatValue = Math.Round(LatestBatch.FStat, 2).ToString("N2");
+        var analytics = LatestBatch.FStatAnalytics ?? "Unknown";
+        var statusClass = analytics.Equals("pass", StringComparison.OrdinalIgnoreCase) ? STAT_PASS_CLASS : STAT_FAIL_CLASS;
+
+        return $"{fStatValue}/<span class=\"{statusClass}\">{analytics}</span>";
+    }
+
+    private string GetSignificanceValue() =>
+        _disposed ? NOT_AVAILABLE : (LatestBatch?.B1PValue != null ? Math.Round(LatestBatch.B1PValue, 4).ToString("F4") : NOT_AVAILABLE);
+
+    // Custom label formatter for chart axes (matching original JavaScript formatter)
+    private string FormatAxisLabel(double value)
+    {
+        if (_disposed) return "0";
+
+        var x = value / 1000;
+        if (value > 0)
+        {
+            return $"${x:F0}K";
+        }
+        else
+        {
+            return $"$({Math.Abs(x):F0})K";
+        }
+    }
+    #endregion
+
+    #region Data Models
+    public class ChartDataModel
+    {
+        public double XValue { get; set; }
+        public double YValue { get; set; }
+    }
+    #endregion
+}
