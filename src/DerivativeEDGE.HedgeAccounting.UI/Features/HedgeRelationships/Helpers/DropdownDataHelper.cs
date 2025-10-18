@@ -27,6 +27,7 @@ public static class DropdownDataHelper
             "hedgeditemtype" => GetHedgedItemTypeOptions(),
             "hedgeditem" => GetHedgedItemOptions(),
             "standard" => GetStandardOptions(),
+            "fairvaluemethod" => GetFairValueMethodOptions(),
             _ => throw new ArgumentException($"Invalid data set: {dataSet}", nameof(dataSet))
         };
 
