@@ -34,7 +34,7 @@ public partial class HedgeRelationshipInfoSection
     [Parameter] public bool CanEditPreIssuanceHedge { get; set; }
     [Parameter] public bool CanEditPortfolioLayerMethod { get; set; }
     
-    [Parameter] public List<EffectivenessChartItem> EffectivenessChartData { get; set; }
+    [Parameter] public List<ChartDataModel> EffectivenessChartData { get; set; }
     
     // Event callbacks
     [Parameter] public EventCallback<ChangeEventArgs<long, Client>> OnClientValueChange { get; set; }
