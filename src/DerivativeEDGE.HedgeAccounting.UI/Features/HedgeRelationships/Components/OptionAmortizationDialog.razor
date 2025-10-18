@@ -48,7 +48,7 @@
                                                 Placeholder="Amortization Method"
                                                 @bind-Value="OptionAmortizationModel.AmortizationMethod"
                                                 DataSource="@FilteredAmortizationMethodOptions">
-                                        <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
+                                        <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" ValueChange="OnAmortizationMethodChanged" />
                                         <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                     </SfComboBox>
                                 </div>
@@ -58,7 +58,7 @@
                                         <SfNumericTextBox TValue="double"
                                                           CssClass="input-numeric"
                                                           Placeholder="Total Amount"
-                                                          Enabled="true"
+                                                          Enabled="@IsTotalAmountEnabled"
                                                           @bind-Value="OptionAmortizationModel.TotalAmount" />
                                     </NumericHotKeys>
                                 </div>
@@ -103,7 +103,7 @@
                         <label class="input-label">Start Date</label>
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker"
-                                      Enabled="true"
+                                      Enabled="@AreDateFieldsEnabled"
                                       Format="MM/dd/yyyy"
                                       Placeholder="mm/dd/yyyy"
                                       ShowClearButton="true"
@@ -114,7 +114,7 @@
                         <label class="input-label">End Date</label>
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker"
-                                      Enabled="true"
+                                      Enabled="@AreDateFieldsEnabled"
                                       Format="MM/dd/yyyy"
                                       Placeholder="mm/dd/yyyy"
                                       ShowClearButton="true"

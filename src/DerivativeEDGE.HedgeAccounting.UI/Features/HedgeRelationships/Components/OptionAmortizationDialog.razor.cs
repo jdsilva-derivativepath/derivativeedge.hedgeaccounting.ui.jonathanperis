@@ -51,6 +51,14 @@ public partial class OptionAmortizationDialog
         string.IsNullOrEmpty(OptionAmortizationModel?.StartDate) || // Required field
         string.IsNullOrEmpty(OptionAmortizationModel?.EndDate); // Required field
     
+    // Legacy: Total Amount disabled when AmortizationMethod is "Swaplet" (line 109)
+    private bool IsTotalAmountEnabled => 
+        OptionAmortizationModel?.AmortizationMethod != DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet;
+    
+    // Legacy: Date fields enabled/disabled based on AmortizationMethod (enableDisableOptionAmortDateFields function)
+    private bool AreDateFieldsEnabled => 
+        OptionAmortizationModel?.AmortizationMethod != DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet;
+    
     private DateTime? OptionAmortizationStartDate
     {
         get => !string.IsNullOrEmpty(OptionAmortizationModel?.StartDate)
@@ -127,6 +135,15 @@ public partial class OptionAmortizationDialog
                 OptionAmortizationModel.ContraAccountID = 0;
             }
         }
+    }
+    
+    // Legacy: Handle amortization method change to enable/disable date fields (selectedAmortizationMethodChanged)
+    private void OnAmortizationMethodChanged(ChangeEventArgs<DerivativeEDGEHAEntityEnumAmortizationMethod, AmortizationMethodOption> args)
+    {
+        // Legacy: enableDisableOptionAmortDateFields(amortizationMethod !== "Swaplet")
+        // Date fields and Total Amount field should be disabled when AmortizationMethod is "Swaplet"
+        // This is handled by the AreDateFieldsEnabled and IsTotalAmountEnabled properties
+        StateHasChanged();
     }
     #endregion
 }
