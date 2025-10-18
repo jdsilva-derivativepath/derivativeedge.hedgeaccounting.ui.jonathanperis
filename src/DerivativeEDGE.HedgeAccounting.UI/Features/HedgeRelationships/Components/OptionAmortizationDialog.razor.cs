@@ -23,7 +23,7 @@ public partial class OptionAmortizationDialog
 
     #region Private Properties
     public DocumentContent Model { get; set; } = new();
-    private bool AmortizeOptionPremium { get; set; }
+    private bool AmortizeOptionPremium { get; set; } = true; // Legacy: defaults to true (hr_hedgeRelationshipAddEditCtrl.js line 3325)
     
     private DateTime? OptionAmortizationStartDate
     {
@@ -47,6 +47,41 @@ public partial class OptionAmortizationDialog
             if (OptionAmortizationModel != null)
                 OptionAmortizationModel.EndDate = value?.ToString("MM/dd/yyyy");
         }
+    }
+    #endregion
+
+    #region Lifecycle Methods
+    protected override void OnParametersSet()
+    {
+        // Legacy behavior (hr_hedgeRelationshipAddEditCtrl.js):
+        // - When creating new (line 3325): AmortizeOptionPremimum = true
+        // - When editing (line 1032): AmortizeOptionPremimum = IsAnOptionHedge
+        if (OptionAmortizationModel?.ID > 0)
+        {
+            // Editing existing entry - set based on IsAnOptionHedge
+            AmortizeOptionPremium = IsAnOptionHedge;
+        }
+        else
+        {
+            // Creating new entry - default to true
+            AmortizeOptionPremium = true;
+        }
+    }
+    #endregion
+    
+    #region Helper Methods
+    private List<AmortizationMethodOption> GetFilteredAmortizationMethodOptions()
+    {
+        // Legacy: filterByOptionAmortType (hr_hedgeRelationshipAddEditCtrl.js line 1104-1106)
+        // Exclude "Swaplet" when OptionTimeValueAmortType === "OptionTimeValue"
+        if (OptionAmortizationModel?.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue)
+        {
+            return AmortizationMethodOptions
+                .Where(option => option.Value != AmortizationMethod.Swaplet)
+                .ToList();
+        }
+        
+        return AmortizationMethodOptions;
     }
     #endregion
 
