@@ -344,14 +344,24 @@ public partial class HedgeRelationshipDetails
         var query = new GetGLAccountsForHedging.Query(HedgeRelationship.ClientID, HedgeRelationship.BankEntityID);
         var result = await Mediator.Send(query);
 
-        AmortizationGLAccounts = result.Data;
-        AmortizationContraAccounts = result.Data;
+        // Add "None" option as first item in GL Account lists (legacy: amortizationView.cshtml line 51, 69)
+        var noneOption = new DerivativeEDGEHAEntityGLAccount
+        {
+            Id = 0,
+            AccountDescription = "None",
+            AccountNumber = "",
+            ClientId = HedgeRelationship.ClientID,
+            BankEntityId = HedgeRelationship.BankEntityID
+        };
 
-        OptionAmortizationGLAccounts = result.Data;
-        OptionAmortizationContraAccounts = result.Data;
+        AmortizationGLAccounts = [noneOption, .. result.Data];
+        AmortizationContraAccounts = [noneOption, .. result.Data];
 
-        IntrinsicAmortizationGLAccounts = result.Data;
-        IntrinsicAmortizationContraAccounts = result.Data;
+        OptionAmortizationGLAccounts = [noneOption, .. result.Data];
+        OptionAmortizationContraAccounts = [noneOption, .. result.Data];
+
+        IntrinsicAmortizationGLAccounts = [noneOption, .. result.Data];
+        IntrinsicAmortizationContraAccounts = [noneOption, .. result.Data];
     }
     #endregion
 
@@ -416,6 +426,37 @@ public partial class HedgeRelationshipDetails
 
     private void NewMenuOnItemSelected(MenuEventArgs args)
     {
+        // Initialize AmortizationModel with defaults when opening new amortization (legacy: InitializeHedgeRelationshipOptionTimeValueAmort)
+        if (args.Item.Text == MODAL_AMORTIZATION)
+        {
+            AmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = 0, // Will be set to "None" option in dialog
+                ContraAccountID = 0, // Will be set to "None" option in dialog
+                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (U.S. Government Securities)
+                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
+                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
+                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.Preceding,
+                AdjDates = true // Default to checked
+            };
+        }
+        else if (args.Item.Text == MODAL_OPTION_AMORTIZATION)
+        {
+            // Initialize OptionAmortizationModel with defaults (legacy: line 3313)
+            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = 0, // Will be set to "None" option in dialog
+                ContraAccountID = 0, // Will be set to "None" option in dialog
+                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (U.S. Government Securities)
+                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
+                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
+                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing,
+                AdjDates = true // Default to checked
+            };
+        }
+        
         OpenModal = args.Item.Text;
     }
 

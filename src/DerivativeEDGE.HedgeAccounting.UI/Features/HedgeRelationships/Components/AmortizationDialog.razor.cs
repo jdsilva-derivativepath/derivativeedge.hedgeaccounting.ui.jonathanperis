@@ -75,6 +75,23 @@ public partial class AmortizationDialog
     }
     #endregion
 
+    #region Lifecycle Methods
+    protected override void OnParametersSet()
+    {
+        // Initialize AmortizationFinancialCenters from model when dialog opens
+        if (AmortizationModel?.FinancialCenters != null)
+        {
+            AmortizationFinancialCenters = AmortizationModel.FinancialCenters
+                .Select(fc => fc.ToString())
+                .ToList();
+        }
+        else
+        {
+            AmortizationFinancialCenters = [];
+        }
+    }
+    #endregion
+
     #region Event Handlers
     private async Task HandleClose()
     {
@@ -118,19 +135,12 @@ public partial class AmortizationDialog
 
     private void OnAmortizationComboBoxCreated(object args)
     {
-        // Set the first item as the default when available
-        if (AmortizationGLAccounts?.Any() == true && AmortizationModel.GLAccountID == 0)
-        {
-            AmortizationModel.GLAccountID = AmortizationGLAccounts.First().Id;
-            StateHasChanged();
-        }
-
-        // Set the first item as the default when available
-        if (AmortizationContraAccounts?.Any() == true && AmortizationModel.ContraAccountID == 0)
-        {
-            AmortizationModel.ContraAccountID = AmortizationContraAccounts.First().Id;
-            StateHasChanged();
-        }
+        // When opening modal for new entry (ID = 0), GLAccountID and ContraAccountID will be 0
+        // which corresponds to "None" option, so no need to override
+        // When editing existing entry, values are already set from the model
+        
+        // Legacy behavior: first item was selected by default, but now we default to "None" (ID = 0)
+        // This matches the legacy system where <option value="">None</option> was the default
     }
     #endregion
 }

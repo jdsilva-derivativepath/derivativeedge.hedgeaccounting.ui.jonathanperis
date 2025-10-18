@@ -86,19 +86,12 @@ public partial class OptionAmortizationDialog
 
     private void OnOptionAmortizationComboBoxCreated(object args)
     {
-        // Set the first item as the default when available
-        if (AmortizationGLAccounts?.Any() == true && OptionAmortizationModel.GLAccountID == 0)
-        {
-            OptionAmortizationModel.GLAccountID = AmortizationGLAccounts.First().Id;
-            StateHasChanged();
-        }
-
-        // Set the first item as the default when available
-        if (AmortizationContraAccounts?.Any() == true && OptionAmortizationModel.ContraAccountID == 0)
-        {
-            OptionAmortizationModel.ContraAccountID = AmortizationContraAccounts.First().Id;
-            StateHasChanged();
-        }
+        // When opening modal for new entry (ID = 0), GLAccountID and ContraAccountID will be 0
+        // which corresponds to "None" option, so no need to override
+        // When editing existing entry, values are already set from the model
+        
+        // Legacy behavior: first item was selected by default, but now we default to "None" (ID = 0)
+        // This matches the legacy system where <option value="">None</option> was the default
     }
     #endregion
 }
