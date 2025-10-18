@@ -2,7 +2,14 @@
 
 public sealed class CreateHedgeRelationshipOptionTimeValueAmort
 {
-    public sealed record Command(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM HedgeRelationshipOptionTimeValueAmort, DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship) : IRequest<Response>;
+    public sealed record Command(
+        DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM HedgeRelationshipOptionTimeValueAmort, 
+        DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship,
+        bool IsAnOptionHedge = false,
+        long IVGLAccountID = 0,
+        long IVContraAccountID = 0,
+        DerivativeEDGEHAEntityEnumAmortizationMethod IVAmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None,
+        double IntrinsicValue = 0) : IRequest<Response>;
 
     public sealed class Response : ResponseBase
     {
@@ -30,6 +37,16 @@ public sealed class CreateHedgeRelationshipOptionTimeValueAmort
                     var hedgeRelationship = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
                     createdEntity.HedgeRelationship = hedgeRelationship;
+
+                    // Map intrinsic value fields from command to entity (these fields don't exist on ViewModel)
+                    // Legacy: optionTimeValue.cshtml lines 63-117 - only set when IsAnOptionHedge is true
+                    if (request.IsAnOptionHedge)
+                    {
+                        createdEntity.IVGLAccountID = request.IVGLAccountID;
+                        createdEntity.IVContraAccountID = request.IVContraAccountID;
+                        createdEntity.IVAmortizationMethod = request.IVAmortizationMethod;
+                        createdEntity.IntrinsicValue = request.IntrinsicValue;
+                    }
 
                     await hedgeAccountingApiClient.HedgeRelationshipOptionTimeValueAmortPOSTAsync(createdEntity, cancellationToken);
                 }

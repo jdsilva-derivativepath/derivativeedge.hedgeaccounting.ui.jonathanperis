@@ -1,4 +1,4 @@
-<SfDialog Width="@(IsAnOptionHedge ? "41rem" : "30rem")" 
+<SfDialog Width="@(IsAnOptionHedge && OptionAmortizationModel.ID == 0 ? "41rem" : "30rem")" 
           Height="auto" 
           CssClass="dp-dialog" 
           IsModal="true" 
@@ -65,7 +65,7 @@
                                     </NumericHotKeys>
                                 </div>
                             </div>
-                            @if (IsAnOptionHedge)
+                            @if (IsAnOptionHedge && OptionAmortizationModel.ID == 0)
                             {
                                 <div class="flex-1">
                                     <div class="form-group dp-inputs">
@@ -75,7 +75,7 @@
                                                     Enabled="true"
                                                     TItem="DerivativeEDGEHAEntityGLAccount"
                                                     Placeholder="Intrinsic Value GL Account"
-                                                    @bind-Value="OptionAmortizationModel.IVGLAccountID"
+                                                    @bind-Value="IVGLAccountID"
                                                     DataSource="AmortizationGLAccounts">
                                             <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
                                             <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
@@ -88,7 +88,7 @@
                                                     Enabled="true"
                                                     TItem="DerivativeEDGEHAEntityGLAccount"
                                                     Placeholder="Intrinsic Value Contra"
-                                                    @bind-Value="OptionAmortizationModel.IVContraAccountID"
+                                                    @bind-Value="IVContraAccountID"
                                                     DataSource="AmortizationContraAccounts">
                                             <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
                                             <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
@@ -101,7 +101,7 @@
                                                     Enabled="true"
                                                     TItem="AmortizationMethodOption"
                                                     Placeholder="Intrinsic Value Amortization Method"
-                                                    @bind-Value="OptionAmortizationModel.IVAmortizationMethod"
+                                                    @bind-Value="IVAmortizationMethod"
                                                     DataSource="AmortizationMethodOptions">
                                             <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
                                             <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
@@ -114,7 +114,7 @@
                                                               CssClass="input-numeric"
                                                               Placeholder="Intrinsic Value"
                                                               Enabled="true"
-                                                              @bind-Value="OptionAmortizationModel.IntrinsicValue" />
+                                                              @bind-Value="IntrinsicValue" />
                                         </NumericHotKeys>
                                     </div>
                                 </div>
