@@ -23,7 +23,23 @@ public partial class OptionAmortizationDialog
 
     #region Private Properties
     public DocumentContent Model { get; set; } = new();
-    private bool AmortizeOptionPremium { get; set; }
+    
+    // Legacy: AmortizeOptionPremimum defaults to true (line 3325 in legacy openOptionTimeValueAmortDialog)
+    private bool AmortizeOptionPremium { get; set; } = true;
+    
+    // Legacy: GL Account and Contra dropdown lists with "None" option (lines 55, 76 in legacy optionTimeValue.cshtml)
+    private List<DerivativeEDGEHAEntityGLAccount> GLAccountsWithNone => 
+        [new DerivativeEDGEHAEntityGLAccount { Id = 0, AccountDescription = "None" }, .. AmortizationGLAccounts];
+    
+    private List<DerivativeEDGEHAEntityGLAccount> ContraAccountsWithNone => 
+        [new DerivativeEDGEHAEntityGLAccount { Id = 0, AccountDescription = "None" }, .. AmortizationContraAccounts];
+    
+    // Legacy: Filter out "Swaplet" when OptionTimeValueAmortType is "OptionTimeValue" (filterByOptionAmortType function)
+    private List<AmortizationMethodOption> FilteredAmortizationMethodOptions =>
+        AmortizationMethodOptions
+            .Where(option => !(OptionAmortizationModel.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue 
+                            && option.Value == DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet))
+            .ToList();
     
     private DateTime? OptionAmortizationStartDate
     {
@@ -83,21 +99,23 @@ public partial class OptionAmortizationDialog
             await AlertService.ShowToast($"Error saving Option Amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
         }
     }
-
-    private void OnOptionAmortizationComboBoxCreated(object args)
+    
+    protected override void OnParametersSet()
     {
-        // Set the first item as the default when available
-        if (AmortizationGLAccounts?.Any() == true && OptionAmortizationModel.GLAccountID == 0)
+        // Legacy: Set defaults when no user data exists (GLAccountID and ContraAccountID default to 0/"None")
+        // If the model has no ID (new record) and no GL Account or Contra selected, they default to 0 (None)
+        if (OptionAmortizationModel?.ID == 0)
         {
-            OptionAmortizationModel.GLAccountID = AmortizationGLAccounts.First().Id;
-            StateHasChanged();
-        }
-
-        // Set the first item as the default when available
-        if (AmortizationContraAccounts?.Any() == true && OptionAmortizationModel.ContraAccountID == 0)
-        {
-            OptionAmortizationModel.ContraAccountID = AmortizationContraAccounts.First().Id;
-            StateHasChanged();
+            // Ensure defaults are set to 0 (None) if not already set by parent
+            if (OptionAmortizationModel.GLAccountID == 0)
+            {
+                OptionAmortizationModel.GLAccountID = 0;
+            }
+            
+            if (OptionAmortizationModel.ContraAccountID == 0)
+            {
+                OptionAmortizationModel.ContraAccountID = 0;
+            }
         }
     }
     #endregion

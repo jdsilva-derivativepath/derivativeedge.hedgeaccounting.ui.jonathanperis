@@ -416,6 +416,23 @@ public partial class HedgeRelationshipDetails
 
     private void NewMenuOnItemSelected(MenuEventArgs args)
     {
+        // Legacy: Initialize OptionAmortizationModel with defaults when opening dialog (openOptionTimeValueAmortDialog)
+        if (args.Item.Text == MODAL_OPTION_AMORTIZATION)
+        {
+            // Create new model with default values
+            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = 0,  // Default to "None" option
+                ContraAccountID = 0,  // Default to "None" option
+                AmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None,
+                OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue,
+                // Legacy: Set dates from hedge relationship if available (lines 3329-3330)
+                StartDate = HedgeRelationship?.DesignationDate,
+                EndDate = HedgeRelationship?.HedgingItems?.FirstOrDefault()?.MaturityDate
+            };
+        }
+        
         OpenModal = args.Item.Text;
     }
 

@@ -24,8 +24,7 @@
                                                 TItem="DerivativeEDGEHAEntityGLAccount"
                                                 Placeholder="GL Account"
                                                 @bind-Value="OptionAmortizationModel.GLAccountID"
-                                                DataSource="AmortizationGLAccounts">
-                                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                                DataSource="GLAccountsWithNone">
                                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                     </SfComboBox>
                                 </div>
@@ -37,8 +36,7 @@
                                                 TItem="DerivativeEDGEHAEntityGLAccount"
                                                 Placeholder="Contra"
                                                 @bind-Value="OptionAmortizationModel.ContraAccountID"
-                                                DataSource="AmortizationContraAccounts">
-                                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                                DataSource="ContraAccountsWithNone">
                                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                     </SfComboBox>
                                 </div>
@@ -49,7 +47,7 @@
                                                 TItem="AmortizationMethodOption"
                                                 Placeholder="Amortization Method"
                                                 @bind-Value="OptionAmortizationModel.AmortizationMethod"
-                                                DataSource="@AmortizationMethodOptions">
+                                                DataSource="@FilteredAmortizationMethodOptions">
                                         <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
                                         <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                     </SfComboBox>
