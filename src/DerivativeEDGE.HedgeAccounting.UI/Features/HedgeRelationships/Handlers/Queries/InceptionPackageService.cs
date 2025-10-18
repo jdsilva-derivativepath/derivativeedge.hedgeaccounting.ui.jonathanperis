@@ -37,9 +37,7 @@ public sealed class InceptionPackageService
                     throw new InvalidOperationException("File response was null");
                 }
 
-                var fileName = fileResponse.Headers?.TryGetValue("Content-Disposition", out var values) == true
-                    ? ExtractFileName(values.FirstOrDefault())
-                    : GenerateDefaultFileName();
+                var fileName = GenerateDefaultFileName();
 
                 var stream = fileResponse.Stream;
                 if (stream.CanSeek)
@@ -65,59 +63,6 @@ public sealed class InceptionPackageService
             // Example: InceptionPackage101720251312.zip (October 17, 2025 13:12)
             var timestamp = DateTime.Now.ToString("MMddyyyyHHmm");
             return $"InceptionPackage{timestamp}.zip";
-        }
-
-        private static string ExtractFileName(string contentDisposition)
-        {
-            if (string.IsNullOrWhiteSpace(contentDisposition))
-            {
-                return GenerateDefaultFileName();
-            }
-
-            // Try to extract filename* first (RFC 5987 encoded filename)
-            const string encodedToken = "filename*=";
-            var encodedIdx = contentDisposition.IndexOf(encodedToken, StringComparison.OrdinalIgnoreCase);
-            if (encodedIdx >= 0)
-            {
-                var start = encodedIdx + encodedToken.Length;
-                var remainder = contentDisposition[start..];
-                
-                // Find the end of this parameter (semicolon or end of string)
-                var endIdx = remainder.IndexOf(';');
-                var encodedValue = endIdx >= 0 ? remainder[..endIdx].Trim() : remainder.Trim();
-                
-                // RFC 5987 format: charset'lang'filename (e.g., UTF-8''filename.zip)
-                var parts = encodedValue.Split('\'');
-                if (parts.Length >= 3)
-                {
-                    var fileName = string.Join("'", parts.Skip(2));
-                    fileName = Uri.UnescapeDataString(fileName);
-                    if (!string.IsNullOrWhiteSpace(fileName))
-                    {
-                        return fileName;
-                    }
-                }
-            }
-
-            // Fall back to filename= parameter
-            const string token = "filename=";
-            var idx = contentDisposition.IndexOf(token, StringComparison.OrdinalIgnoreCase);
-            if (idx < 0)
-            {
-                return GenerateDefaultFileName();
-            }
-
-            var startPos = idx + token.Length;
-            var value = contentDisposition[startPos..];
-            
-            // Find the end of this parameter (semicolon or end of string)
-            var semicolonIdx = value.IndexOf(';');
-            var result = semicolonIdx >= 0 ? value[..semicolonIdx].Trim() : value.Trim();
-            
-            // Remove surrounding quotes if present
-            result = result.Trim('"');
-            
-            return string.IsNullOrWhiteSpace(result) ? GenerateDefaultFileName() : result;
         }
     }
 }
