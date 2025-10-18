@@ -7,7 +7,7 @@ public partial class HedgeRelationshipHistoryTab
     [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>> HedgeRegressionBatchesChanged { get; set; }
     #endregion
 
-    public List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HistoryBatches { get; set; } = new();
+    public List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HistoryBatches { get; set; } = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -19,14 +19,13 @@ public partial class HedgeRelationshipHistoryTab
     {
         if (HedgeRegressionBatches == null || !HedgeRegressionBatches.Any())
         {
-            HistoryBatches = new List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
+            HistoryBatches = [];
             return;
         }
 
-        HistoryBatches = HedgeRegressionBatches
+        HistoryBatches = [.. HedgeRegressionBatches
             .Where(batch => batch.Enabled)
-            .OrderByDescending(batch => batch.CreatedOn)
-            .ToList();
+            .OrderByDescending(batch => batch.CreatedOn)];
     }
 
     private string GetDisplayDate(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM batch)

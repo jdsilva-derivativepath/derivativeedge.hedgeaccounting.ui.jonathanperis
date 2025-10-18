@@ -19,9 +19,9 @@ public partial class ReDesignateDialog
     [Parameter] public bool IsDocTemplateFound { get; set; }
 
     // Data sources
-    [Parameter] public List<PaymentFrequencyOption> AvailablePaymentFrequencies { get; set; } = new();
-    [Parameter] public List<DayCountConvOption> AvailableDayCountConventions { get; set; } = new();
-    [Parameter] public List<PayBusDayConvOption> AvailablePayBusDayConventions { get; set; } = new();
+    [Parameter] public List<PaymentFrequencyOption> AvailablePaymentFrequencies { get; set; } = [];
+    [Parameter] public List<DayCountConvOption> AvailableDayCountConventions { get; set; } = [];
+    [Parameter] public List<PayBusDayConvOption> AvailablePayBusDayConventions { get; set; } = [];
 
     private string ValidationMessage { get; set; } = string.Empty;
 

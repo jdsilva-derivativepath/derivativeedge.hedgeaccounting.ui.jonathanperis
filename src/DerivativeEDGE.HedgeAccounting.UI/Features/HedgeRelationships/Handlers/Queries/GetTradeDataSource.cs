@@ -52,7 +52,7 @@ public static class GetTradeDataSource
                         _logger,
                         $"API request failed: {response.StatusCode}",
                         content,
-                        msg => new Response(new(), false, msg));
+                        msg => new Response([], false, msg));
                 }
 
                 var result = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -63,7 +63,7 @@ public static class GetTradeDataSource
                         _logger,
                         "API returned null or invalid trade data.",
                         content,
-                        msg => new Response(new(), false, msg));
+                        msg => new Response([], false, msg));
                 }
 
                 _logger.LogInformation("Retrieved {Count} trade items.", LoggingSanitizer.Sanitize(result.Result.Count.ToString()));
@@ -73,12 +73,12 @@ public static class GetTradeDataSource
             {
                 var error = ex is TaskCanceledException ? "Request timeout occurred" : "Network error occurred while fetching trade data";
                 _logger.LogError(ex, error);
-                return new Response(new(), false, error);
+                return new Response([], false, error);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error occurred while fetching trade data");
-                return new Response(new(), false, "An unexpected error occurred");
+                return new Response([], false, "An unexpected error occurred");
             }
         }
     }

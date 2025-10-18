@@ -6,7 +6,7 @@ public partial class HedgeRelationshipGrid
 
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public IEnumerable<HedgeRelationshipRecordViewModel> Data { get; set; } = Array.Empty<HedgeRelationshipRecordViewModel>();
-    [Parameter] public List<GridViewModel> GridViewItems { get; set; } = new();
+    [Parameter] public List<GridViewModel> GridViewItems { get; set; } = [];
     [Parameter] public EventCallback<GridViewModel> ViewCrudEvent { get; set; }
     [Parameter] public EventCallback<HedgeRelationshipRecordViewModel?> OnRowClicked { get; set; }
     [Parameter] public EventCallback<long> OnDeleteRequested { get; set; }

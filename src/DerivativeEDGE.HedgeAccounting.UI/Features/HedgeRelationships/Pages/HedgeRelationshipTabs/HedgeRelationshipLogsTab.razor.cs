@@ -8,7 +8,7 @@ public partial class HedgeRelationshipLogsTab
     #endregion
 
     #region Public Properties
-    public List<EnhancedLogDetail> Logs { get; set; } = new();
+    public List<EnhancedLogDetail> Logs { get; set; } = [];
     #endregion
 
     #region Models
@@ -30,7 +30,7 @@ public partial class HedgeRelationshipLogsTab
     {
         if (HedgeRegressionBatches == null || !HedgeRegressionBatches.Any())
         {
-            Logs = new List<EnhancedLogDetail>();
+            Logs = [];
             return;
         }
 
@@ -130,11 +130,10 @@ public partial class HedgeRelationshipLogsTab
         }
 
         // Sort by creation date (newest first) and remove duplicates
-        Logs = allLogs
+        Logs = [.. allLogs
             .GroupBy(log => new { log.ID, log.Key, log.Message })
             .Select(group => group.First())
-            .OrderByDescending(log => log.CreatedOn)
-            .ToList();
+            .OrderByDescending(log => log.CreatedOn)];
     }
     #endregion
 }

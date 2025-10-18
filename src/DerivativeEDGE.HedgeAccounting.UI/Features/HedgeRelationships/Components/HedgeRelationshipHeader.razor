@@ -1,0 +1,47 @@
+@* Breadcrumb and Workflow Section *@
+<div class="my-2.5 mx-5 flex justify-between">
+    <div class="flex gap-2.5 flex-wrap items-center">
+        <div class="breadcrumb-div">
+            <ul class="breadcrumb">
+                <li class="breadcrumb-icons">
+                    <a href="/">
+                        <i class="fa fa-home linkColor"></i>
+                        <i class="fa fa-chevron-right linkColor"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-last">
+                    <a href="@($"{NavManager.BaseUri}hedgerelationship")">
+                        Hedge Relationships
+                    </a>
+                </li>
+                <li class="breadcrumb-icons">
+                    <i class="fa fa-chevron-right linkColor"></i>
+                </li>
+                <li class="breadcrumb-last">
+                    <a href="@($"{NavManager.BaseUri}hedgerelationship?id={HedgeRelationshipId}")">
+                        HR ID @HedgeRelationshipId
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="flex gap-2.5 flex-wrap items-center">
+        <div class="dp-buttons">
+            <SfButton Disabled="true" CssClass="button-primary button-default" Content="@HedgeStateText" />
+            <SfDropDownButton Items="@WorkflowItems" CssClass="dp-dropdown-menu-style dropdown-menu-primary" Content="Workflow">
+                <DropDownMenuItems>
+                    <DropDownButtonEvents ItemSelected="OnWorkflowAction" />
+                </DropDownMenuItems>
+            </SfDropDownButton>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private NavigationManager NavManager { get; set; }
+    
+    [Parameter] public long HedgeRelationshipId { get; set; }
+    [Parameter] public string HedgeStateText { get; set; }
+    [Parameter] public List<DropDownMenuItem> WorkflowItems { get; set; }
+    [Parameter] public EventCallback<MenuEventArgs> OnWorkflowAction { get; set; }
+}

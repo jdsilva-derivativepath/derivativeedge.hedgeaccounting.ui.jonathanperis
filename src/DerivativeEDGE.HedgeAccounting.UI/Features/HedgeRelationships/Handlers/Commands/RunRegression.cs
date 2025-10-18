@@ -9,14 +9,14 @@ public sealed class RunRegression
     public sealed class Response : ResponseBase
     {
         public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM Data { get; set; }
-        public List<string> ValidationErrors { get; set; } = new();
+        public List<string> ValidationErrors { get; set; } = [];
         
         public Response(bool hasError, string message, DerivativeEDGEHAApiViewModelsHedgeRelationshipVM data = null, List<string> validationErrors = null)
         {
             HasError = hasError;
             ErrorMessage = message;
             Data = data;
-            ValidationErrors = validationErrors ?? new List<string>();
+            ValidationErrors = validationErrors ?? [];
         }
         
         public Response(Exception exception) : base(exception) { }

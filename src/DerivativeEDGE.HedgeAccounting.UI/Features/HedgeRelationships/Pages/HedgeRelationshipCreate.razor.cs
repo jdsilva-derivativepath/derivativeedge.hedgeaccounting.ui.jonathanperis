@@ -3,8 +3,8 @@
 public partial class HedgeRelationshipCreate
 {
     public bool ShowNewProcessModal { get; set; }
-    private List<Client> AvailableClients { get; set; } = new();
-    private List<Entity> AvailableEntities { get; set; } = new();
+    private List<Client> AvailableClients { get; set; } = [];
+    private List<Entity> AvailableEntities { get; set; } = [];
     public DerivativeEDGEHAEntityHedgeRelationship HedgeRelationship { get; set; } = new();
 
     #region Loading States
@@ -110,13 +110,13 @@ public partial class HedgeRelationshipCreate
             // Clear entities if no client is selected (for DPI users)
             if (clientId == null || clientId == 0)
             {
-                AvailableEntities = new List<Entity>();
+                AvailableEntities = [];
                 HedgeRelationship.BankEntityID = 0; // reset selection
                 return;
             }
 
             var query = new GetClientEntities.Query(clientId);
-            AvailableEntities = new List<Entity>();
+            AvailableEntities = [];
             var response = await Mediator.Send(query, CancellationToken.None);
 
             response.Entities.Insert(0, new Entity { EntityId = 0, EntityLongName = "None" }); // Insert "None" option
@@ -270,7 +270,7 @@ public partial class HedgeRelationshipCreate
 
     private async Task HandleClientValueChangeAsync()
     {
-        AvailableEntities = new List<Entity>();
+        AvailableEntities = [];
         await LoadClientEntitiesAsync(HedgeRelationship.ClientID);
     }
 }

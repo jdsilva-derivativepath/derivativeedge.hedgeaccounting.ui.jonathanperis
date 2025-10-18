@@ -15,16 +15,16 @@ public partial class InstrumentAnalysisTab
 
     #region Public Properties
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM HedgedItem { get; set; } = new();
-    public List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM> HedgedItems { get; set; } = new();
+    public List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM> HedgedItems { get; set; } = [];
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM HedgingItem { get; set; } = new();
-    public List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM> HedgingItems { get; set; } = new();
-    public List<TradeDto> SelectExistingTrade { get; set; } = new();
+    public List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM> HedgingItems { get; set; } = [];
+    public List<TradeDto> SelectExistingTrade { get; set; } = [];
     public bool IsSelectExistingTradeModal { get; set; }
     public bool IsLoadingTradeData { get; set; }
     #endregion
 
     #region Private Properties
-    private List<HedgeCurrencyDropdownItem> Currency { get; set; } = new();
+    private List<HedgeCurrencyDropdownItem> Currency { get; set; } = [];
     private string ExistingTradeModalHeaderText { get; set; }
     #endregion
 
@@ -74,8 +74,8 @@ public partial class InstrumentAnalysisTab
     #endregion
 
     #region Constants
-    private static readonly List<DropDownMenuItem> MenuItems = new()
-    {
+    private static readonly List<DropDownMenuItem> MenuItems =
+    [
         new DropDownMenuItem { Text = "Callable Debt", Id = "callabledebt" },
         new DropDownMenuItem { Text = "Cancelable", Id = "cancelable" },
         new DropDownMenuItem { Text = "Cap Floor", Id = "cap" },
@@ -87,7 +87,7 @@ public partial class InstrumentAnalysisTab
         new DropDownMenuItem { Text = "Swaption", Id = "swaption" },
         new DropDownMenuItem { Text = "Corridor", Id = "corridor" },
         new DropDownMenuItem { Text = "FX Forward", Id = "fxforward" }
-    };
+    ];
 
     public class DropDownMenuItem
     {
@@ -124,8 +124,8 @@ public partial class InstrumentAnalysisTab
         if (HedgeRelationship != null)
         {
             // Load the data
-            HedgedItems = HedgeRelationship.HedgedItems?.ToList() ?? new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>();
-            HedgingItems = HedgeRelationship.HedgingItems?.ToList() ?? new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>();
+            HedgedItems = HedgeRelationship.HedgedItems?.ToList() ?? [];
+            HedgingItems = HedgeRelationship.HedgingItems?.ToList() ?? [];
 
             // Ensure mutual exclusivity - if both are true (shouldn't happen), prefer Cumulative Changes
             if (HedgeRelationship.CumulativeChanges && HedgeRelationship.PeriodicChanges)
@@ -139,8 +139,8 @@ public partial class InstrumentAnalysisTab
         else
         {
             // Initialize empty lists if HedgeRelationship is null
-            HedgedItems = new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>();
-            HedgingItems = new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>();
+            HedgedItems = [];
+            HedgingItems = [];
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -179,19 +179,19 @@ public partial class InstrumentAnalysisTab
 
             if (response.IsSuccess)
             {
-                SelectExistingTrade = response.TradeData ?? new List<TradeDto>();
+                SelectExistingTrade = response.TradeData ?? [];
             }
             else
             {
                 // Handle error - you might want to show a toast/alert here
                 Console.WriteLine($"Error loading trade data: {response.ErrorMessage}");
-                SelectExistingTrade = new List<TradeDto>();
+                SelectExistingTrade = [];
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception loading trade data: {ex.Message}");
-            SelectExistingTrade = new List<TradeDto>();
+            SelectExistingTrade = [];
         }
         finally
         {
@@ -203,7 +203,7 @@ public partial class InstrumentAnalysisTab
     private void CloseSelectExistingTradeModal()
     {
         IsSelectExistingTradeModal = false;
-        SelectExistingTrade = new List<TradeDto>(); // Clear data when closing
+        SelectExistingTrade = []; // Clear data when closing
         IsLoadingTradeData = false; // Reset loading state
     }
 
@@ -221,9 +221,9 @@ public partial class InstrumentAnalysisTab
         if (HedgeRelationship != null)
         {
             HedgeRelationship.HedgedItem = HedgedItem;
-            HedgeRelationship.HedgedItems = HedgedItems ?? new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>();
+            HedgeRelationship.HedgedItems = HedgedItems ?? [];
             HedgeRelationship.HedgingItem = HedgingItem;
-            HedgeRelationship.HedgingItems = HedgingItems ?? new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>();
+            HedgeRelationship.HedgingItems = HedgingItems ?? [];
             await HedgeRelationshipChanged.InvokeAsync(HedgeRelationship);
         }
     }
@@ -264,7 +264,7 @@ public partial class InstrumentAnalysisTab
         ExistingTradeModalHeaderText = hedgeType == "HedgeItem" ? "Hedged" : "Hedging";
 
         // Open modal immediately with empty data and loading state
-        SelectExistingTrade = new List<TradeDto>(); // Start with empty data
+        SelectExistingTrade = []; // Start with empty data
         IsSelectExistingTradeModal = true;
 
         // Load data asynchronously after modal is shown for both hedge types
@@ -276,7 +276,7 @@ public partial class InstrumentAnalysisTab
         if (item != null && HedgedItems != null)
         {
             HedgedItems.Remove(item);
-            HedgedItems = HedgedItems.ToList(); // Force collection refresh
+            HedgedItems = [.. HedgedItems]; // Force collection refresh
             await UpdateParentData();
             await InvokeAsync(StateHasChanged);
         }
@@ -287,7 +287,7 @@ public partial class InstrumentAnalysisTab
         if (item != null && HedgingItems != null)
         {
             HedgingItems.Remove(item);
-            HedgingItems = HedgingItems.ToList(); // Force collection refresh
+            HedgingItems = [.. HedgingItems]; // Force collection refresh
             await UpdateParentData();
             await InvokeAsync(StateHasChanged);
         }
@@ -311,7 +311,7 @@ public partial class InstrumentAnalysisTab
 
                     HedgedItem = hedgeItemVM;
                     HedgedItems.Add(hedgeItemVM);
-                    HedgedItems = HedgedItems.ToList(); // Force collection refresh
+                    HedgedItems = [.. HedgedItems]; // Force collection refresh
                 }
                 else if (ExistingTradeModalHeaderText == "Hedging")
                 {
@@ -320,7 +320,7 @@ public partial class InstrumentAnalysisTab
 
                     HedgingItem = hedgeItemVM;
                     HedgingItems.Add(hedgeItemVM);
-                    HedgingItems = HedgingItems.ToList(); // Force collection refresh
+                    HedgingItems = [.. HedgingItems]; // Force collection refresh
                 }
 
                 await UpdateParentData();

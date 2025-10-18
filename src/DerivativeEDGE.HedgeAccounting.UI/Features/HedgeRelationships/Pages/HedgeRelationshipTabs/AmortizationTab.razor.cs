@@ -7,7 +7,7 @@ public partial class AmortizationTab
     [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM>> HedgeRelationshipOptionTimeValueAmortsChanged { get; set; }
     #endregion
 
-    public List<DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM> OptionTimeValueAmortRollSchedules { get; set; } = new();
+    public List<DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM> OptionTimeValueAmortRollSchedules { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,15 +26,14 @@ public partial class AmortizationTab
         // Aggregate all roll schedules from all HedgeRelationshipOptionTimeValueAmorts
         if (HedgeRelationshipOptionTimeValueAmorts?.Any() == true)
         {
-            OptionTimeValueAmortRollSchedules = HedgeRelationshipOptionTimeValueAmorts
+            OptionTimeValueAmortRollSchedules = [.. HedgeRelationshipOptionTimeValueAmorts
                 .Where(amort => amort.OptionTimeValueAmortRollSchedules?.Any() == true)
                 .SelectMany(amort => amort.OptionTimeValueAmortRollSchedules)
-                .OrderBy(schedule => schedule.PaymentDate)
-                .ToList();
+                .OrderBy(schedule => schedule.PaymentDate)];
         }
         else
         {
-            OptionTimeValueAmortRollSchedules = new List<DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM>();
+            OptionTimeValueAmortRollSchedules = [];
         }
 
         await Task.CompletedTask;
