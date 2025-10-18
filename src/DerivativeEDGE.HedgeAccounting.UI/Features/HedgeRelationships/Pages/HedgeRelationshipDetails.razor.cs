@@ -116,18 +116,21 @@ public partial class HedgeRelationshipDetails
     private bool IsDeDesignateModal => OpenModal == MODAL_DEDESIGNATE;
     private bool IsReDesignateModal => OpenModal == MODAL_REDESIGNATE;
     private string BenchMarkLabel => HedgeRelationshipLabelHelper.GetBenchMarkLabel(HedgeRelationship);
-
-    /// <summary>
-    /// Gets the display name for the selected template based on InceptionMemoTemplateID
-    /// </summary>
-    private string GetTemplateDisplayName()
+    
+    private string _templateDisplayName = string.Empty;
+    private string TemplateDisplayName
     {
-        if (HedgeRelationship?.InceptionMemoTemplateID == null)
-            return string.Empty;
+        get
+        {
+            if (HedgeRelationship?.InceptionMemoTemplateID == null)
+                return string.Empty;
 
-        var templates = DropdownDataHelper.GetDropdownDatasource("hedgingobjective");
-        var selectedTemplate = templates.FirstOrDefault(t => t.ID == HedgeRelationship.InceptionMemoTemplateID);
-        return selectedTemplate?.Text ?? string.Empty;
+            var templates = DropdownDataHelper.GetDropdownDatasource("hedgingobjective");
+            var selectedTemplate = templates.FirstOrDefault(t => t.ID == HedgeRelationship.InceptionMemoTemplateID);
+            _templateDisplayName = selectedTemplate?.Text ?? string.Empty;
+            return _templateDisplayName;
+        }
+        set => _templateDisplayName = value ?? string.Empty;
     }
 
     // TODO: Replace with actual business logic
