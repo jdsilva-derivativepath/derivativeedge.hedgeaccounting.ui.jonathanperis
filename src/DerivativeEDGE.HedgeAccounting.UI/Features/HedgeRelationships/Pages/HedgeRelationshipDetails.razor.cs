@@ -42,6 +42,7 @@ public partial class HedgeRelationshipDetails
     private InstrumentAnalysisTab instrumentAnalysisTabRef;
     private TestResultsTab testResultsTabRef;
     private List<string> ValidationErrors { get; set; } = new();
+    private bool IsDpiUser { get; set; }
     private DateTime? DesignationDate
     {
         get => !string.IsNullOrEmpty(HedgeRelationship?.DesignationDate)
@@ -205,6 +206,9 @@ public partial class HedgeRelationshipDetails
 
     protected override async Task OnInitializedAsync()
     {
+        // Initialize IsDpiUser from UserAuthData
+        IsDpiUser = UserAuthData?.IsDpiUser ?? false;
+
         // Load hedge relationship first to ensure data is populated
         await GetHedgeRelationship(HedgeId);
 

@@ -259,11 +259,13 @@
                                            Label="Cumulative Changes"
                                            Name="regressionType"
                                            Value="cumulative"
+                                           Disabled="@(!IsRegressionEnabled)"
                                            @bind-Checked="@RegressionType" />
                             <SfRadioButton CssClass="input-radiobutton"
                                            Label="Periodic Changes"
                                            Name="regressionType"
                                            Value="periodic"
+                                           Disabled="@(!IsRegressionEnabled)"
                                            @bind-Checked="@RegressionType" />
                             <SfCheckBox CssClass="input-checkbox" @bind-Checked="HedgeRelationship.EOM" Label="End Of Month" />
                         </div>

@@ -10,6 +10,7 @@ public partial class InstrumentAnalysisTab
     #region Parameters
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; }
     [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> HedgeRelationshipChanged { get; set; }
+    [Parameter] public bool IsDpiUser { get; set; }
     #endregion
 
     #region Public Properties
@@ -42,7 +43,7 @@ public partial class InstrumentAnalysisTab
         }
         set
         {
-            if (HedgeRelationship != null)
+            if (HedgeRelationship != null && IsRegressionEnabled)
             {
                 HedgeRelationship.CumulativeChanges = value == "cumulative";
                 HedgeRelationship.PeriodicChanges = value == "periodic";
@@ -52,6 +53,34 @@ public partial class InstrumentAnalysisTab
                     await InvokeAsync(StateHasChanged);
                 }); // Fire and forget with state update
             }
+        }
+    }
+
+    // Computed property to check if regression can be changed
+    // Based on legacy logic: regression can only be changed when HedgeState is Draft
+    // Or when Designated AND user is DPI user OR contract type is SaaS/SwaS
+    private bool IsRegressionEnabled
+    {
+        get
+        {
+            if (HedgeRelationship == null)
+                return false;
+
+            // If it's Draft, regression can always be changed
+            if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)
+                return true;
+
+            // If Designated, check if user has permission
+            if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Designated)
+            {
+                // User can change if they are DPI user OR contract type is SaaS/SwaS
+                return IsDpiUser || 
+                       HedgeRelationship.ContractType == "SaaS" || 
+                       HedgeRelationship.ContractType == "SwaS";
+            }
+
+            // For any other state (Dedesignated), don't allow changes
+            return false;
         }
     }
     #endregion
