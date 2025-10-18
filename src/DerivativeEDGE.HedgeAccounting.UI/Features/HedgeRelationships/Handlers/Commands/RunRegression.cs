@@ -22,39 +22,26 @@ public sealed class RunRegression
         public Response(Exception exception) : base(exception) { }
     }
 
-    public sealed class Handler : IRequestHandler<Command, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, IMapper mapper, ILogger<RunRegression.Handler> logger, TokenProvider tokenProvider) : IRequestHandler<Command, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly IMapper _mapper;
-        private readonly TokenProvider _tokenProvider; // future use
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, IMapper mapper, ILogger<Handler> logger, TokenProvider tokenProvider)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _mapper = mapper;
-            _logger = logger;
-            _tokenProvider = tokenProvider; // stored for future hook
-        }
-
         public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Sending request to run regression for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
+                logger.LogInformation("Sending request to run regression for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
 
                 // Map the full HedgeRelationshipVM to HedgeRelationship entity (following UpdateHedgeRelationship pattern)
                 // The API needs the complete hedge relationship data including hedged items, hedging items, effectiveness methods, etc.
-                var body = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
+                var body = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
-                var apiResponse = await _hedgeAccountingApiClient.RegressAsync(request.HedgeResultType, body, cancellationToken);
+                var apiResponse = await hedgeAccountingApiClient.RegressAsync(request.HedgeResultType, body, cancellationToken);
 
-                _logger.LogInformation("Successfully completed regression analysis for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
+                logger.LogInformation("Successfully completed regression analysis for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
                 return new Response(false, "Regression analysis completed successfully", apiResponse);
             }
             catch (ApiException apiEx)
             {
-                _logger.LogError(apiEx, "API error while running regression analysis for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
+                logger.LogError(apiEx, "API error while running regression analysis for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
                     request.HedgeRelationship.ID, apiEx.StatusCode, apiEx.Response);
                 
                 // Return the actual API error message to the user
@@ -66,7 +53,7 @@ public sealed class RunRegression
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while running regression analysis for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
+                logger.LogError(ex, "An error occurred while running regression analysis for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationship.ID);
                 return new Response(true, $"Failed to run regression analysis: {ex.Message}");
             }
         }

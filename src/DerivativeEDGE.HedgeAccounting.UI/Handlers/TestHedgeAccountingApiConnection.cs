@@ -2,30 +2,21 @@
 
 public class TestHedgeAccountingApiConnection
 {
-    public sealed class Response
+    public sealed class Response(string responseData)
     {
-        public string ResponseData { get; set; }
-        public Response(string responseData)
-        {
-            ResponseData = responseData;
-        }
+        public string ResponseData { get; set; } = responseData;
     }
 
     public sealed record Request(string RequestData) : IRequest<Response>
     {
     }
 
-    public class Handler : IRequestHandler<Request, Response>
+    public class Handler(IHedgeAccountingApiService hedgeAccountingApiService) : IRequestHandler<Request, Response>
     {
-        private readonly IHedgeAccountingApiService _hedgeAccountingApiService;
-        public Handler(IHedgeAccountingApiService hedgeAccountingApiService)
-        {
-            _hedgeAccountingApiService = hedgeAccountingApiService;
-        }
         public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
         {
             var url = $"initial?requestData={request.RequestData}";
-            Response response = await _hedgeAccountingApiService.GetAsync<Response>(url, HedgeAccountingApiVersions.None);
+            Response response = await hedgeAccountingApiService.GetAsync<Response>(url, HedgeAccountingApiVersions.None);
             return response ?? new Response(string.Empty);
         }
     }

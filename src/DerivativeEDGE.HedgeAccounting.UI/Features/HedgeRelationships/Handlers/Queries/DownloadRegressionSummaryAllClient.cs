@@ -5,19 +5,8 @@ public sealed class DownloadRegressionSummaryAllClient
     public sealed record Query(DateTime? ValueDate) : IRequest<Response>;
     public sealed record Response(Stream ExcelStream, string FileName);
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<DownloadRegressionSummaryAllClient.Handler> logger) : IRequestHandler<Query, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly TokenProvider _tokenProvider; // retained for future hooks
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<Handler> logger)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _tokenProvider = tokenProvider;
-            _logger = logger;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             var valueDate = request.ValueDate.HasValue ? new DateTimeOffset(request.ValueDate.Value) : (DateTimeOffset?)null;
@@ -28,24 +17,24 @@ public sealed class DownloadRegressionSummaryAllClient
 
             try
             {
-                _logger.LogInformation("Initiating request via {Client}.{Method} (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
+                logger.LogInformation("Initiating request via {Client}.{Method} (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
 
                 FileResponse fileResponse;
                 try
                 {
-                    fileResponse = await _hedgeAccountingApiClient.RegressionSummaryAllClientsAsync(valueDate, cancellationToken);
+                    fileResponse = await hedgeAccountingApiClient.RegressionSummaryAllClientsAsync(valueDate, cancellationToken);
                 }
                 catch (Exception ex) when (ex.GetType().Name == "ApiException")
                 {
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message;
-                    _logger.LogWarning("{Client}.{Method} failed. StatusCode: {StatusCode}, Reason: {Reason}", clientTypeName, methodName, statusCode, reason);
+                    logger.LogWarning("{Client}.{Method} failed. StatusCode: {StatusCode}, Reason: {Reason}", clientTypeName, methodName, statusCode, reason);
                     throw; // preserve original behavior
                 }
 
                 if (fileResponse == null)
                 {
-                    _logger.LogWarning("{Client}.{Method} returned null FileResponse (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
+                    logger.LogWarning("{Client}.{Method} returned null FileResponse (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
                     throw new InvalidOperationException("FileResponse was null");
                 }
 
@@ -59,17 +48,17 @@ public sealed class DownloadRegressionSummaryAllClient
                     stream.Position = 0;
                 }
 
-                _logger.LogInformation("{Client}.{Method} succeeded (valueDate: {ValueDate}) -> {FileName}", clientTypeName, methodName, request.ValueDate, fileName);
+                logger.LogInformation("{Client}.{Method} succeeded (valueDate: {ValueDate}) -> {FileName}", clientTypeName, methodName, request.ValueDate, fileName);
                 return new Response(stream, fileName);
             }
             catch (Exception ex)
             {
                 // Obtain BaseUrl reflectively only when needed for error context
-                var baseUrl = _hedgeAccountingApiClient.GetType()
+                var baseUrl = hedgeAccountingApiClient.GetType()
                     .GetProperty("BaseUrl", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?
-                    .GetValue(_hedgeAccountingApiClient) as string ?? string.Empty;
+                    .GetValue(hedgeAccountingApiClient) as string ?? string.Empty;
 
-                _logger.LogError(ex, "Error executing {Client}.{Method} (BaseUrl: {BaseUrl}, valueDate: {ValueDate})", clientTypeName, methodName, baseUrl, request.ValueDate);
+                logger.LogError(ex, "Error executing {Client}.{Method} (BaseUrl: {BaseUrl}, valueDate: {ValueDate})", clientTypeName, methodName, baseUrl, request.ValueDate);
                 throw;
             }
         }

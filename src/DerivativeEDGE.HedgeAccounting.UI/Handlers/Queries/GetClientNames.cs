@@ -4,29 +4,15 @@ public sealed class GetClientNames
 {
     public sealed record Query(List<long> ClientIds) : IRequest<Response>;
 
-    public sealed class Response
+    public sealed class Response(IEnumerable<ClientName> clientNames)
     {
-        public List<ClientName> ClientNames { get; }
-
-        public Response(IEnumerable<ClientName> clientNames)
-        {
-            ClientNames = [.. clientNames];
-        }
+        public List<ClientName> ClientNames { get; } = [.. clientNames];
     }
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IIdentityClient client, IAppCache appCache, IConfiguration configuration) : IRequestHandler<Query, Response>
     {
-        private readonly IIdentityClient _client;
-        private readonly string _apiKey;
+        private readonly string _apiKey = configuration[ConfigurationKeys.IdentityApiKey]!;
         private readonly TimeSpan _cacheExpiryTime = new(0, 1, 0);
-        private readonly IAppCache _appCache;
-
-        public Handler(IIdentityClient client, IAppCache appCache, IConfiguration configuration)
-        {
-            _client = client;
-            _appCache = appCache;
-            _apiKey = configuration[ConfigurationKeys.IdentityApiKey]!;
-        }
 
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -34,7 +20,7 @@ public sealed class GetClientNames
             async Task<List<ClientName>> localGet()
             {
 
-                var clients = await _client.GetClientsByIdsAsync(request.ClientIds, _apiKey);
+                var clients = await client.GetClientsByIdsAsync(request.ClientIds, _apiKey);
                 return [.. clients.Select(client =>
                     new ClientName()
                     {
@@ -43,7 +29,7 @@ public sealed class GetClientNames
                         Id = client.ClientId
                     })];
             }
-            var clientNames = await _appCache.GetOrAdd(key, localGet, _cacheExpiryTime);
+            var clientNames = await appCache.GetOrAdd(key, localGet, _cacheExpiryTime);
             return new Response(clientNames);
         }
 

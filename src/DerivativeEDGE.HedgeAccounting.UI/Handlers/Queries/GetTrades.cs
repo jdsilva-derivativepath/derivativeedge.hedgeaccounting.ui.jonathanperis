@@ -2,32 +2,21 @@
 
 public sealed class GetTrades
 {
-    public sealed class Response
+    public sealed class Response(IEnumerable<ClientTrade> trades)
     {
-        public IEnumerable<ClientTrade> Trades { get; set; }
-        public Response(IEnumerable<ClientTrade> trades)
-        {
-            Trades = trades;
-        }
+        public IEnumerable<ClientTrade> Trades { get; set; } = trades;
     }
 
     public sealed class Query : IRequest<Response>
     {
     }
 
-    public class Handler : IRequestHandler<Query, Response>
+    public class Handler(ITradeClient tradeServiceClient, IMapper mapper) : IRequestHandler<Query, Response>
     {
-        private readonly ITradeClient _tradeServiceClient;
-        private readonly IMapper _mapper;
-        public Handler(ITradeClient tradeServiceClient, IMapper mapper)
-        {
-            _tradeServiceClient = tradeServiceClient;
-            _mapper = mapper;
-        }
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
-            var trades = await _tradeServiceClient.GetTrades();
-            var tradesDto = _mapper.Map<IEnumerable<Trade>, IEnumerable<ClientTrade>>(trades);
+            var trades = await tradeServiceClient.GetTrades();
+            var tradesDto = mapper.Map<IEnumerable<Trade>, IEnumerable<ClientTrade>>(trades);
             return new Response(tradesDto);
         }
     }

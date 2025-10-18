@@ -1,15 +1,8 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Handlers.Behaviors;
 
-public sealed class LogExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class LogExceptionBehavior<TRequest, TResponse>(ILogger<TRequest> logger) : IPipelineBehavior<TRequest, TResponse>
 where TRequest : IRequest<TResponse>
 {
-    private readonly ILogger<TRequest> _logger;
-
-    public LogExceptionBehavior(ILogger<TRequest> logger)
-    {
-        _logger = logger;
-    }
-
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         try
@@ -18,7 +11,7 @@ where TRequest : IRequest<TResponse>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{nameOfRequest}", typeof(TRequest).Name);
+            logger.LogError(ex, "{nameOfRequest}", typeof(TRequest).Name);
             throw;
         }
     }

@@ -1024,7 +1024,7 @@ public partial class HedgeRelationshipDetails
                 DedesignateUserMessage = response.ErrorMessage ?? "An error occurred loading de-designation data";
                 DedesignateIsError = true;
                 // Only set DedesignationDate if it's not default value
-                if (response.DedesignationDate != default(DateTime))
+                if (response.DedesignationDate != default)
                 {
                     DedesignationDateDialog = response.DedesignationDate;
                 }

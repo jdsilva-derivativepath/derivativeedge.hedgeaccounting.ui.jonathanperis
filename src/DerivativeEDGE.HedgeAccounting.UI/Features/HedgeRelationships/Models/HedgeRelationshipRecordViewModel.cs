@@ -1,13 +1,8 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
 
-public class HedgeRelationshipRecordViewModel
+public class HedgeRelationshipRecordViewModel(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM source)
 {
-    private readonly DerivativeEDGEHAApiViewModelsHedgeRelationshipVM _source;
-
-    public HedgeRelationshipRecordViewModel(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM source)
-    {
-        _source = source ?? throw new ArgumentNullException(nameof(source));
-    }
+    private readonly DerivativeEDGEHAApiViewModelsHedgeRelationshipVM _source = source ?? throw new ArgumentNullException(nameof(source));
 
     // Computed properties
     public string? EntityName => _source.BankEntity?.LegalEntity?.Name;

@@ -17,38 +17,25 @@ public sealed class GetGLAccountsForHedging
         public string Message { get; set; } = string.Empty;
     }
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<GetGLAccountsForHedging.Handler> logger, IMapper mapper) : IRequestHandler<Query, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly TokenProvider _tokenProvider; // future use if direct auth needed
-        private readonly IMapper _mapper;
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<Handler> logger, IMapper mapper)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _tokenProvider = tokenProvider;
-            _logger = logger;
-            _mapper = mapper;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Sending request to get GL accounts for hedging. ClientID: {ClientID}, BankEntityID: {BankEntityID}.", request.ClientID, request.BankEntityID);
+                logger.LogInformation("Sending request to get GL accounts for hedging. ClientID: {ClientID}, BankEntityID: {BankEntityID}.", request.ClientID, request.BankEntityID);
 
-                var updatedApiVm = await _hedgeAccountingApiClient.GetForHedgingAllAsync(request.ClientID, request.BankEntityID, cancellationToken);
+                var updatedApiVm = await hedgeAccountingApiClient.GetForHedgingAllAsync(request.ClientID, request.BankEntityID, cancellationToken);
 
                 // Map API VM to UI view model
-                var updatedVm = _mapper.Map<List<DerivativeEDGEHAEntityGLAccount>>(updatedApiVm);
+                var updatedVm = mapper.Map<List<DerivativeEDGEHAEntityGLAccount>>(updatedApiVm);
 
-                _logger.LogInformation("Successfully retrieved GL accounts for hedging. ClientID: {ClientID}, BankEntityID: {BankEntityID}.", request.ClientID, request.BankEntityID);
+                logger.LogInformation("Successfully retrieved GL accounts for hedging. ClientID: {ClientID}, BankEntityID: {BankEntityID}.", request.ClientID, request.BankEntityID);
                 return new Response(false, "Successfully retrieved GL accounts for hedging", updatedVm);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while getting GL accounts for hedging. ClientID: {ClientID}, BankEntityID: {BankEntityID}.", request.ClientID, request.BankEntityID);
+                logger.LogError(ex, "An error occurred while getting GL accounts for hedging. ClientID: {ClientID}, BankEntityID: {BankEntityID}.", request.ClientID, request.BankEntityID);
                 return new Response(true, "Failed to retrieve GL accounts for hedging");
             }
         }

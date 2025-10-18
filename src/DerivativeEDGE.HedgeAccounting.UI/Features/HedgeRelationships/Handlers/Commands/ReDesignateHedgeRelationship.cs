@@ -30,33 +30,20 @@ public sealed class ReDesignateHedgeRelationship
         public Response(Exception exception) : base(exception) { }
     }
 
-    public sealed class Handler : IRequestHandler<Command, Response>
+    public sealed class Handler(
+        IHedgeAccountingApiClient hedgeAccountingApiClient,
+        IMapper mapper,
+        ILogger<ReDesignateHedgeRelationship.Handler> logger,
+        TokenProvider tokenProvider) : IRequestHandler<Command, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly IMapper _mapper;
-        private readonly TokenProvider _tokenProvider;
-
-        public Handler(
-            IHedgeAccountingApiClient hedgeAccountingApiClient,
-            IMapper mapper,
-            ILogger<Handler> logger,
-            TokenProvider tokenProvider)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _mapper = mapper;
-            _logger = logger;
-            _tokenProvider = tokenProvider;
-        }
-
         public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Sending request to redesignate hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                logger.LogInformation("Sending request to redesignate hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
 
                 // Get the current hedge relationship
-                var currentHedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
+                var currentHedgeRelationship = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
 
@@ -68,13 +55,13 @@ public sealed class ReDesignateHedgeRelationship
                 if (validationErrors.Any())
                 {
                     var errorMessage = string.Join("; ", validationErrors);
-                    _logger.LogWarning("Re-designation validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 
+                    logger.LogWarning("Re-designation validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 
                         request.HedgeRelationshipId, errorMessage);
                     return new Response(true, errorMessage);
                 }
 
                 // Map to entity and update redesignation properties
-                var hedgeRelationshipEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);
+                var hedgeRelationshipEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);
                 
                 // Set redesignation specific properties
                 hedgeRelationshipEntity.RedesignationDate = new DateTimeOffset(request.RedesignationDate);
@@ -102,16 +89,16 @@ public sealed class ReDesignateHedgeRelationship
                 hedgeRelationshipEntity.MarkAsAcquisition = request.MarkAsAcquisition;
 
                 // Call the Redesignate API endpoint
-                var redesignatedHedgeRelationship = await _hedgeAccountingApiClient.RedesignatePOSTAsync(
+                var redesignatedHedgeRelationship = await hedgeAccountingApiClient.RedesignatePOSTAsync(
                     hedgeRelationshipEntity,
                     cancellationToken);
 
-                _logger.LogInformation("Successfully redesignated hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                logger.LogInformation("Successfully redesignated hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 return new Response(false, "Hedge Relationship successfully re-designated", redesignatedHedgeRelationship);
             }
             catch (ApiException apiEx)
             {
-                _logger.LogError(apiEx, "API error occurred while redesignating hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}",
+                logger.LogError(apiEx, "API error occurred while redesignating hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}",
                     request.HedgeRelationshipId, apiEx.StatusCode, apiEx.Response);
                 
                 // Return the actual API error message to the user
@@ -123,7 +110,7 @@ public sealed class ReDesignateHedgeRelationship
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while redesignating hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                logger.LogError(ex, "An error occurred while redesignating hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 return new Response(true, $"Failed to redesignate hedge relationship: {ex.Message}");
             }
         }

@@ -2,21 +2,13 @@
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Middlware;
 
-public class JwtTokenForwardHandler : HttpClientHandler
+public class JwtTokenForwardHandler(IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : HttpClientHandler
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IConfiguration _configuration;
     private const string AccessTokenHeader = "access_token"; // TODO: Consider renaming to 'X-HA-AccessToken'.
-
-    public JwtTokenForwardHandler(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _configuration = configuration;
-    }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var context = _httpContextAccessor.HttpContext;
+        var context = httpContextAccessor.HttpContext;
         if (context == null)
         {
             return await base.SendAsync(request, cancellationToken);
@@ -68,11 +60,11 @@ public class JwtTokenForwardHandler : HttpClientHandler
 
     private string GenerateJwtFromCurrentUserClaims()
     {
-        var context = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext available.");
+        var context = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext available.");
         var claims = context.User?.Claims?.ToArray() ?? Array.Empty<Claim>();
-        var keyString = _configuration["JWT_ISSUERSIGNINGKEY"] ?? throw new InvalidOperationException("JWT_ISSUERSIGNINGKEY not configured.");
-        var issuer = _configuration["JWT_ISSUER"];
-        var audience = _configuration["JWT_AUDIENCE"];
+        var keyString = configuration["JWT_ISSUERSIGNINGKEY"] ?? throw new InvalidOperationException("JWT_ISSUERSIGNINGKEY not configured.");
+        var issuer = configuration["JWT_ISSUER"];
+        var audience = configuration["JWT_AUDIENCE"];
 
         var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(keyString));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);

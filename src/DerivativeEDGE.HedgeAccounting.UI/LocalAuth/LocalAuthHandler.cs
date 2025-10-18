@@ -3,14 +3,9 @@
 /// <summary>
 /// Authentication Handler for local development that does not require reverse proxy to be running
 /// </summary>
-public class LocalAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class LocalAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger, UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    public LocalAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger, UrlEncoder encoder)
-        : base(options, logger, encoder)
-    {
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         //TODO: configure local claims as needed

@@ -29,31 +29,20 @@ public sealed class GetDeDesignateData
         public Response(Exception exception) : base(exception) { }
     }
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(
+        IHedgeAccountingApiClient hedgeAccountingApiClient,
+        ILogger<GetDeDesignateData.Handler> logger,
+        TokenProvider tokenProvider) : IRequestHandler<Query, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly TokenProvider _tokenProvider;
-
-        public Handler(
-            IHedgeAccountingApiClient hedgeAccountingApiClient,
-            ILogger<Handler> logger,
-            TokenProvider tokenProvider)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _logger = logger;
-            _tokenProvider = tokenProvider;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Fetching dedesignation data for hedge relationship ID: {HedgeRelationshipId} with reason: {Reason}", 
+                logger.LogInformation("Fetching dedesignation data for hedge relationship ID: {HedgeRelationshipId} with reason: {Reason}", 
                     request.HedgeRelationshipId, request.Reason);
 
                 // Call API to get dedesignation data
-                var dedesignationData = await _hedgeAccountingApiClient.DedesignateGETAsync(
+                var dedesignationData = await hedgeAccountingApiClient.DedesignateGETAsync(
                     request.HedgeRelationshipId,
                     request.Reason,
                     cancellationToken);
@@ -102,20 +91,20 @@ public sealed class GetDeDesignateData
                     response.BasisAdjustmentBalance = Convert.ToDecimal(dedesignationData?.BasisAdjustmentBalance ?? 0d);
                 }
 
-                _logger.LogInformation("Successfully fetched dedesignation data for hedge relationship ID: {HedgeRelationshipId}", 
+                logger.LogInformation("Successfully fetched dedesignation data for hedge relationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationshipId);
                     
                 return response;
             }
             catch (ApiException apiEx)
             {
-                _logger.LogError(apiEx, "API error occurred while fetching dedesignation data for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
+                logger.LogError(apiEx, "API error occurred while fetching dedesignation data for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
                     request.HedgeRelationshipId, apiEx.StatusCode, apiEx.Response);
                 return new Response(true, $"Failed to fetch dedesignation data: {apiEx.Message}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching dedesignation data for hedge relationship ID: {HedgeRelationshipId}", 
+                logger.LogError(ex, "An error occurred while fetching dedesignation data for hedge relationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationshipId);
                 return new Response(true, "Failed to fetch dedesignation data due to an unexpected error");
             }

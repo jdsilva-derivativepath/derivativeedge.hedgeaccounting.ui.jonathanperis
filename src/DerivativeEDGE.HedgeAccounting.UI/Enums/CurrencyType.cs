@@ -51,13 +51,10 @@ public abstract class Enumeration : IComparable
         return left is null ? right is null : left.CompareTo(right) >= 0;
     }
 }
-public class CurrencyType : Enumeration
+public class CurrencyType(string id, string text, string fimg) : Enumeration(id, text, fimg)
 {
     public static readonly CurrencyType AUD = new("AUD", nameof(AUD), "flag-australia");
     public static readonly CurrencyType BRL = new("BRL", nameof(BRL), "flag-brazil");
     public static readonly CurrencyType CAD = new("CAD", nameof(CAD), "flag-canada");
     public static readonly CurrencyType USD = new("USD", nameof(USD), "flag-us");
-
-    public CurrencyType(string id, string text, string fimg)
-        : base(id, text, fimg) { }
 }
