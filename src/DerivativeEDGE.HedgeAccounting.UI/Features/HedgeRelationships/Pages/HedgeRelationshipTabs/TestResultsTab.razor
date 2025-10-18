@@ -277,6 +277,7 @@
 
 @* Delete Confirmation Modal - Legacy: confirm('Are you sure to delete the selected test?') *@
 <DpConfirmationModal Visible="@_showDeleteConfirmation"
+                     VisibleChanged="@((bool v) => _showDeleteConfirmation = v)"
                      Title="Confirm Delete"
                      Message="Are you sure to delete the selected test?"
                      ConfirmText="Delete"
