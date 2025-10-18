@@ -363,6 +363,12 @@ public partial class InstrumentAnalysisTab
 
             if (hedgeItemVM is not null)
             {
+                // Populate ItemStatusText from ItemStatus if missing (same as LoadInstrumentAnalysisData)
+                if (string.IsNullOrWhiteSpace(hedgeItemVM.ItemStatusText))
+                {
+                    hedgeItemVM.ItemStatusText = GetTradeStatusText(hedgeItemVM.ItemStatus);
+                }
+
                 if (ExistingTradeModalHeaderText == "Hedged")
                 {
                     hedgeItemVM.HedgeRelationshipID = HedgeRelationship.ID;
