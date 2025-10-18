@@ -1,8 +1,3 @@
-using DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
-using DerivativeEDGE.HedgeAccounting.UI.Models;
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Inputs;
-
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
 
 public partial class HedgeRelationshipInfoSection
@@ -18,7 +13,7 @@ public partial class HedgeRelationshipInfoSection
     
     [Parameter] public string TemplateDisplayName { get; set; }
     [Parameter] public bool IsNewHedgeDocumentTemplate { get; set; }
-    [Parameter] public List<object> BasicTools { get; set; }
+    [Parameter] public List<ToolbarItemModel> BasicTools { get; set; }
     
     [Parameter] public string BenchMarkLabel { get; set; }
     [Parameter] public bool CanEditFairValueMethod { get; set; }
@@ -38,9 +33,9 @@ public partial class HedgeRelationshipInfoSection
     
     // Event callbacks
     [Parameter] public EventCallback<ChangeEventArgs<long, Client>> OnClientValueChange { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs<bool>> OnIsAnOptionHedgeChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs<bool>> OnOffMarketChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs<bool>> OnExcludeIntrinsicValueChanged { get; set; }
+    [Parameter] public EventCallback<Syncfusion.Blazor.Buttons.ChangeEventArgs<bool>> OnIsAnOptionHedgeChanged { get; set; }
+    [Parameter] public EventCallback<Syncfusion.Blazor.Buttons.ChangeEventArgs<bool>> OnOffMarketChanged { get; set; }
+    [Parameter] public EventCallback<Syncfusion.Blazor.Buttons.ChangeEventArgs<bool>> OnExcludeIntrinsicValueChanged { get; set; }
     
     [Parameter] public EventCallback OnSelectTemplateClick { get; set; }
     [Parameter] public EventCallback OnPreviewDocumentLegacyClick { get; set; }

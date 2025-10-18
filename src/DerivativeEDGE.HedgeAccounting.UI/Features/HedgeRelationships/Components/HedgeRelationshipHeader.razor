@@ -18,8 +18,8 @@
                     <i class="fa fa-chevron-right linkColor"></i>
                 </li>
                 <li class="breadcrumb-last">
-                    <a href="@($"{NavManager.BaseUri}hedgerelationship?id={HedgeId}")">
-                        HR ID @HedgeId
+                    <a href="@($"{NavManager.BaseUri}hedgerelationship?id={HedgeRelationshipId}")">
+                        HR ID @HedgeRelationshipId
                     </a>
                 </li>
             </ul>
@@ -40,8 +40,8 @@
 @code {
     [Inject] private NavigationManager NavManager { get; set; }
     
-    [Parameter] public long HedgeId { get; set; }
+    [Parameter] public long HedgeRelationshipId { get; set; }
     [Parameter] public string HedgeStateText { get; set; }
-    [Parameter] public List<ItemModel> WorkflowItems { get; set; }
+    [Parameter] public List<DropDownMenuItem> WorkflowItems { get; set; }
     [Parameter] public EventCallback<MenuEventArgs> OnWorkflowAction { get; set; }
 }

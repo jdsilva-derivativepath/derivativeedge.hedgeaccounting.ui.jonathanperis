@@ -3,7 +3,7 @@
 public partial class HedgeRelationshipDetails
 {
     #region Parameters
-    [Parameter] public long HedgeId { get; set; }
+    [Parameter] public long HedgeRelationshipId { get; set; }
     #endregion
 
     #region Injected Services
@@ -226,7 +226,7 @@ public partial class HedgeRelationshipDetails
         IsDpiUser = UserAuthData?.IsDpiUser ?? false;
 
         // Load hedge relationship first to ensure data is populated
-        await GetHedgeRelationship(HedgeId);
+        await GetHedgeRelationship(HedgeRelationshipId);
 
         // Only proceed if HedgeRelationship was successfully loaded
         if (HedgeRelationship != null)
@@ -494,7 +494,7 @@ public partial class HedgeRelationshipDetails
     private Task RedirectToHedgeDocumentService(string pathAndQuery)
     {
         // Append HedgeRelationshipId and ClientId parameters as done in legacy system
-        var url = $"{pathAndQuery}HedgeRelationshipId={HedgeId}&ClientId={HedgeRelationship.ClientID}";
+        var url = $"{pathAndQuery}HedgeRelationshipId={HedgeRelationshipId}&ClientId={HedgeRelationship.ClientID}";
         NavManager.NavigateTo(url, forceLoad: true);
         return Task.CompletedTask;
     }
@@ -634,7 +634,7 @@ public partial class HedgeRelationshipDetails
             if (!result.HasError)
             {
                 // Reload from backend to ensure all fields are correct
-                await GetHedgeRelationship(HedgeId);
+                await GetHedgeRelationship(HedgeRelationshipId);
                 await AlertService.ShowToast("Hedge relationship updated successfully!", AlertKind.Success, "Success", showButton: true);
             }
             else
@@ -752,7 +752,7 @@ public partial class HedgeRelationshipDetails
             else
             {
                 // If no data returned, refresh the hedge relationship from the API
-                await GetHedgeRelationship(HedgeId);
+                await GetHedgeRelationship(HedgeRelationshipId);
 
                 // *** Refresh the TestResultsTab after API refresh ***
                 if (testResultsTabRef != null)
@@ -933,7 +933,7 @@ public partial class HedgeRelationshipDetails
             else
             {
                 // If no data returned, refresh the hedge relationship from the API
-                await GetHedgeRelationship(HedgeId);
+                await GetHedgeRelationship(HedgeRelationshipId);
 
                 // Refresh the TestResultsTab after API refresh
                 if (testResultsTabRef != null)
@@ -996,7 +996,7 @@ public partial class HedgeRelationshipDetails
         {
             // Check if document template exists (matching legacy behavior)
             var documentTemplateResponse = await Mediator.Send(
-                new FindDocumentTemplate.Query(HedgeId));
+                new FindDocumentTemplate.Query(HedgeRelationshipId));
 
             if (documentTemplateResponse.HasError)
             {
@@ -1010,11 +1010,11 @@ public partial class HedgeRelationshipDetails
                 await SaveHedgeRelationshipAsync();
                 
                 // Reload the hedge relationship after save
-                await GetHedgeRelationship(HedgeId);
+                await GetHedgeRelationship(HedgeRelationshipId);
             }
 
             // Execute designation workflow
-            var response = await Mediator.Send(new DesignateHedgeRelationship.Command(HedgeId));
+            var response = await Mediator.Send(new DesignateHedgeRelationship.Command(HedgeRelationshipId));
             
             if (response.HasError)
             {
@@ -1096,7 +1096,7 @@ public partial class HedgeRelationshipDetails
         {
             // API Call: Load de-designation data for the selected reason
             var response = await Mediator.Send(
-                new GetDeDesignateData.Query(HedgeId, (DerivativeEDGEHAEntityEnumDedesignationReason)reason));
+                new GetDeDesignateData.Query(HedgeRelationshipId, (DerivativeEDGEHAEntityEnumDedesignationReason)reason));
             
             if (response.HasError || !string.IsNullOrEmpty(response.ErrorMessage))
             {
@@ -1136,7 +1136,7 @@ public partial class HedgeRelationshipDetails
         {
             // Execute de-designation
             var command = new DeDesignateHedgeRelationship.Command(
-                HedgeRelationshipId: HedgeId,
+                HedgeRelationshipId: HedgeRelationshipId,
                 DedesignationDate: DedesignationDateDialog.GetValueOrDefault(),
                 DedesignationReason: DedesignationReason,
                 Payment: DedesignatePayment.GetValueOrDefault(),
@@ -1175,7 +1175,7 @@ public partial class HedgeRelationshipDetails
         try
         {
             // Execute redraft
-            var response = await Mediator.Send(new RedraftHedgeRelationship.Command(HedgeId));
+            var response = await Mediator.Send(new RedraftHedgeRelationship.Command(HedgeRelationshipId));
             
             if (response.HasError)
             {
@@ -1200,7 +1200,7 @@ public partial class HedgeRelationshipDetails
         try
         {
             // Check if document template exists
-            var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeId));
+            var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeRelationshipId));
             
             if (findDocTemplateResponse.HasError)
             {
@@ -1216,11 +1216,11 @@ public partial class HedgeRelationshipDetails
                 await SaveHedgeRelationshipAsync();
                 
                 // Reload hedge relationship
-                await GetHedgeRelationship(HedgeId);
+                await GetHedgeRelationship(HedgeRelationshipId);
             }
 
             // Get re-designation data
-            var redesignateResponse = await Mediator.Send(new GetReDesignateData.Query(HedgeId));
+            var redesignateResponse = await Mediator.Send(new GetReDesignateData.Query(HedgeRelationshipId));
             
             if (redesignateResponse.HasError)
             {
@@ -1255,7 +1255,7 @@ public partial class HedgeRelationshipDetails
         {
             // Execute re-designation
             var command = new ReDesignateHedgeRelationship.Command(
-                HedgeRelationshipId: HedgeId,
+                HedgeRelationshipId: HedgeRelationshipId,
                 RedesignationDate: RedesignationDate.GetValueOrDefault(),
                 Payment: RedesignatePayment.GetValueOrDefault(),
                 TimeValuesStartDate: RedesignateTimeValuesStartDate.GetValueOrDefault(),
@@ -1294,14 +1294,14 @@ public partial class HedgeRelationshipDetails
     private async Task OnAmortizationSaved()
     {
         // Refresh the hedge relationship data after saving amortization
-        await GetHedgeRelationship(HedgeId);
+        await GetHedgeRelationship(HedgeRelationshipId);
         StateHasChanged();
     }
 
     private async Task OnOptionAmortizationSaved()
     {
         // Refresh the hedge relationship data after saving option amortization
-        await GetHedgeRelationship(HedgeId);
+        await GetHedgeRelationship(HedgeRelationshipId);
         StateHasChanged();
     }
     #endregion

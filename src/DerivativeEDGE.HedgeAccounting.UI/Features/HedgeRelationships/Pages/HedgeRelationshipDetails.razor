@@ -39,7 +39,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
         <ValidationSummary />
 
         <HedgeRelationshipHeader 
-            HedgeId="@HedgeId"
+            HedgeRelationshipId="@HedgeRelationshipId"
             HedgeStateText="@HedgeRelationship.HedgeStateText"
             WorkflowItems="@WorkflowItems"
             OnWorkflowAction="@HandleWorkflowAction" />
@@ -61,7 +61,6 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
             OnRunRegressionClick="@RunRegressionAsync"
             OnBackloadClick="@BackloadAsync"
             OnDownloadSpecsAndChecksClick="@DownloadSpecsAndChecksAsync" />
-
 
         <HedgeRelationshipInfoSection
             @bind-HedgeRelationship="@HedgeRelationship"
