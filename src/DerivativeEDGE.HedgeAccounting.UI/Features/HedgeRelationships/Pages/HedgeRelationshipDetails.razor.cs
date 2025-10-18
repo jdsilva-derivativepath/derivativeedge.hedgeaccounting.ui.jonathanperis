@@ -1303,8 +1303,15 @@ public partial class HedgeRelationshipDetails
         
         try
         {
-            // Delete the amortization via API (legacy: HedgeRelationshipOptionTimeValueAmort destroy)
-            await HedgeAccountingApiService.HedgeRelationshipOptionTimeValueAmortDELETEAsync(amortization.ID);
+            // Delete the amortization via handler (legacy: HedgeRelationshipOptionTimeValueAmort destroy)
+            var command = new DeleteHedgeRelationshipOptionTimeValueAmort.Command(amortization.ID);
+            var result = await Mediator.Send(command);
+            
+            if (result.HasError)
+            {
+                await AlertService.ShowToast(result.Message, AlertKind.Error, "Error", showButton: true);
+                return;
+            }
             
             // Refresh the hedge relationship data
             await GetHedgeRelationship(HedgeRelationshipId);
@@ -1352,8 +1359,15 @@ public partial class HedgeRelationshipDetails
         
         try
         {
-            // Delete the option amortization via API
-            await HedgeAccountingApiService.HedgeRelationshipOptionTimeValueAmortDELETEAsync(optionAmortization.ID);
+            // Delete the option amortization via handler
+            var command = new DeleteHedgeRelationshipOptionTimeValueAmort.Command(optionAmortization.ID);
+            var result = await Mediator.Send(command);
+            
+            if (result.HasError)
+            {
+                await AlertService.ShowToast(result.Message, AlertKind.Error, "Error", showButton: true);
+                return;
+            }
             
             // Refresh the hedge relationship data
             await GetHedgeRelationship(HedgeRelationshipId);
