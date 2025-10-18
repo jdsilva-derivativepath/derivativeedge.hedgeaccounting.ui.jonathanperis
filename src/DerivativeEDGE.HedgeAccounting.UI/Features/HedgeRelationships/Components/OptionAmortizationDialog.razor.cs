@@ -23,7 +23,9 @@ public partial class OptionAmortizationDialog
 
     #region Private Properties
     public DocumentContent Model { get; set; } = new();
-    private bool AmortizeOptionPremium { get; set; } = true; // Legacy: defaults to true (hr_hedgeRelationshipAddEditCtrl.js line 3325)
+    // UI-only property that controls whether the Generate button is enabled (not persisted to database)
+    // Legacy: hr_hedgeRelationshipAddEditCtrl.js lines 1032, 3325 and optionTimeValue.cshtml line 149
+    private bool AmortizeOptionPremium { get; set; } = true;
     
     private DateTime? OptionAmortizationStartDate
     {
@@ -56,14 +58,15 @@ public partial class OptionAmortizationDialog
         // Legacy behavior (hr_hedgeRelationshipAddEditCtrl.js):
         // - When creating new (line 3325): AmortizeOptionPremimum = true
         // - When editing (line 1032): AmortizeOptionPremimum = IsAnOptionHedge
+        // NOTE: This is a UI-only property, not persisted to the database
         if (OptionAmortizationModel?.ID > 0)
         {
-            // Editing existing entry - use saved value from model, fallback to IsAnOptionHedge
-            AmortizeOptionPremium = OptionAmortizationModel.AmortizeOptionPremimum;
+            // Editing existing entry - set from IsAnOptionHedge (legacy: line 1032)
+            AmortizeOptionPremium = IsAnOptionHedge;
         }
         else
         {
-            // Creating new entry - default to true
+            // Creating new entry - default to true (legacy: line 3325)
             AmortizeOptionPremium = true;
         }
     }
@@ -98,7 +101,7 @@ public partial class OptionAmortizationDialog
         {
             OptionAmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
             OptionAmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue;
-            OptionAmortizationModel.AmortizeOptionPremimum = AmortizeOptionPremium; // Set checkbox value to model
+            // NOTE: AmortizeOptionPremium is a UI-only property and is not persisted to the database
 
             var isUpdate = OptionAmortizationModel.ID > 0;
             var successMessage = isUpdate ? "Success! Option Amortization Updated." : "Success! Option Amortization Created.";
