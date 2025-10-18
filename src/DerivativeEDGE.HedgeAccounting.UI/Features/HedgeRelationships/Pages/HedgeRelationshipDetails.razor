@@ -239,6 +239,22 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                     <DropDownListFieldSettings Text="Text" Value="Value" />
                                 </SfDropDownList>
                             </div>
+                            @if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
+                            {
+                                <div class="form-group dp-inputs min-w-100">
+                                    <span class="input-label">Fair Value Method</span>
+                                    <SfDropDownList TValue="DerivativeEDGEHAEntityEnumFairValueMethod"
+                                    CssClass="dropdown-input"
+                                    Enabled="@CanEditFairValueMethod()"
+                                    TItem="DropdownModel"
+                                    Placeholder="Fair Value Method"
+                                    @bind-Value="HedgeRelationship.FairValueMethod"
+                                    DataSource="@DropdownDataHelper.GetDropdownDatasource("fairvaluemethod")">
+                                        <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumFairValueMethod" TItem="DropdownModel" />
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+                            }
                             <div class="form-group dp-inputs min-w-100">
                                 <span class="input-label">Hedging Instrument Structure</span>
                                 <SfDropDownList TValue="DerivativeEDGEHAEntityEnumHedgingInstrumentStructure"
