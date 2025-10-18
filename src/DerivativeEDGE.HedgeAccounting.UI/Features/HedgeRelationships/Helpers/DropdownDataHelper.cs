@@ -116,4 +116,11 @@ public static class DropdownDataHelper
         new() { Value = "None", Text = "None" },
         new() { Value = "ASC815", Text = "ASC815" }
     };
+
+    private static List<DropdownModel> GetFairValueMethodOptions() => new()
+    {
+        new() { Value = "None", Text = "None" },
+        new() { Value = "BenchmarkOnly", Text = "Benchmark Only" },
+        new() { Value = "AllCashFlows", Text = "All Cash Flows" }
+    };
 }
