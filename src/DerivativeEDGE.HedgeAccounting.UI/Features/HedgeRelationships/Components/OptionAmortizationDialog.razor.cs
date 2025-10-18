@@ -58,8 +58,8 @@ public partial class OptionAmortizationDialog
         // - When editing (line 1032): AmortizeOptionPremimum = IsAnOptionHedge
         if (OptionAmortizationModel?.ID > 0)
         {
-            // Editing existing entry - set based on IsAnOptionHedge
-            AmortizeOptionPremium = IsAnOptionHedge;
+            // Editing existing entry - use saved value from model, fallback to IsAnOptionHedge
+            AmortizeOptionPremium = OptionAmortizationModel.AmortizeOptionPremimum;
         }
         else
         {
@@ -98,6 +98,7 @@ public partial class OptionAmortizationDialog
         {
             OptionAmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
             OptionAmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue;
+            OptionAmortizationModel.AmortizeOptionPremimum = AmortizeOptionPremium; // Set checkbox value to model
 
             var isUpdate = OptionAmortizationModel.ID > 0;
             var successMessage = isUpdate ? "Success! Option Amortization Updated." : "Success! Option Amortization Created.";
