@@ -992,28 +992,11 @@ public partial class HedgeRelationshipDetails
             BasisAdjustment = 0;
             BasisAdjustmentBalance = 0;
 
-            // API Call: Get termination date from hedging item
-            // if (HedgeRelationship.HedgingItems?.Any() == true)
-            // {
-            //     var lastHedgingItem = HedgeRelationship.HedgingItems.Last();
-            //     
-            //     // API Call: Get termination date
-            //     var terminationDateResponse = await Mediator.Send(
-            //         new GetTerminationDate.Query(lastHedgingItem.ItemID));
-            //     
-            //     if (terminationDateResponse.TerminationDate != null)
-            //     {
-            //         // API Call: Price the instrument to get accrual
-            //         var pricingResponse = await Mediator.Send(
-            //             new PriceInstrument.Query(
-            //                 lastHedgingItem.ItemID, 
-            //                 terminationDateResponse.TerminationDate, 
-            //                 lastHedgingItem.SecurityType));
-            //         
-            //         // Set accrual from pricing response
-            //         DedesignateAccrual = pricingResponse.Accrual;
-            //     }
-            // }
+            // Call API to get initial de-designation data with default reason (Termination = 0)
+            // This populates the dialog fields including accrual before showing the modal
+            // The legacy system did this by calling GetTerminationDate and then pricing the instrument
+            // The new API consolidates this into a single call via DedesignateGETAsync
+            await OnDeDesignateReasonChanged(0);
 
             // Show De-Designation dialog
             OpenModal = MODAL_DEDESIGNATE;
