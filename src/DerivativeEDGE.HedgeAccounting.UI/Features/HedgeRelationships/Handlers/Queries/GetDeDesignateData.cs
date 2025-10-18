@@ -68,6 +68,9 @@ public sealed class GetDeDesignateData
                     
                     var errorResponse = new Response(true, errorMessage, null);
                     errorResponse.ErrorMessage = errorMessage;
+                    errorResponse.DedesignationDate = DateTime.Today;
+                    errorResponse.TimeValuesStartDate = DateTime.Today;
+                    errorResponse.TimeValuesEndDate = DateTime.Today;
                     return errorResponse;
                 }
 
