@@ -18,11 +18,8 @@
     <DialogTemplates>
         <Header>Add/Edit Amortization</Header>
         <Content>
-            <EditForm Model="AmortizationModel" OnSubmit="OnSubmitAmortization" Context="amortizationFormContext">
+            <EditForm Model="FormModel" OnSubmit="OnSubmitAmortization" Context="amortizationFormContext">
                 <DataAnnotationsValidator />
-                <ValidationMessage For="@(() => AmortizationModel.GLAccountID)" />
-                <ValidationMessage For="@(() => AmortizationModel.ContraAccountID)" />
-                <ValidationMessage For="@(() => AmortizationModel.StartDate)" />
                 <div class="form-group dp-inputs">
                     <span class="input-label">GL Account</span>
                     <SfComboBox TValue="long"
@@ -30,11 +27,12 @@
                                 Enabled="true"
                                 TItem="DerivativeEDGEHAEntityGLAccount"
                                 Placeholder="GL Account"
-                                @bind-Value="AmortizationModel.GLAccountID"
+                                @bind-Value="FormModel.GLAccountID"
                                 DataSource="AmortizationGLAccounts">
                         <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                     </SfComboBox>
+                    <ValidationMessage For="@(() => FormModel.GLAccountID)" class="text-xs text-red-600 mt-1" />
                 </div>
                 <div class="form-group dp-inputs">
                     <span class="input-label">Contra</span>
@@ -43,11 +41,12 @@
                                 Enabled="true" 
                                 TItem="DerivativeEDGEHAEntityGLAccount" 
                                 Placeholder="Contra"
-                                @bind-Value="AmortizationModel.ContraAccountID"
+                                @bind-Value="FormModel.ContraAccountID"
                                 DataSource="AmortizationContraAccounts">
                         <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnAmortizationComboBoxCreated" />
                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                     </SfComboBox>
+                    <ValidationMessage For="@(() => FormModel.ContraAccountID)" class="text-xs text-red-600 mt-1" />
                 </div>
                 <div class="form-group dp-inputs">
                     <span class="input-label">Financial Centers</span>
@@ -56,48 +55,48 @@
                                    Enabled="true"
                                    TItem="FinancialCenterOption"
                                    Placeholder="Financial Centers"
-                                   @bind-Value="AmortizationFinancialCenters"
+                                   @bind-Value="FormModel.FinancialCenters"
                                    DataSource="@FinancialCenterOptions">
                         <MultiSelectFieldSettings Value="@nameof(FinancialCenterOption.Value)" Text="@nameof(FinancialCenterOption.Text)" />
                     </SfMultiSelect>
                 </div>
                 <div class="form-group dp-inputs">
                     <span class="input-label">Payment Frequency</span>
-                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency"
+                    <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency?"
                                 CssClass="dropdown-input"
                                 Enabled="true"
                                 TItem="PaymentFrequencyOption"
                                 Placeholder="Payment Frequency"
-                                @bind-Value="AmortizationModel.PaymentFrequency"
+                                @bind-Value="FormModel.PaymentFrequency"
                                 DataSource="@PaymentFrequencyOptions">
-                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency" TItem="PaymentFrequencyOption" />
+                        <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency?" TItem="PaymentFrequencyOption" />
                         <ComboBoxFieldSettings Value="@nameof(PaymentFrequencyOption.Value)" Text="@nameof(PaymentFrequencyOption.Text)" />
                     </SfComboBox>
                 </div>
                 <div class="custom-datepicker-container">
                     <div class="form-group dp-inputs">
                         <span class="input-label">Day Count Convention</span>
-                        <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv"
+                        <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv?"
                                     CssClass="dropdown-input"
                                     Enabled="true"
                                     TItem="DayCountConvOption"
                                     Placeholder="Day Count Convention"
-                                    @bind-Value="AmortizationModel.DayCountConv"
+                                    @bind-Value="FormModel.DayCountConv"
                                     DataSource="@DayCountConvOptions">
-                            <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv" TItem="DayCountConvOption" />
+                            <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv?" TItem="DayCountConvOption" />
                             <ComboBoxFieldSettings Value="@nameof(DayCountConvOption.Value)" Text="@nameof(DayCountConvOption.Text)" />
                         </SfComboBox>
                     </div>
                     <div class="form-group dp-inputs">
                         <span class="input-label">Payment Convention</span>
-                        <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv"
+                        <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv?"
                                     CssClass="dropdown-input"
-                                    Enabled="@(AmortizationModel.ID != 0)"
+                                    Enabled="@(FormModel.ID != 0)"
                                     TItem="PayBusDayConvOption"
                                     Placeholder="Payment Convention"
-                                    @bind-Value="AmortizationModel.PayBusDayConv"
+                                    @bind-Value="FormModel.PayBusDayConv"
                                     DataSource="@PayBusDayConvOptions">
-                            <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv" TItem="PayBusDayConvOption" />
+                            <ComboBoxEvents TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv?" TItem="PayBusDayConvOption" />
                             <ComboBoxFieldSettings Value="@nameof(PayBusDayConvOption.Value)" Text="@nameof(PayBusDayConvOption.Text)" />
                         </SfComboBox>
                     </div>
@@ -111,8 +110,9 @@
                                       Format="MM/dd/yyyy" 
                                       Placeholder="mm/dd/yyyy" 
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationStartDate">
+                                      @bind-Value="FormModel.StartDate">
                         </SfDatePicker>
+                        <ValidationMessage For="@(() => FormModel.StartDate)" class="text-xs text-red-600 mt-1" />
                     </div>
                     <div class="dp-inputs">
                         <label class="input-label">End Date</label>
@@ -122,8 +122,9 @@
                                       Format="MM/dd/yyyy" 
                                       Placeholder="mm/dd/yyyy" 
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationEndDate">
+                                      @bind-Value="FormModel.EndDate">
                         </SfDatePicker>
+                        <ValidationMessage For="@(() => FormModel.EndDate)" class="text-xs text-red-600 mt-1" />
                     </div>
                 </div>
                 <div class="custom-datepicker-container">
@@ -135,8 +136,9 @@
                                       Format="MM/dd/yyyy" 
                                       Placeholder="mm/dd/yyyy" 
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationFrontRollDate">
+                                      @bind-Value="FormModel.FrontRollDate">
                         </SfDatePicker>
+                        <ValidationMessage For="@(() => FormModel.FrontRollDate)" class="text-xs text-red-600 mt-1" />
                     </div>
                     <div class="dp-inputs">
                         <label class="input-label">Back Roll Date</label>
@@ -146,35 +148,36 @@
                                       Format="MM/dd/yyyy" 
                                       Placeholder="mm/dd/yyyy" 
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationBackRollDate">
+                                      @bind-Value="FormModel.BackRollDate">
                         </SfDatePicker>
+                        <ValidationMessage For="@(() => FormModel.BackRollDate)" class="text-xs text-red-600 mt-1" />
                     </div>
                 </div>
                 <div class="form-group dp-inputs">
                     <span class="input-label">Total Amount</span>
                     <NumericHotKeys>
-                        <SfNumericTextBox TValue="double"
+                        <SfNumericTextBox TValue="double?"
                                           CssClass="input-numeric" 
                                           Placeholder="Total Amount" 
                                           Enabled="true"
-                                          @bind-Value="AmortizationModel.TotalAmount" />
+                                          @bind-Value="FormModel.TotalAmount" />
                     </NumericHotKeys>
                 </div>
                 <div class="custom-checkbox-container">
                     <div class="dp-inputs">
-                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.AdjDates" Label="Adj Dates" />
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="FormModel.AdjDates" Label="Adj Dates" />
                     </div>
                     <div class="dp-inputs">
-                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.Straightline" Label="Straightline" />
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="FormModel.Straightline" Label="Straightline" />
                     </div>
                     <div class="dp-inputs">
-                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.IncludeInRegression" Label="Include In Regression" />
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="FormModel.IncludeInRegression" Label="Include In Regression" />
                     </div>
                 </div>
                 <div class="custom-action-container ">
                     <div class="dp-buttons">
                         <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
-                        <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" />
+                        <SfButton CssClass="button-primary button-default" Content="@GetSaveButtonText()" Disabled="@IsSaveButtonDisabled" IsPrimary="true" />
                     </div>
                 </div>
             </EditForm>

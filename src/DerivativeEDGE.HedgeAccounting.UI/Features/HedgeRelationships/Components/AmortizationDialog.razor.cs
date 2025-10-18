@@ -1,6 +1,6 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Components;
 
-public partial class AmortizationDialog
+public partial class AmortizationDialog : IDisposable
 {
     #region Parameters
     [Parameter] public bool Visible { get; set; }
@@ -24,70 +24,52 @@ public partial class AmortizationDialog
     #endregion
 
     #region Private Properties
-    private List<string> AmortizationFinancialCenters { get; set; }
-    
-    private DateTime? AmortizationStartDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.StartDate)
-               ? DateTime.Parse(AmortizationModel.StartDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.StartDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    
-    private DateTime? AmortizationEndDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.EndDate)
-               ? DateTime.Parse(AmortizationModel.EndDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.EndDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    
-    private DateTime? AmortizationFrontRollDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.FrontRollDate)
-               ? DateTime.Parse(AmortizationModel.FrontRollDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.FrontRollDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
-    
-    private DateTime? AmortizationBackRollDate
-    {
-        get => !string.IsNullOrEmpty(AmortizationModel?.BackRollDate)
-               ? DateTime.Parse(AmortizationModel.BackRollDate)
-               : null;
-        set
-        {
-            if (AmortizationModel != null)
-                AmortizationModel.BackRollDate = value?.ToString("MM/dd/yyyy");
-        }
-    }
+    private AmortizationFormModel FormModel { get; set; } = new();
+    private EditContext? EditContext { get; set; }
+    private bool IsSaveButtonDisabled => EditContext?.Validate() == false;
     #endregion
 
     #region Lifecycle Methods
     protected override void OnParametersSet()
     {
-        // Initialize AmortizationFinancialCenters from model when dialog opens
-        if (AmortizationModel?.FinancialCenters != null)
+        // Convert API model to form model for validation
+        if (AmortizationModel != null)
         {
-            AmortizationFinancialCenters = AmortizationModel.FinancialCenters
-                .Select(fc => fc.ToString())
-                .ToList();
+            FormModel = AmortizationFormModel.FromApiModel(AmortizationModel);
+            
+            // Initialize FinancialCenters from API model
+            if (AmortizationModel.FinancialCenters != null)
+            {
+                FormModel.FinancialCenters = AmortizationModel.FinancialCenters
+                    .Select(fc => fc.ToString())
+                    .ToList();
+            }
+            else
+            {
+                FormModel.FinancialCenters = [];
+            }
         }
         else
         {
-            AmortizationFinancialCenters = [];
+            FormModel = new AmortizationFormModel();
+        }
+        
+        // Create EditContext for validation
+        EditContext = new EditContext(FormModel);
+        EditContext.OnFieldChanged += OnFieldChanged;
+    }
+    
+    private void OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Trigger re-render when a field changes to update save button state
+        StateHasChanged();
+    }
+    
+    public void Dispose()
+    {
+        if (EditContext != null)
+        {
+            EditContext.OnFieldChanged -= OnFieldChanged;
         }
     }
     #endregion
@@ -103,20 +85,29 @@ public partial class AmortizationDialog
     {
         try
         {
-            AmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
-            AmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.Amortization;
-
-            if (AmortizationFinancialCenters != null)
+            // Validate form before submission
+            if (!context.Validate())
             {
-                AmortizationModel.FinancialCenters = [.. AmortizationFinancialCenters
+                await AlertService.ShowToast("Please fill in all required fields.", AlertKind.Warning, "Validation Error", showButton: true);
+                return;
+            }
+            
+            // Convert form model back to API model
+            var apiModel = FormModel.ToApiModel();
+            apiModel.HedgeRelationshipID = HedgeRelationship.ID;
+            apiModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.Amortization;
+
+            if (FormModel.FinancialCenters != null)
+            {
+                apiModel.FinancialCenters = [.. FormModel.FinancialCenters
                     .Select(s => Enum.TryParse<DerivativeEDGEDomainEntitiesEnumsFinancialCenter>(s, out var result) ? result : default)
                     .Where(fc => fc != default)];
             }
 
-            var isUpdate = AmortizationModel.ID > 0;
+            var isUpdate = FormModel.ID > 0;
             var successMessage = isUpdate ? "Success! Amortization Updated." : "Success! Amortization Created.";
 
-            var response = await Mediator.Send(new CreateHedgeRelationshipOptionTimeValueAmort.Command(AmortizationModel, HedgeRelationship));
+            var response = await Mediator.Send(new CreateHedgeRelationshipOptionTimeValueAmort.Command(apiModel, HedgeRelationship));
 
             await AlertService.ShowToast(successMessage, AlertKind.Success, "Success", showButton: true);
 
@@ -141,6 +132,11 @@ public partial class AmortizationDialog
         
         // Legacy behavior: first item was selected by default, but now we default to "None" (ID = 0)
         // This matches the legacy system where <option value="">None</option> was the default
+    }
+    
+    private string GetSaveButtonText()
+    {
+        return FormModel.ID > 0 ? "Update" : "Save";
     }
     #endregion
 }
