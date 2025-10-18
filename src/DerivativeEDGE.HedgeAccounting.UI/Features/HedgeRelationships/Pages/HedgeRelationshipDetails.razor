@@ -38,102 +38,29 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="my-2.5 mx-5 flex justify-between">
-            <div class="flex gap-2.5 flex-wrap items-center">
-                <div class="breadcrumb-div">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-icons">
-                            <a href="/">
-                                <i class="fa fa-home linkColor"></i>
-                                <i class="fa fa-chevron-right linkColor"></i>
-                            </a>
-                        </li>
-                        <li class="breadcrumb-last">
-                            <a href="@($"{NavManager.BaseUri}hedgerelationship")">
-                                Hedge Relationships
-                            </a>
-                        </li>
-                        <li class="breadcrumb-icons">
-                            <i class="fa fa-chevron-right linkColor"></i>
-                        </li>
-                        <li class="breadcrumb-last">
-                            <a href="@($"{NavManager.BaseUri}hedgerelationship?id={HedgeId}")">
-                                HR ID @HedgeId
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flex gap-2.5 flex-wrap items-center">
-                <div class="dp-buttons">
-                    <SfButton Disabled="true" CssClass="button-primary button-default" Content="@HedgeRelationship.HedgeStateText" />
-                    <SfDropDownButton Items="@WorkflowItems" CssClass="dp-dropdown-menu-style dropdown-menu-primary" Content="Workflow">
-                        <DropDownMenuItems>
-                            <DropDownButtonEvents ItemSelected="HandleWorkflowAction" />
-                        </DropDownMenuItems>
-                    </SfDropDownButton>
-                </div>
-            </div>
-        </div>
+        <HedgeRelationshipHeader 
+            HedgeId="@HedgeId"
+            HedgeStateText="@HedgeRelationship.HedgeStateText"
+            WorkflowItems="@WorkflowItems"
+            OnWorkflowAction="@HandleWorkflowAction" />
 
-        <div class="my-2.5 mx-5 flex justify-between">
-            <div class="flex gap-2.5 flex-wrap items-center">
-                <div class="dp-buttons">
-                    <SfButton IsPrimary="true" 
-                    CssClass="button-primary button-default" 
-                    Content="@(IsSavingHedgeRelationship ? "Saving..." : "Save")"
-                    Disabled="@(IsSavingHedgeRelationship || IsSaveDisabled())"
-                    OnClick="SaveHedgeRelationshipAsync" />
-                </div>
-                <div class="dp-buttons">
-                    <SfButton CssClass="button-secondary button-default"
-                    Content="Cancel" 
-                    OnClick="CancelButtonHandler"/>
-                </div>
-                <div class="dp-buttons">
-                    <SfButton IsPrimary="true"
-                    CssClass="button-primary button-default" 
-                    Content="@(IsGeneratingInceptionPackage ? "Generating..." : "Preview Inception Package")"
-                    Disabled="@(IsGeneratingInceptionPackage || IsPreviewInceptionPackageDisabled())"
-                    OnClick="GenerateInceptionPackageAsync" />
-                </div>
-                <div class="dp-buttons">
-                    <SfButton IsPrimary="true" 
-                    CssClass="button-primary button-default" 
-                    Content="@(IsRunningRegression ? "Running Regression..." : "Run Regression")"
-                    Disabled="@(IsRunningRegression || IsRegressionDisabled())"
-                    OnClick="RunRegressionAsync" />
-                </div>
-                <div class="dp-buttons">
-                    <SfButton IsPrimary="true" 
-                    CssClass="button-primary button-default" 
-                    Disabled="@(IsBackloadDisabled())"
-                    Content="Backload" 
-                    OnClick="BackloadAsync" />
-                </div>
-                <div class="dp-inputs" style="width: 11rem; margin-bottom: 0.625rem;">
-                    <label class="input-label">Curve Date</label>
-                    <SfDatePicker CssClass="calendar-datepicker"
-                    TValue="DateTime?"
-                    Value="@CurveDate"
-                    Enabled="true"
-                    Format="MM/dd/yyyy"
-                    Placeholder="mm/dd/yyyy"
-                    ShowClearButton="true" />
-                </div>
-                @if (HedgeRelationship.ShowHrSpecAndChecksButton)
-                {
-                    <div class="dp-buttons">
-                        <SfButton IsPrimary="true" 
-                        CssClass="button-primary button-default" 
-                        IconCss="@(IsDownloadingSpecsAndChecks ? "fa-solid fa-circle-notch fa-spin" : "fa-solid fa-download")"
-                        Disabled="@IsDownloadingSpecsAndChecks"
-                        OnClick="DownloadSpecsAndChecksAsync" />
-                    </div>
-                }
-            </div>
-            <div class="flex gap-2.5 flex-wrap items-center"></div>
-        </div>
+        <HedgeRelationshipActionBar 
+            IsSaving="@IsSavingHedgeRelationship"
+            IsSaveDisabled="@IsSaveDisabled()"
+            IsGeneratingInceptionPackage="@IsGeneratingInceptionPackage"
+            IsPreviewInceptionPackageDisabled="@IsPreviewInceptionPackageDisabled()"
+            IsRunningRegression="@IsRunningRegression"
+            IsRegressionDisabled="@IsRegressionDisabled()"
+            IsBackloadDisabled="@IsBackloadDisabled()"
+            @bind-CurveDate="@CurveDate"
+            ShowHrSpecAndChecksButton="@HedgeRelationship.ShowHrSpecAndChecksButton"
+            IsDownloadingSpecsAndChecks="@IsDownloadingSpecsAndChecks"
+            OnSaveClick="@SaveHedgeRelationshipAsync"
+            OnCancelClick="@CancelButtonHandler"
+            OnPreviewInceptionPackageClick="@GenerateInceptionPackageAsync"
+            OnRunRegressionClick="@RunRegressionAsync"
+            OnBackloadClick="@BackloadAsync"
+            OnDownloadSpecsAndChecksClick="@DownloadSpecsAndChecksAsync" />
 
         <div class="flex gap-4 justify-between items-stretch flex-wrap my-2.5 mx-5 bg-white shadow-sm">
             <div class="flex-1 min-w-[18.75rem] p-5 flex flex-col">

@@ -1,0 +1,80 @@
+@* Action Buttons Bar *@
+<div class="my-2.5 mx-5 flex justify-between">
+    <div class="flex gap-2.5 flex-wrap items-center">
+        <div class="dp-buttons">
+            <SfButton IsPrimary="true" 
+            CssClass="button-primary button-default" 
+            Content="@(IsSaving ? "Saving..." : "Save")"
+            Disabled="@(IsSaving || IsSaveDisabled)"
+            OnClick="OnSaveClick" />
+        </div>
+        <div class="dp-buttons">
+            <SfButton CssClass="button-secondary button-default"
+            Content="Cancel" 
+            OnClick="OnCancelClick"/>
+        </div>
+        <div class="dp-buttons">
+            <SfButton IsPrimary="true"
+            CssClass="button-primary button-default" 
+            Content="@(IsGeneratingInceptionPackage ? "Generating..." : "Preview Inception Package")"
+            Disabled="@(IsGeneratingInceptionPackage || IsPreviewInceptionPackageDisabled)"
+            OnClick="OnPreviewInceptionPackageClick" />
+        </div>
+        <div class="dp-buttons">
+            <SfButton IsPrimary="true" 
+            CssClass="button-primary button-default" 
+            Content="@(IsRunningRegression ? "Running Regression..." : "Run Regression")"
+            Disabled="@(IsRunningRegression || IsRegressionDisabled)"
+            OnClick="OnRunRegressionClick" />
+        </div>
+        <div class="dp-buttons">
+            <SfButton IsPrimary="true" 
+            CssClass="button-primary button-default" 
+            Disabled="@IsBackloadDisabled"
+            Content="Backload" 
+            OnClick="OnBackloadClick" />
+        </div>
+        <div class="dp-inputs" style="width: 11rem; margin-bottom: 0.625rem;">
+            <label class="input-label">Curve Date</label>
+            <SfDatePicker CssClass="calendar-datepicker"
+            TValue="DateTime?"
+            @bind-Value="@CurveDate"
+            Enabled="true"
+            Format="MM/dd/yyyy"
+            Placeholder="mm/dd/yyyy"
+            ShowClearButton="true" />
+        </div>
+        @if (ShowHrSpecAndChecksButton)
+        {
+            <div class="dp-buttons">
+                <SfButton IsPrimary="true" 
+                CssClass="button-primary button-default" 
+                IconCss="@(IsDownloadingSpecsAndChecks ? "fa-solid fa-circle-notch fa-spin" : "fa-solid fa-download")"
+                Disabled="@IsDownloadingSpecsAndChecks"
+                OnClick="OnDownloadSpecsAndChecksClick" />
+            </div>
+        }
+    </div>
+    <div class="flex gap-2.5 flex-wrap items-center"></div>
+</div>
+
+@code {
+    [Parameter] public bool IsSaving { get; set; }
+    [Parameter] public bool IsSaveDisabled { get; set; }
+    [Parameter] public bool IsGeneratingInceptionPackage { get; set; }
+    [Parameter] public bool IsPreviewInceptionPackageDisabled { get; set; }
+    [Parameter] public bool IsRunningRegression { get; set; }
+    [Parameter] public bool IsRegressionDisabled { get; set; }
+    [Parameter] public bool IsBackloadDisabled { get; set; }
+    [Parameter] public DateTime? CurveDate { get; set; }
+    [Parameter] public EventCallback<DateTime?> CurveDateChanged { get; set; }
+    [Parameter] public bool ShowHrSpecAndChecksButton { get; set; }
+    [Parameter] public bool IsDownloadingSpecsAndChecks { get; set; }
+    
+    [Parameter] public EventCallback OnSaveClick { get; set; }
+    [Parameter] public EventCallback OnCancelClick { get; set; }
+    [Parameter] public EventCallback OnPreviewInceptionPackageClick { get; set; }
+    [Parameter] public EventCallback OnRunRegressionClick { get; set; }
+    [Parameter] public EventCallback OnBackloadClick { get; set; }
+    [Parameter] public EventCallback OnDownloadSpecsAndChecksClick { get; set; }
+}
