@@ -1124,7 +1124,32 @@ public partial class HedgeRelationshipDetails
     {
         try
         {
-            // Check if document template exists
+            // Step 1: Check analytics service availability (legacy: checkAnalyticsStatus before opening modal)
+            // Reference: old/hr_hedgeRelationshipAddEditCtrl.js line 2744
+            var analyticsStatusQuery = new CheckAnalyticsStatus.Query();
+            var analyticsResponse = await Mediator.Send(analyticsStatusQuery);
+
+            if (analyticsResponse.HasError)
+            {
+                await AlertService.ShowToast("Failed to check analytics service status", AlertKind.Error, "Error", showButton: true);
+                return;
+            }
+
+            if (!analyticsResponse.IsAnalyticsAvailable)
+            {
+                // Show confirmation dialog similar to JavaScript confirm
+                // Legacy: "Analytics service is currently unavailable. Are you sure you want to continue?"
+                var proceed = await JSRuntime.InvokeAsync<bool>("confirm",
+                    "Analytics service is currently unavailable. Are you sure you want to continue?");
+
+                if (!proceed)
+                {
+                    return;
+                }
+            }
+
+            // Step 2: Check if document template exists (legacy: initiateReDesignation)
+            // Reference: old/hr_hedgeRelationshipAddEditCtrl.js line 2772-2791
             var findDocTemplateResponse = await Mediator.Send(new FindDocumentTemplate.Query(HedgeRelationshipId));
             
             if (findDocTemplateResponse.HasError)
@@ -1137,14 +1162,15 @@ public partial class HedgeRelationshipDetails
             
             if (IsDocTemplateFound)
             {
-                // Save current state first
+                // Save current state first (legacy: submit with callback)
                 await SaveHedgeRelationshipAsync();
                 
-                // Reload hedge relationship
+                // Reload hedge relationship (legacy: init with 1000ms timeout before opening dialog)
                 await GetHedgeRelationship(HedgeRelationshipId);
             }
 
-            // Get re-designation data
+            // Step 3: Get re-designation data from API (legacy: HedgeRelationship/Redesignate/{id})
+            // Reference: old/hr_hedgeRelationshipAddEditCtrl.js line 2745-2758
             var redesignateResponse = await Mediator.Send(new GetReDesignateData.Query(HedgeRelationshipId));
             
             if (redesignateResponse.HasError)
@@ -1153,7 +1179,7 @@ public partial class HedgeRelationshipDetails
                 return;
             }
 
-            // Set model properties from response
+            // Set model properties from response (legacy: $scope.Model assignments)
             RedesignationDate = redesignateResponse.RedesignationDate;
             RedesignateTimeValuesStartDate = redesignateResponse.TimeValuesStartDate;
             RedesignateTimeValuesEndDate = redesignateResponse.TimeValuesEndDate;
@@ -1164,7 +1190,8 @@ public partial class HedgeRelationshipDetails
             RedesignateAdjustedDates = redesignateResponse.AdjustedDates;
             MarkAsAcquisition = redesignateResponse.MarkAsAcquisition;
 
-            // Show Re-Designation dialog
+            // Step 4: Show Re-Designation dialog (legacy: ngDialog.open)
+            // Reference: old/hr_hedgeRelationshipAddEditCtrl.js line 2760-2767
             OpenModal = MODAL_REDESIGNATE;
             StateHasChanged();
         }
