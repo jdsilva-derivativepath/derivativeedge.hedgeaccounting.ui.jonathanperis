@@ -74,7 +74,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
             BenchMarkLabel="@BenchMarkLabel"
             CanEditFairValueMethod="@CanEditFairValueMethod()"
             IsHedgingInstrumentStructureDisabled="@IsHedgingInstrumentStructureDisabled()"
-            HedgingInstrumentStructureOptions="@GetHedgingInstrumentStructureOptions()"
+            HedgingInstrumentStructureOptions="@HedgeRelationshipDataHelper.GetHedgingInstrumentStructureOptions()"
             @bind-DesignationDate="@DesignationDate"
             @bind-DeDesignationDate="@DeDesignationDate"
             CanEditCheckbox="@CanEditCheckbox()"
@@ -200,7 +200,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                   IsAnOptionHedge="@HedgeRelationship.IsAnOptionHedge"
                                   AmortizationGLAccounts="@AmortizationGLAccounts"
                                   AmortizationContraAccounts="@AmortizationContraAccounts"
-                                  AmortizationMethodOptions="@GetAmortizationMethodOptions()"
+                                  AmortizationMethodOptions="@HedgeRelationshipDataHelper.GetAmortizationMethodOptions()"
                                   OnOptionAmortizationSaved="@OnOptionAmortizationSaved" />
 
         <HedgeDocumentPreviewDialog Visible="@IsHedgeDocumentPreviewModal"
