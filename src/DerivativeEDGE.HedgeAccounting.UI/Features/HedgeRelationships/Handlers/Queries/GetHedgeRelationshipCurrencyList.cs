@@ -35,7 +35,7 @@ public sealed class GetHedgeRelationshipCurrencyList
             if (data == null)
             {
                 _logger.LogError("Failed to deserialize currency data.");
-                data = new List<HedgeCurrencyDropdownItem>();
+                data = [];
             }
 
             _logger.LogInformation("Retrieved {Count} currencies", data.Count);

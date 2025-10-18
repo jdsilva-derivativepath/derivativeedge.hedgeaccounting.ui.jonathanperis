@@ -34,8 +34,8 @@ public partial class TestResultsTab
     #endregion
 
     #region Public Properties
-    public List<ChartDataModel> ChartData { get; set; } = new();
-    public List<ChartDataModel> TrendlineData { get; set; } = new();
+    public List<ChartDataModel> ChartData { get; set; } = [];
+    public List<ChartDataModel> TrendlineData { get; set; } = [];
     public double ChartMinValue { get; set; } = 0;
     public double ChartMaxValue { get; set; } = 0;
     #endregion
@@ -252,15 +252,15 @@ public partial class TestResultsTab
             // Sort data by X value for proper line rendering
             var sortedData = graphData.OrderBy(d => d.XValue).ToList();
 
-            TrendlineData = new List<ChartDataModel>
-            {
+            TrendlineData =
+            [
                 new() { XValue = sortedData.First().XValue, YValue = slope * sortedData.First().XValue + intercept },
                 new() { XValue = sortedData.Last().XValue, YValue = slope * sortedData.Last().XValue + intercept }
-            };
+            ];
         }
         else
         {
-            TrendlineData = new List<ChartDataModel>();
+            TrendlineData = [];
         }
     }
 
@@ -268,8 +268,8 @@ public partial class TestResultsTab
     {
         if (_disposed) return;
 
-        ChartData = new List<ChartDataModel>();
-        TrendlineData = new List<ChartDataModel>();
+        ChartData = [];
+        TrendlineData = [];
         ChartMinValue = 0;
         ChartMaxValue = 0;
     }

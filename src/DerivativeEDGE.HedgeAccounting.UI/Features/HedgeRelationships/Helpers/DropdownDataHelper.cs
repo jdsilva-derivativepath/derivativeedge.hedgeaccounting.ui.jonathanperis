@@ -35,15 +35,15 @@ public static class DropdownDataHelper
         return data;
     }
 
-    private static List<DropdownModel> GetIntrinsicMethodOptions() => new()
-    {
+    private static List<DropdownModel> GetIntrinsicMethodOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "ForwardMethod", Text = "Forward Method" },
         new() { Value = "SpotMethod", Text = "Spot Method" }
-    };
+    ];
 
-    private static List<DropdownModel> GetHedgingObjectiveOptions() => new()
-    {
+    private static List<DropdownModel> GetHedgingObjectiveOptions() =>
+    [
         new() { ID = 1, Text = "None" },
         new() { ID = 2, Text = "1M Contractual Rate" },
         new() { ID = 3, Text = "1M FHLB" },
@@ -59,33 +59,33 @@ public static class DropdownDataHelper
         new() { ID = 13, Text = "Last of Layer" },
         new() { ID = 14, Text = "Contractually Specified Rate Purchased Option" },
         new() { ID = 15, Text = "Net Investment Hedge - Forward Rate Method" }
-    };
+    ];
 
-    private static List<DropdownModel> GetHedgedRiskOptions() => new()
-    {
+    private static List<DropdownModel> GetHedgedRiskOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "InterestRate", Text = "Interest Rate" },
         new() { Value = "ForeignExchange", Text = "Foreign Exchange" }
-    };
+    ];
 
-    private static List<DropdownModel> GetHedgedDirectionOptions() => new()
-    {
+    private static List<DropdownModel> GetHedgedDirectionOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "All", Text = "All" },
         new() { Value = "LimitDownside", Text = "Limit Downside" },
         new() { Value = "LimitUpside", Text = "Limit Upside" },
         new() { Value = "Corridor", Text = "Corridor" },
-    };
+    ];
 
-    private static List<DropdownModel> GetHedgeTypeOptions() => new()
-    {
+    private static List<DropdownModel> GetHedgeTypeOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "CashFlow", Text = "Cash Flow" },
         new() { Value = "FairValue", Text = "Fair Value" }
-    };
+    ];
 
-    private static List<DropdownModel> GetContractualRateOptions() => new()
-    {
+    private static List<DropdownModel> GetContractualRateOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "LIBORUSDBBA1M", Text = "LIBOR-USD-BBA 1M" },
         new() { Value = "LIBORUSDBBA3M", Text = "LIBOR-USD-BBA 3M" },
@@ -95,32 +95,32 @@ public static class DropdownDataHelper
         new() { Value = "Prime", Text = "USD-PRIME.H15" },
         new() { Value = "SOFR", Text = "SOFR" },
         new() { Value = "Other", Text = "Other" },
-    };
+    ];
 
-    private static List<DropdownModel> GetHedgedItemTypeOptions() => new()
-    {
+    private static List<DropdownModel> GetHedgedItemTypeOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "Existing", Text = "Existing" },
         new() { Value = "Forecasted", Text = "Forecasted" }
-    };
+    ];
 
-    private static List<DropdownModel> GetHedgedItemOptions() => new()
-    {
+    private static List<DropdownModel> GetHedgedItemOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "Asset", Text = "Asset" },
         new() { Value = "Liability", Text = "Liability" }
-    };
+    ];
 
-    private static List<DropdownModel> GetStandardOptions() => new()
-    {
+    private static List<DropdownModel> GetStandardOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "ASC815", Text = "ASC815" }
-    };
+    ];
 
-    private static List<DropdownModel> GetFairValueMethodOptions() => new()
-    {
+    private static List<DropdownModel> GetFairValueMethodOptions() =>
+    [
         new() { Value = "None", Text = "None" },
         new() { Value = "BenchmarkOnly", Text = "Benchmark Only" },
         new() { Value = "AllCashFlows", Text = "All Cash Flows" }
-    };
+    ];
 }

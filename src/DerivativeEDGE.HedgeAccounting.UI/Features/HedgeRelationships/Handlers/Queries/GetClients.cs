@@ -8,7 +8,7 @@
 
         public Response(IEnumerable<Client> clients)
         {
-            Clients = clients.ToList();
+            Clients = [.. clients];
         }
     }
 
@@ -36,7 +36,7 @@
             async Task<List<Client>> FetchClients()
             {
                 var clients = await _client.GetClientsAsync(_apiKey);
-                return clients
+                return [.. clients
                     .Select(c => new Client
                     {
                         ClientName = c.ClientName ?? string.Empty,
@@ -44,8 +44,7 @@
                     })
                     .Where(c => c.ClientId != null)
                     .DistinctBy(c => c.ClientId)
-                    .OrderBy(c => c.ClientName)
-                    .ToList();
+                    .OrderBy(c => c.ClientName)];
             }
 
             var clientList = await _appCache.GetOrAdd(CacheKey, FetchClients, _cacheExpiryTime);

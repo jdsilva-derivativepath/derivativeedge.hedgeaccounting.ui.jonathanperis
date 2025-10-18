@@ -6,7 +6,7 @@ public sealed class GetClientEntities
 
     public sealed class Response(IEnumerable<Entity> entitieList)
     {
-        public List<Entity> Entities { get; } = entitieList.ToList();
+        public List<Entity> Entities { get; } = [.. entitieList];
     }
 
     public sealed class Handler(IIdentityClient identityClient, IConfiguration configuration) :
@@ -17,7 +17,7 @@ public sealed class GetClientEntities
 
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
-            var data = await _identityClient.GetEntitiesAsync(request.ClientId, _apiKey) ?? new List<Entity>(); // Assuming RawEntity is the original type
+            var data = await _identityClient.GetEntitiesAsync(request.ClientId, _apiKey) ?? []; // Assuming RawEntity is the original type
 
             var entityList = data
                 .Where(e => e.ClientLongName != null) // Ensuring non-null values before filtering

@@ -10,12 +10,12 @@ public partial class AmortizationDialog
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM AmortizationModel { get; set; } = new();
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; }
     
-    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; set; } = new();
-    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; set; } = new();
-    [Parameter] public List<FinancialCenterOption> FinancialCenterOptions { get; set; } = new();
-    [Parameter] public List<PaymentFrequencyOption> PaymentFrequencyOptions { get; set; } = new();
-    [Parameter] public List<DayCountConvOption> DayCountConvOptions { get; set; } = new();
-    [Parameter] public List<PayBusDayConvOption> PayBusDayConvOptions { get; set; } = new();
+    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; set; } = [];
+    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; set; } = [];
+    [Parameter] public List<FinancialCenterOption> FinancialCenterOptions { get; set; } = [];
+    [Parameter] public List<PaymentFrequencyOption> PaymentFrequencyOptions { get; set; } = [];
+    [Parameter] public List<DayCountConvOption> DayCountConvOptions { get; set; } = [];
+    [Parameter] public List<PayBusDayConvOption> PayBusDayConvOptions { get; set; } = [];
     #endregion
 
     #region Injected Services
@@ -91,10 +91,9 @@ public partial class AmortizationDialog
 
             if (AmortizationFinancialCenters != null)
             {
-                AmortizationModel.FinancialCenters = AmortizationFinancialCenters
+                AmortizationModel.FinancialCenters = [.. AmortizationFinancialCenters
                     .Select(s => Enum.TryParse<DerivativeEDGEDomainEntitiesEnumsFinancialCenter>(s, out var result) ? result : default)
-                    .Where(fc => fc != default)
-                    .ToList();
+                    .Where(fc => fc != default)];
             }
 
             var isUpdate = AmortizationModel.ID > 0;

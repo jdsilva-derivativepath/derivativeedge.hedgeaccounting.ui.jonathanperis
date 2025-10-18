@@ -11,9 +11,9 @@ public partial class OptionAmortizationDialog
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; }
     [Parameter] public bool IsAnOptionHedge { get; set; }
     
-    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; set; } = new();
-    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; set; } = new();
-    [Parameter] public List<AmortizationMethodOption> AmortizationMethodOptions { get; set; } = new();
+    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; set; } = [];
+    [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; set; } = [];
+    [Parameter] public List<AmortizationMethodOption> AmortizationMethodOptions { get; set; } = [];
     #endregion
 
     #region Injected Services

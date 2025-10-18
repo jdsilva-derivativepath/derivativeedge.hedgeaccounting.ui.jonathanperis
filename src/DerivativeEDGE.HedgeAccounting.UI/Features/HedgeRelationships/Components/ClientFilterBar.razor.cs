@@ -2,7 +2,7 @@
 
 public partial class ClientFilterBar
 {
-    [Parameter] public List<Client> Clients { get; set; } = new();
+    [Parameter] public List<Client> Clients { get; set; } = [];
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public long? SelectedClientId { get; set; }
     [Parameter] public DateTime? CurveDate { get; set; }

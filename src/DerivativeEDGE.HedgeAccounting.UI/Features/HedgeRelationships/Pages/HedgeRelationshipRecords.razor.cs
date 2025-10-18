@@ -9,7 +9,7 @@ public partial class HedgeRelationshipRecords
     #endregion
 
     #region Public Properties
-    public List<Client> AvailableClients { get; set; } = new();
+    public List<Client> AvailableClients { get; set; } = [];
     public bool IsLoadingClients { get; set; }
     public record CancelContext(bool IsUpload, bool IsByClient);
     #endregion
@@ -26,17 +26,17 @@ public partial class HedgeRelationshipRecords
 
     private bool _clientDropdownInitialized;
     private HedgeRelationshipGrid _gridWrapper = null!;
-    private List<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> _hedgeRelationships { get; set; } = new();
-    private List<HedgeRelationshipRecordViewModel> _filteredHedgeRelationship { get; set; } = new();
-    private readonly List<GridViewModel> _gridViewItems = new();
+    private List<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> _hedgeRelationships { get; set; } = [];
+    private List<HedgeRelationshipRecordViewModel> _filteredHedgeRelationship { get; set; } = [];
+    private readonly List<GridViewModel> _gridViewItems = [];
     private HedgeRelationshipCreate? _newRelationshipModal { get; set; }
-    private Dictionary<string, Func<Task>> _actionMap = new();
+    private Dictionary<string, Func<Task>> _actionMap = [];
 
-    private readonly List<string> actionItems = new()
-    {
+    private readonly List<string> actionItems =
+    [
         "Regression Summary", "Regression Summary All Clients",
         "Upload Regression Summary", "Upload Regression Summary All Clients"
-    };
+    ];
     private string DeleteMessage => $"Are you sure you want to delete {SelectedHedgeRelationshipId}?";
     private string GetRegressionMessage()
     => CancelContextFlag
@@ -208,7 +208,7 @@ public partial class HedgeRelationshipRecords
         try
         {
             var response = await Mediator.Send(new GetHedgeRelationship.Query());
-            _hedgeRelationships = response.HedgeRelationships ?? new();
+            _hedgeRelationships = response.HedgeRelationships ?? [];
             FilterHedgeRelationshipsByClient();
         }
         finally
@@ -250,14 +250,12 @@ public partial class HedgeRelationshipRecords
 
     private void FilterHedgeRelationshipsByClient()
     {
-        var data = _hedgeRelationships ?? new List<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM>();
+        var data = _hedgeRelationships ?? [];
         var filteredData = (SelectedClientId == null || SelectedClientId == 0)
             ? data
             : data.Where(u => u.ClientID == SelectedClientId);
 
-        _filteredHedgeRelationship = filteredData
-            .Select(x => new HedgeRelationshipRecordViewModel(x))
-            .ToList();
+        _filteredHedgeRelationship = [.. filteredData.Select(x => new HedgeRelationshipRecordViewModel(x))];
     }
     #endregion
 

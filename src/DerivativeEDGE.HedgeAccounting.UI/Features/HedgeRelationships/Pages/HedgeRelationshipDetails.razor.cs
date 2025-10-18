@@ -23,6 +23,7 @@ public partial class HedgeRelationshipDetails
     private const string STANDARD_MODAL_WIDTH = "33rem";
     private const string WIDE_MODAL_WIDTH = "41rem";
     private const string NARROW_MODAL_WIDTH = "30rem";
+
     private bool IsNewHedgeDocumentTemplate => string.IsNullOrWhiteSpace(HedgeRelationship.Objective)
         || IsHtmlWhitespaceOnly(HedgeRelationship.Objective);
 
@@ -41,7 +42,7 @@ public partial class HedgeRelationshipDetails
     private SfTab hedgerelationshiptabRef;
     private InstrumentAnalysisTab instrumentAnalysisTabRef;
     private TestResultsTab testResultsTabRef;
-    private List<string> ValidationErrors { get; set; } = new();
+    private List<string> ValidationErrors { get; set; } = [];
     private bool IsDpiUser { get; set; }
     private DateTime? DesignationDate
     {
@@ -68,17 +69,17 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Data Collections
-    public List<Client> AvailableClients { get; private set; } = new();
-    public List<DerivativeEDGEHAEntityLegalEntity> AvailableEntities { get; private set; } = new();
+    public List<Client> AvailableClients { get; private set; } = [];
+    public List<DerivativeEDGEHAEntityLegalEntity> AvailableEntities { get; private set; } = [];
 
-    public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; private set; } = new();
-    public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; private set; } = new();
+    public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; private set; } = [];
+    public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; private set; } = [];
 
-    public List<DerivativeEDGEHAEntityGLAccount> OptionAmortizationGLAccounts { get; private set; } = new();
-    public List<DerivativeEDGEHAEntityGLAccount> OptionAmortizationContraAccounts { get; private set; } = new();
+    public List<DerivativeEDGEHAEntityGLAccount> OptionAmortizationGLAccounts { get; private set; } = [];
+    public List<DerivativeEDGEHAEntityGLAccount> OptionAmortizationContraAccounts { get; private set; } = [];
 
-    public List<DerivativeEDGEHAEntityGLAccount> IntrinsicAmortizationGLAccounts { get; private set; } = new();
-    public List<DerivativeEDGEHAEntityGLAccount> IntrinsicAmortizationContraAccounts { get; private set; } = new();
+    public List<DerivativeEDGEHAEntityGLAccount> IntrinsicAmortizationGLAccounts { get; private set; } = [];
+    public List<DerivativeEDGEHAEntityGLAccount> IntrinsicAmortizationContraAccounts { get; private set; } = [];
 
     // Enum‐based data sources
     public List<FinancialCenterOption> AvailableFinancialCenters { get; private set; }
@@ -177,25 +178,13 @@ public partial class HedgeRelationshipDetails
     public DocumentContent Model { get; set; } = new();
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM AmortizationModel { get; set; } = new();
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM OptionAmortizationModel { get; set; } = new();
-    private List<DropDownMenuItem> WorkflowItems = new();
+    private readonly List<DropDownMenuItem> WorkflowItems = [];
 
     // Dynamic chart data from HedgeRegressionBatches
-    private List<ChartDataModel> EffectivenessChartData { get; set; } = new();
+    private List<ChartDataModel> EffectivenessChartData { get; set; } = [];
 
-    // Static fallback data (kept for reference)
-    private static readonly List<ChartDataModel> ChartData = new()
-    {
-        new() { Date = new DateTime(2023, 3, 1).ToString("yyyy-MM-dd"), R2Value = 0.85, Slope = 1 },
-        new() { Date = new DateTime(2023, 4, 1).ToString("yyyy-MM-dd"), R2Value = 0.9, Slope = 1 },
-        new() { Date = new DateTime(2023, 5, 1).ToString("yyyy-MM-dd"), R2Value = 0.87, Slope = 1 },
-        new() { Date = new DateTime(2023, 6, 1).ToString("yyyy-MM-dd"), R2Value = 0.92, Slope = 1 },
-        new() { Date = new DateTime(2023, 7, 1).ToString("yyyy-MM-dd"), R2Value = 0.89, Slope = 1 },
-        new() { Date = new DateTime(2023, 8, 1).ToString("yyyy-MM-dd"), R2Value = 0.91, Slope = 1 },
-        new() { Date = new DateTime(2023, 9, 1).ToString("yyyy-MM-dd"), R2Value = 0.88, Slope = 1 }
-    };
-
-    private List<ToolbarItemModel> BasicTools = new()
-    {
+    private readonly List<ToolbarItemModel> BasicTools =
+    [
         new() { Command = ToolbarCommand.Bold },
         new() { Command = ToolbarCommand.Italic },
         new() { Command = ToolbarCommand.Underline },
@@ -211,7 +200,7 @@ public partial class HedgeRelationshipDetails
         new() { Command = ToolbarCommand.SourceCode },
         new() { Command = ToolbarCommand.Undo },
         new() { Command = ToolbarCommand.Redo }
-    };
+    ];
     #endregion
 
     #region Lifecycle Methods
@@ -279,7 +268,7 @@ public partial class HedgeRelationshipDetails
 
     private void GenerateEffectivenessChartData()
     {
-        if (HedgeRelationship?.HedgeRegressionBatches?.Any() == true)
+        if (HedgeRelationship?.HedgeRegressionBatches?.Count > 0)
         {
             // Filter batches: take first 8, exclude 'User' type unless HedgeState is 'Draft'
             var filteredBatches = HedgeRelationship.HedgeRegressionBatches
@@ -290,9 +279,7 @@ public partial class HedgeRelationshipDetails
                 .ToList();
 
             // Sort by ValueDate
-            filteredBatches = filteredBatches
-                .OrderBy(batch => batch.ValueDate)
-                .ToList();
+            filteredBatches = [.. filteredBatches.OrderBy(batch => batch.ValueDate)];
 
             var chartData = new List<ChartDataModel>();
             var processedDates = new HashSet<string>();
@@ -322,7 +309,7 @@ public partial class HedgeRelationshipDetails
         else
         {
             // Fallback to static data converted to DateTime format
-            EffectivenessChartData = new List<ChartDataModel> { };
+            EffectivenessChartData = [];
         }
     }
 
@@ -373,11 +360,11 @@ public partial class HedgeRelationshipDetails
             var query = new GetClientEntities.Query(clientId);
             var response = await Mediator.Send(query, CancellationToken.None);
             response.Entities.Insert(0, new Entity { EntityId = 0, EntityLongName = "None" });
-            AvailableEntities = response.Entities.Select(data => new DerivativeEDGEHAEntityLegalEntity
+            AvailableEntities = [.. response.Entities.Select(data => new DerivativeEDGEHAEntityLegalEntity
             {
                 Id = data.EntityId,
                 Name = data.EntityLongName,
-            }).ToList();
+            })];
 
             // Restore BankEntityID if it exists in the new entities list
             if (HedgeRelationship != null)
@@ -670,7 +657,7 @@ public partial class HedgeRelationshipDetails
         }
 
         ValidationErrors = RegressionRequirementsValidator.Validate(HedgeRelationship);
-        if (ValidationErrors.Any())
+        if (ValidationErrors.Count > 0)
         {
             StateHasChanged();
             return;
@@ -709,7 +696,7 @@ public partial class HedgeRelationshipDetails
 
             if (regressionResponse.HasError)
             {
-                if (regressionResponse.ValidationErrors?.Any() == true)
+                if (regressionResponse.ValidationErrors?.Count > 0)
                 {
                     var errorMessage = string.Join("; ", regressionResponse.ValidationErrors);
                     await AlertService.ShowToast($"Regression failed: {errorMessage}", AlertKind.Error, "Regression Error", showButton: true);
@@ -890,7 +877,7 @@ public partial class HedgeRelationshipDetails
 
             if (response.HasError)
             {
-                if (response.ValidationErrors?.Any() == true)
+                if (response.ValidationErrors?.Count > 0)
                 {
                     var errorMessage = string.Join("; ", response.ValidationErrors);
                     await AlertService.ShowToast($"Backload failed: {errorMessage}", AlertKind.Error, "Backload Error", showButton: true);
@@ -986,7 +973,7 @@ public partial class HedgeRelationshipDetails
     {
         // Validate designation requirements
         ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
-        if (ValidationErrors.Any())
+        if (ValidationErrors.Count > 0)
         {
             StateHasChanged();
             return;
@@ -1389,15 +1376,15 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Helper Methods
-    public static List<HedgingInstrumentStructureOption> GetHedgingInstrumentStructureOptions() => new()
-    {
+    public static List<HedgingInstrumentStructureOption> GetHedgingInstrumentStructureOptions() =>
+    [
         new() { Value = HedgingInstrumentStructure.SingleInstrument, Text = HedgingInstrumentStructure.SingleInstrument.GetDescription() },
         new() { Value = HedgingInstrumentStructure.StructuredProduct, Text = HedgingInstrumentStructure.StructuredProduct.GetDescription() },
         new() { Value = HedgingInstrumentStructure.MultipleInstruments, Text = HedgingInstrumentStructure.MultipleInstruments.GetDescription() }
-    };
+    ];
 
-    public static List<FinancialCenterOption> GetFinancialCenterOptions() => new()
-    {
+    public static List<FinancialCenterOption> GetFinancialCenterOptions() =>
+    [
         new() { Value = FinancialCenter.BEBR, Text = FinancialCenter.BEBR.GetDescription() },
         new() { Value = FinancialCenter.ARBA, Text = FinancialCenter.ARBA.GetDescription() },
         new() { Value = FinancialCenter.ATVI, Text = FinancialCenter.ATVI.GetDescription() },
@@ -1465,10 +1452,10 @@ public partial class HedgeRelationshipDetails
         new() { Value = FinancialCenter.GBEDI, Text = FinancialCenter.GBEDI.GetDescription() },
         new() { Value = FinancialCenter.KYGEC, Text = FinancialCenter.KYGEC.GetDescription() },
         new() { Value = FinancialCenter.PELI, Text = FinancialCenter.PELI.GetDescription() }
-    };
+    ];
 
-    private static List<PaymentFrequencyOption> GetPaymentFrequencyOptions() => new()
-    {
+    private static List<PaymentFrequencyOption> GetPaymentFrequencyOptions() =>
+    [
         new() { Value = PaymentFrequency.Monthly,     Text = PaymentFrequency.Monthly.GetDescription() },
         new() { Value = PaymentFrequency.ThreeMonths, Text = PaymentFrequency.ThreeMonths.GetDescription() },
         new() { Value = PaymentFrequency.SixMonths,   Text = PaymentFrequency.SixMonths.GetDescription() },
@@ -1477,42 +1464,42 @@ public partial class HedgeRelationshipDetails
         new() { Value = PaymentFrequency.ThreeYear,   Text = PaymentFrequency.ThreeYear.GetDescription() },
         new() { Value = PaymentFrequency.FourYear,    Text = PaymentFrequency.FourYear.GetDescription() },
         new() { Value = PaymentFrequency.FiveYear,    Text = PaymentFrequency.FiveYear.GetDescription() }
-    };
+    ];
 
-    public static List<DayCountConvOption> GetDayCountConvOptions() => new()
-    {
+    public static List<DayCountConvOption> GetDayCountConvOptions() =>
+    [
         new() { Value = DayCountConv.ACT_360,      Text = DayCountConv.ACT_360.GetDescription() },
         new() { Value = DayCountConv.ACT_365Fixed, Text = DayCountConv.ACT_365Fixed.GetDescription() },
         new() { Value = DayCountConv.ACT_ISDA,     Text = DayCountConv.ACT_ISDA.GetDescription() },
         new() { Value = DayCountConv._30_360,      Text = DayCountConv._30_360.GetDescription() },
         new() { Value = DayCountConv._30E_360,     Text = DayCountConv._30E_360.GetDescription() }
-    };
+    ];
 
-    private static List<PayBusDayConvOption> GetPayBusDayConvOptions() => new()
-    {
+    private static List<PayBusDayConvOption> GetPayBusDayConvOptions() =>
+    [
         new() { Value = PayBusDayConv.Following,    Text = PayBusDayConv.Following.GetDescription() },
         new() { Value = PayBusDayConv.ModFollowing, Text = PayBusDayConv.ModFollowing.GetDescription() },
         new() { Value = PayBusDayConv.Preceding,    Text = PayBusDayConv.Preceding.GetDescription() },
         new() { Value = PayBusDayConv.ModPreceding, Text = PayBusDayConv.ModPreceding.GetDescription() },
         new() { Value = PayBusDayConv.FRN,          Text = PayBusDayConv.FRN.GetDescription() }
-    };
+    ];
 
-    public static List<AmortizationMethodOption> GetAmortizationMethodOptions() => new()
-    {
+    public static List<AmortizationMethodOption> GetAmortizationMethodOptions() =>
+    [
         new() { Value = AmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },
         new() { Value = AmortizationMethod.TotalCashFlowMethod, Text = AmortizationMethod.TotalCashFlowMethod.GetDescription() },
         new() { Value = AmortizationMethod.Straightline, Text = AmortizationMethod.Straightline.GetDescription() },
         new() { Value = AmortizationMethod.IntrinsicValueMethod, Text = AmortizationMethod.IntrinsicValueMethod.GetDescription() },
         new() { Value = AmortizationMethod.Swaplet, Text = AmortizationMethod.Swaplet.GetDescription() }
-    };
+    ];
 
-    public static List<IntrinsicAmortizationMethodOption> GetIntrinsicAmortizationMethodOptions() => new()
-    {
+    public static List<IntrinsicAmortizationMethodOption> GetIntrinsicAmortizationMethodOptions() =>
+    [
         new() { Value = AmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },
         new() { Value = AmortizationMethod.TotalCashFlowMethod, Text = AmortizationMethod.TotalCashFlowMethod.GetDescription() },
         new() { Value = AmortizationMethod.Straightline, Text = AmortizationMethod.Straightline.GetDescription() },
         new() { Value = AmortizationMethod.IntrinsicValueMethod, Text = AmortizationMethod.IntrinsicValueMethod.GetDescription() },
         new() { Value = AmortizationMethod.Swaplet, Text = AmortizationMethod.Swaplet.GetDescription() }
-    };
+    ];
     #endregion
 }
