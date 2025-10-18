@@ -414,23 +414,65 @@ public partial class HedgeRelationshipDetails
         }
     }
 
-    private void NewMenuOnItemSelected(MenuEventArgs args)
+    private async Task NewMenuOnItemSelected(MenuEventArgs args)
     {
         // Legacy: Initialize OptionAmortizationModel with defaults when opening dialog (openOptionTimeValueAmortDialog)
         if (args.Item.Text == MODAL_OPTION_AMORTIZATION)
         {
-            // Create new model with default values
-            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            try
             {
-                ID = 0,
-                GLAccountID = 0,  // Default to "None" option
-                ContraAccountID = 0,  // Default to "None" option
-                AmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None,
-                OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue,
-                // Legacy: Set dates from hedge relationship if available (lines 3329-3330)
-                StartDate = HedgeRelationship?.DesignationDate,
-                EndDate = HedgeRelationship?.HedgingItems?.FirstOrDefault()?.MaturityDate
-            };
+                // Legacy: Call GetOptionAmortizationDefaults API (line 3304 in legacy)
+                var response = await Mediator.Send(new GetOptionAmortizationDefaults.Query(HedgeRelationship));
+                
+                if (response?.DefaultValues != null)
+                {
+                    var defaults = response.DefaultValues;
+                    
+                    // Create new model with default values from API
+                    OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+                    {
+                        ID = 0,
+                        // Legacy: Use values from API if available, otherwise default to 0 (None)
+                        GLAccountID = defaults.GlAccountId > 0 ? defaults.GlAccountId : 0,
+                        ContraAccountID = defaults.GlContraAcctId > 0 ? defaults.GlContraAcctId : 0,
+                        // Legacy: AmortizationMethod defaults to "None" if not set (lines 609-611)
+                        AmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None,
+                        OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue,
+                        TotalAmount = defaults.TimeValue,
+                        // Legacy: Set dates from hedge relationship if available (lines 3329-3330)
+                        StartDate = HedgeRelationship?.DesignationDate,
+                        EndDate = HedgeRelationship?.HedgingItems?.FirstOrDefault()?.MaturityDate
+                    };
+                }
+                else
+                {
+                    // Fallback if API call fails
+                    OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+                    {
+                        ID = 0,
+                        GLAccountID = 0,  // Default to "None" option
+                        ContraAccountID = 0,  // Default to "None" option
+                        AmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None,
+                        OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue,
+                        StartDate = HedgeRelationship?.DesignationDate,
+                        EndDate = HedgeRelationship?.HedgingItems?.FirstOrDefault()?.MaturityDate
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error and use fallback defaults
+                OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+                {
+                    ID = 0,
+                    GLAccountID = 0,
+                    ContraAccountID = 0,
+                    AmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None,
+                    OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue,
+                    StartDate = HedgeRelationship?.DesignationDate,
+                    EndDate = HedgeRelationship?.HedgingItems?.FirstOrDefault()?.MaturityDate
+                };
+            }
         }
         
         OpenModal = args.Item.Text;
