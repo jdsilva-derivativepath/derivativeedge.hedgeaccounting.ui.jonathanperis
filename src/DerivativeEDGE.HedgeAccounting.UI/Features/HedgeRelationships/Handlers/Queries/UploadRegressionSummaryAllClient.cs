@@ -15,19 +15,8 @@ public sealed class UploadRegressionSummaryAllClient
         public string Message { get; set; } = string.Empty;
     }
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<UploadRegressionSummaryAllClient.Handler> logger) : IRequestHandler<Query, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly TokenProvider _tokenProvider; // retained
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<Handler> logger)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _tokenProvider = tokenProvider;
-            _logger = logger;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             var clientTypeName = typeof(IHedgeAccountingApiClient).Name;
@@ -35,30 +24,30 @@ public sealed class UploadRegressionSummaryAllClient
 
             try
             {
-                _logger.LogInformation("Initiating request via {Client}.{Method} (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
+                logger.LogInformation("Initiating request via {Client}.{Method} (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
 
                 try
                 {
                     var valueDate = request.ValueDate.HasValue ? new DateTimeOffset(request.ValueDate.Value) : (DateTimeOffset?)null;
-                    await _hedgeAccountingApiClient.ProcessSummaryAllClientsAsync(valueDate, cancellationToken);
+                    await hedgeAccountingApiClient.ProcessSummaryAllClientsAsync(valueDate, cancellationToken);
                 }
                 catch (Exception ex) when (ex.GetType().Name == "ApiException")
                 {
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message;
-                    _logger.LogWarning("{Client}.{Method} failed. StatusCode: {StatusCode}, Reason: {Reason}", clientTypeName, methodName, statusCode, reason);
+                    logger.LogWarning("{Client}.{Method} failed. StatusCode: {StatusCode}, Reason: {Reason}", clientTypeName, methodName, statusCode, reason);
                     throw; // maintain original semantics
                 }
 
-                _logger.LogInformation("{Client}.{Method} succeeded (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
+                logger.LogInformation("{Client}.{Method} succeeded (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
                 return new Response(false, "Successfully uploaded regression summary");
             }
             catch (Exception ex)
             {
-                var baseUrl = _hedgeAccountingApiClient.GetType()
+                var baseUrl = hedgeAccountingApiClient.GetType()
                     .GetProperty("BaseUrl", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?
-                    .GetValue(_hedgeAccountingApiClient) as string ?? string.Empty;
-                _logger.LogError(ex, "Error executing {Client}.{Method} (BaseUrl: {BaseUrl}, valueDate: {ValueDate})", clientTypeName, methodName, baseUrl, request.ValueDate);
+                    .GetValue(hedgeAccountingApiClient) as string ?? string.Empty;
+                logger.LogError(ex, "Error executing {Client}.{Method} (BaseUrl: {BaseUrl}, valueDate: {ValueDate})", clientTypeName, methodName, baseUrl, request.ValueDate);
                 return new Response(true, "Failed to upload regression summary");
             }
         }

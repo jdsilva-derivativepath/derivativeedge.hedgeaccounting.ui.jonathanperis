@@ -15,27 +15,18 @@ public static class GetTradeDataSource
 
     private record ApiResponse(List<TradeDto> Result);
 
-    public class Handler : IRequestHandler<Query, Response>
+    public class Handler(IHttpClientFactory factory, TokenProvider tokenProvider, ILogger<GetTradeDataSource.Handler> logger) : IRequestHandler<Query, Response>
     {
-        private readonly HttpClient _httpClient;
-        private readonly TokenProvider _tokenProvider;
-        private readonly ILogger<Handler> _logger;
-
-        public Handler(IHttpClientFactory factory, TokenProvider tokenProvider, ILogger<Handler> logger)
-        {
-            _httpClient = factory.CreateClient("SwapzillaTrade");
-            _tokenProvider = tokenProvider;
-            _logger = logger;
-        }
+        private readonly HttpClient _httpClient = factory.CreateClient("SwapzillaTrade");
 
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             var apiUrl = $"Trade/DataSource?bankEntityId={request.BankEntityId}&clientId={request.ClientId}";
-            _logger.LogInformation("Calling API: {ApiUrl}", apiUrl);
+            logger.LogInformation("Calling API: {ApiUrl}", apiUrl);
 
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, apiUrl)
             {
-                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", _tokenProvider.AccessToken) }
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", tokenProvider.AccessToken) }
             };
 
             try
@@ -43,13 +34,13 @@ public static class GetTradeDataSource
                 using var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                _logger.LogInformation("Response Status: {StatusCode}", response.StatusCode);
-                _logger.LogDebug("Response Body: {ResponseContent}", LoggingSanitizer.Sanitize(content));
+                logger.LogInformation("Response Status: {StatusCode}", response.StatusCode);
+                logger.LogDebug("Response Body: {ResponseContent}", LoggingSanitizer.Sanitize(content));
 
                 if (!response.IsSuccessStatusCode)
                 {
                     return ErrorLoggingHelper.LogAndReturnError(
-                        _logger,
+                        logger,
                         $"API request failed: {response.StatusCode}",
                         content,
                         msg => new Response([], false, msg));
@@ -60,24 +51,24 @@ public static class GetTradeDataSource
                 if (result?.Result == null)
                 {
                     return ErrorLoggingHelper.LogAndReturnError(
-                        _logger,
+                        logger,
                         "API returned null or invalid trade data.",
                         content,
                         msg => new Response([], false, msg));
                 }
 
-                _logger.LogInformation("Retrieved {Count} trade items.", LoggingSanitizer.Sanitize(result.Result.Count.ToString()));
+                logger.LogInformation("Retrieved {Count} trade items.", LoggingSanitizer.Sanitize(result.Result.Count.ToString()));
                 return new Response(result.Result, true);
             }
             catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
             {
                 var error = ex is TaskCanceledException ? "Request timeout occurred" : "Network error occurred while fetching trade data";
-                _logger.LogError(ex, error);
+                logger.LogError(ex, error);
                 return new Response([], false, error);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error occurred while fetching trade data");
+                logger.LogError(ex, "Unexpected error occurred while fetching trade data");
                 return new Response([], false, "An unexpected error occurred");
             }
         }

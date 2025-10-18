@@ -2,40 +2,24 @@
 {
     public sealed class Query : IRequest<Response> { }
 
-    public sealed class Response
+    public sealed class Response(IEnumerable<Client> clients)
     {
-        public List<Client> Clients { get; }
-
-        public Response(IEnumerable<Client> clients)
-        {
-            Clients = [.. clients];
-        }
+        public List<Client> Clients { get; } = [.. clients];
     }
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IIdentityClient client, IAppCache appCache, IConfiguration configuration) : IRequestHandler<Query, Response>
     {
-        private readonly IIdentityClient _client;
-        private readonly string _apiKey;
-        private readonly TimeSpan _cacheExpiryTime;
-        private readonly IAppCache _appCache;
-
-        private const string CacheKey = "GetClientList";
-
-        public Handler(IIdentityClient client, IAppCache appCache, IConfiguration configuration)
-        {
-            _client = client;
-            _appCache = appCache;
-            _apiKey = configuration[ConfigurationKeys.IdentityApiKey]!;
-            _cacheExpiryTime = TimeSpan.FromMinutes(
+        private readonly string _apiKey = configuration[ConfigurationKeys.IdentityApiKey]!;
+        private readonly TimeSpan _cacheExpiryTime = TimeSpan.FromMinutes(
                 configuration.GetValue<int?>("CacheExpiryMinutes") ?? 10
             );
-        }
+        private const string CacheKey = "GetClientList";
 
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             async Task<List<Client>> FetchClients()
             {
-                var clients = await _client.GetClientsAsync(_apiKey);
+                var clients = await client.GetClientsAsync(_apiKey);
                 return [.. clients
                     .Select(c => new Client
                     {
@@ -47,7 +31,7 @@
                     .OrderBy(c => c.ClientName)];
             }
 
-            var clientList = await _appCache.GetOrAdd(CacheKey, FetchClients, _cacheExpiryTime);
+            var clientList = await appCache.GetOrAdd(CacheKey, FetchClients, _cacheExpiryTime);
             return new Response(clientList);
         }
     }

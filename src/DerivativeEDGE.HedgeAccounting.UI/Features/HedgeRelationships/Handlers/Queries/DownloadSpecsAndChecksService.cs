@@ -5,35 +5,24 @@ public sealed class DownloadSpecsAndChecksService
     public sealed record Query(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship) : IRequest<Response>;
     public sealed record Response(Stream ExcelStream, string FileName);
     
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<DownloadSpecsAndChecksService.Handler> logger, IMapper mapper) : IRequestHandler<Query, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly IMapper _mapper;
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<Handler> logger, IMapper mapper)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _logger = logger;
-            _mapper = mapper;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             if (request.HedgeRelationship == null)
             {
-                _logger.LogError("HedgeRelationship is required but was null");
+                logger.LogError("HedgeRelationship is required but was null");
                 throw new ArgumentNullException(nameof(request.HedgeRelationship), "HedgeRelationship is required");
             }
 
             try
             {
-                _logger.LogInformation("Downloading specs and checks for HedgeRelationship ID: {HedgeRelationshipId}", 
+                logger.LogInformation("Downloading specs and checks for HedgeRelationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationship.ID);
 
-                var apiEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
+                var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
-                var fileResponse = await _hedgeAccountingApiClient.DownloadSpecsAndChecksAsync(apiEntity, cancellationToken);
+                var fileResponse = await hedgeAccountingApiClient.DownloadSpecsAndChecksAsync(apiEntity, cancellationToken);
                 if (fileResponse == null)
                 {
                     throw new InvalidOperationException("File response was null");
@@ -50,12 +39,12 @@ public sealed class DownloadSpecsAndChecksService
                     stream.Position = 0;
                 }
 
-                _logger.LogInformation("Successfully downloaded specs and checks: {FileName}", fileName);
+                logger.LogInformation("Successfully downloaded specs and checks: {FileName}", fileName);
                 return new Response(stream, fileName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to download specs and checks for HedgeRelationship ID: {HedgeRelationshipId}", 
+                logger.LogError(ex, "Failed to download specs and checks for HedgeRelationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationship.ID);
                 throw;
             }

@@ -2,21 +2,14 @@
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Services.User;
 
-public sealed class UserMetaDataService : IUserMetaDataService
+public sealed class UserMetaDataService(AuthenticationStateProvider authState) : IUserMetaDataService
 {
-    private readonly AuthenticationStateProvider _authState;
-    private UserMetaData _userMetaData;
+    private UserMetaData _userMetaData = new UserMetaData();
     private bool _isUserMetaDataInitialized;
-
-    public UserMetaDataService(AuthenticationStateProvider authState)
-    {
-        _authState = authState;
-        _userMetaData = new UserMetaData();
-    }
 
     private async Task LoadUserMetaData()
     {
-        var state = await _authState.GetAuthenticationStateAsync();
+        var state = await authState.GetAuthenticationStateAsync();
         var clientIdString = state.User.Claims.FirstOrDefault(c => c.Type.Contains("clientId"))?.Value ?? "0";
         var userId = state.User.Claims.FirstOrDefault(c => c.Type.Contains("edgeuserid"))?.Value ?? "0";
         _userMetaData.FirstName = state.User.Claims.FirstOrDefault(c => c.Type.Contains("givenname"))?.Value ?? string.Empty;

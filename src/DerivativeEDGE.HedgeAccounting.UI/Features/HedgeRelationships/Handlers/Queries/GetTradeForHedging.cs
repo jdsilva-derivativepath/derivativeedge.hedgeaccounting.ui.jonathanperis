@@ -6,46 +6,35 @@ public sealed class GetTradesForHedging
 
     public sealed record Response(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM HedgeItem);
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<GetTradesForHedging.Handler> logger, IMapper mapper) : IRequestHandler<Query, Response>
     {
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly ILogger<Handler> _logger;
-        private readonly IMapper _mapper;
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<Handler> logger, IMapper mapper)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _logger = logger;
-            _mapper = mapper;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             // Log using API client metadata instead of hard-coded relative path
-            var baseUrl = _hedgeAccountingApiClient.GetType()
+            var baseUrl = hedgeAccountingApiClient.GetType()
                 .GetProperty("BaseUrl", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?
-                .GetValue(_hedgeAccountingApiClient) as string ?? string.Empty;
-            _logger.LogInformation(
+                .GetValue(hedgeAccountingApiClient) as string ?? string.Empty;
+            logger.LogInformation(
                 "Invoking {Method} on HedgeAccountingApiClient (BaseUrl: {BaseUrl}) for TradeId {TradeId} ClientId {ClientId}",
                 nameof(IHedgeAccountingApiClient.GetForHedgingAsync), baseUrl, request.ItemID, request.ClientId);
 
             try
             {
-                var apiItem = await _hedgeAccountingApiClient.GetForHedgingAsync(request.ItemID, request.ClientId, cancellationToken);
+                var apiItem = await hedgeAccountingApiClient.GetForHedgingAsync(request.ItemID, request.ClientId, cancellationToken);
 
                 if (apiItem == null)
                 {
                     const string error = "Failed to deserialize HedgeRelationshipItem from API response.";
-                    _logger.LogError(error);
+                    logger.LogError(error);
                     throw new InvalidOperationException(error);
                 }
 
-                _logger.LogInformation("Successfully retrieved HedgeRelationshipItem with ItemID {ItemID}", request.ItemID);
+                logger.LogInformation("Successfully retrieved HedgeRelationshipItem with ItemID {ItemID}", request.ItemID);
                 return new Response(apiItem);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving HedgeRelationshipItem with ItemID {ItemID}", request.ItemID);
+                logger.LogError(ex, "Error retrieving HedgeRelationshipItem with ItemID {ItemID}", request.ItemID);
                 throw;
             }
         }

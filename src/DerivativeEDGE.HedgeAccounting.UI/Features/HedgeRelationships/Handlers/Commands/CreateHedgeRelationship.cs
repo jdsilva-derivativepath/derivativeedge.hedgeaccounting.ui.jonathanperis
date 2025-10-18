@@ -18,33 +18,20 @@ public sealed class CreateHedgeRelationship
 
     }
 
-    public sealed class Handler : IRequestHandler<Command, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<CreateHedgeRelationship.Handler> logger, IMapper mapper) : IRequestHandler<Command, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly TokenProvider _tokenProvider; // retained for future use (auth already via handler)
-        private readonly IMapper _mapper;
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<Handler> logger, IMapper mapper)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _tokenProvider = tokenProvider;
-            _logger = logger;
-            _mapper = mapper;
-        }
-
         public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Sending request to create hedge relationship.");
+                logger.LogInformation("Sending request to create hedge relationship.");
 
                 // Map DTO to API entity
-                var apiEntity = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
+                var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
                 try
                 {
-                    await _hedgeAccountingApiClient.HedgeRelationshipPOSTAsync(apiEntity, cancellationToken);
+                    await hedgeAccountingApiClient.HedgeRelationshipPOSTAsync(apiEntity, cancellationToken);
                 }
                 catch (Exception ex) when (ex.GetType().Name == "ApiException")
                 {
@@ -52,7 +39,7 @@ public sealed class CreateHedgeRelationship
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message; // no direct ReasonPhrase in generated exception
                     var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
-                    _logger.LogWarning("Failed to create hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
+                    logger.LogWarning("Failed to create hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
                     return new Response(true, "Failed to create hedge relationship");
                 }
 
@@ -62,8 +49,8 @@ public sealed class CreateHedgeRelationship
                 {
                     try
                     {
-                        var apiVm = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(request.HedgeRelationship.ID, cancellationToken);
-                        createdVm = _mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(apiVm);
+                        var apiVm = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(request.HedgeRelationship.ID, cancellationToken);
+                        createdVm = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(apiVm);
                     }
                     catch
                     {
@@ -71,12 +58,12 @@ public sealed class CreateHedgeRelationship
                     }
                 }
 
-                _logger.LogInformation("Successfully created hedge relationship.");
+                logger.LogInformation("Successfully created hedge relationship.");
                 return new Response(false, "Successfully created hedge relationship", createdVm);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating hedge relationship.");
+                logger.LogError(ex, "An error occurred while creating hedge relationship.");
                 return new Response(true, "Failed to create hedge relationship");
             }
         }

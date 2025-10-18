@@ -8,13 +8,8 @@ public class ScenarioCollection : ICollectionFixture<BlazorServerWebApplicationF
 }
 
 [Collection("scenarios")]
-public abstract class ScenarioContext
+public abstract class ScenarioContext(BlazorServerWebApplicationFactory blazorServerWebApplicationFactory)
 {
-    protected readonly string _serverAddress;
-    protected readonly BlazorServerWebApplicationFactory _blazorServerWebApplicationFactory;
-    protected ScenarioContext(BlazorServerWebApplicationFactory blazorServerWebApplicationFactory)
-    {
-        _blazorServerWebApplicationFactory = blazorServerWebApplicationFactory;
-        _serverAddress = blazorServerWebApplicationFactory.ServerAddress;
-    }
+    protected readonly string _serverAddress = blazorServerWebApplicationFactory.ServerAddress;
+    protected readonly BlazorServerWebApplicationFactory _blazorServerWebApplicationFactory = blazorServerWebApplicationFactory;
 }

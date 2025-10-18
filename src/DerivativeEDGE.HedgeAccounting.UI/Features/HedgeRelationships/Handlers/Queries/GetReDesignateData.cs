@@ -29,31 +29,20 @@ public sealed class GetReDesignateData
         public Response(Exception exception) : base(exception) { }
     }
 
-    public sealed class Handler : IRequestHandler<Query, Response>
+    public sealed class Handler(
+        IHedgeAccountingApiClient hedgeAccountingApiClient,
+        ILogger<GetReDesignateData.Handler> logger,
+        TokenProvider tokenProvider) : IRequestHandler<Query, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly TokenProvider _tokenProvider;
-
-        public Handler(
-            IHedgeAccountingApiClient hedgeAccountingApiClient,
-            ILogger<Handler> logger,
-            TokenProvider tokenProvider)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _logger = logger;
-            _tokenProvider = tokenProvider;
-        }
-
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Fetching redesignation data for hedge relationship ID: {HedgeRelationshipId}", 
+                logger.LogInformation("Fetching redesignation data for hedge relationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationshipId);
 
                 // Call API to get redesignation data
-                var redesignationData = await _hedgeAccountingApiClient.RedesignateGETAsync(
+                var redesignationData = await hedgeAccountingApiClient.RedesignateGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
 
@@ -75,20 +64,20 @@ public sealed class GetReDesignateData
                     response.MarkAsAcquisition = redesignationData.MarkAsAcquisition;
                 }
 
-                _logger.LogInformation("Successfully fetched redesignation data for hedge relationship ID: {HedgeRelationshipId}", 
+                logger.LogInformation("Successfully fetched redesignation data for hedge relationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationshipId);
                     
                 return response;
             }
             catch (ApiException apiEx)
             {
-                _logger.LogError(apiEx, "API error occurred while fetching redesignation data for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
+                logger.LogError(apiEx, "API error occurred while fetching redesignation data for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}", 
                     request.HedgeRelationshipId, apiEx.StatusCode, apiEx.Response);
                 return new Response(true, $"Failed to fetch redesignation data: {apiEx.Message}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching redesignation data for hedge relationship ID: {HedgeRelationshipId}", 
+                logger.LogError(ex, "An error occurred while fetching redesignation data for hedge relationship ID: {HedgeRelationshipId}", 
                     request.HedgeRelationshipId);
                 return new Response(true, "Failed to fetch redesignation data due to an unexpected error");
             }

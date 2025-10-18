@@ -15,42 +15,33 @@ public sealed class DeleteHedgeRelationship
         public string Message { get; set; } = string.Empty;
     }
 
-    public sealed class Handler : IRequestHandler<Command, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<DeleteHedgeRelationship.Handler> logger) : IRequestHandler<Command, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-
-        public Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<Handler> logger)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _logger = logger;
-        }
-
         public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Sending DELETE request to delete hedge relationship {HrId}.", request.HedgeRelationshipId);
+                logger.LogInformation("Sending DELETE request to delete hedge relationship {HrId}.", request.HedgeRelationshipId);
 
                 try
                 {
-                    await _hedgeAccountingApiClient.HedgeRelationshipDELETEAsync(request.HedgeRelationshipId, cancellationToken);
+                    await hedgeAccountingApiClient.HedgeRelationshipDELETEAsync(request.HedgeRelationshipId, cancellationToken);
                 }
                 catch (Exception ex) when (ex.GetType().Name == "ApiException")
                 {
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message;
                     var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
-                    _logger.LogWarning("Failed to delete hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
+                    logger.LogWarning("Failed to delete hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
                     return new Response(true, "Failed to delete hedge relationship");
                 }
 
-                _logger.LogInformation("Successfully deleted hedge relationship.");
+                logger.LogInformation("Successfully deleted hedge relationship.");
                 return new Response(false, "Successfully deleted hedge relationship");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting hedge relationship.");
+                logger.LogError(ex, "An error occurred while deleting hedge relationship.");
                 return new Response(true, "Failed to delete hedge relationship");
             }
         }

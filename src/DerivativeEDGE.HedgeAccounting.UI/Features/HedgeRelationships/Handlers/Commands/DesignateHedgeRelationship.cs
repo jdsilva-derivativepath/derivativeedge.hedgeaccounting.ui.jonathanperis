@@ -22,39 +22,26 @@ public sealed class DesignateHedgeRelationship
         public Response(Exception exception) : base(exception) { }
     }
 
-    public sealed class Handler : IRequestHandler<Command, Response>
+    public sealed class Handler(
+        IHedgeAccountingApiClient hedgeAccountingApiClient,
+        IMediator mediator,
+        ILogger<DesignateHedgeRelationship.Handler> logger,
+        TokenProvider tokenProvider) : IRequestHandler<Command, Response>
     {
-        private readonly ILogger<Handler> _logger;
-        private readonly IHedgeAccountingApiClient _hedgeAccountingApiClient;
-        private readonly IMediator _mediator;
-        private readonly TokenProvider _tokenProvider;
-
-        public Handler(
-            IHedgeAccountingApiClient hedgeAccountingApiClient,
-            IMediator mediator,
-            ILogger<Handler> logger,
-            TokenProvider tokenProvider)
-        {
-            _hedgeAccountingApiClient = hedgeAccountingApiClient;
-            _mediator = mediator;
-            _logger = logger;
-            _tokenProvider = tokenProvider;
-        }
-
         public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Starting designation process for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                logger.LogInformation("Starting designation process for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
 
                 // Step 1: Get the current hedge relationship
-                var hedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
+                var hedgeRelationship = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
 
                 // Step 2: Run regression for inception
-                _logger.LogInformation("Running regression for inception for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
-                var regressionResponse = await _mediator.Send(
+                logger.LogInformation("Running regression for inception for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                var regressionResponse = await mediator.Send(
                     new RunRegression.Command(hedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Inception),
                     cancellationToken);
 
@@ -67,16 +54,16 @@ public sealed class DesignateHedgeRelationship
                 hedgeRelationship = regressionResponse.Data;
 
                 // Step 3: Check analytics availability
-                var analyticsAvailable = await _hedgeAccountingApiClient.IsAnalyticsAvailableAsync(cancellationToken);
+                var analyticsAvailable = await hedgeAccountingApiClient.IsAnalyticsAvailableAsync(cancellationToken);
                 
                 if (!analyticsAvailable)
                 {
-                    _logger.LogWarning("Analytics are not available for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                    logger.LogWarning("Analytics are not available for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 }
 
                 // Step 4: Generate inception package (this designates the relationship on the backend)
-                _logger.LogInformation("Generating inception package for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
-                var inceptionPackageResponse = await _mediator.Send(
+                logger.LogInformation("Generating inception package for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                var inceptionPackageResponse = await mediator.Send(
                     new GenerateInceptionPackage.Command(hedgeRelationship, Preview: false),
                     cancellationToken);
 
@@ -86,16 +73,16 @@ public sealed class DesignateHedgeRelationship
                 }
 
                 // Step 5: Reload the hedge relationship to get the updated state
-                hedgeRelationship = await _hedgeAccountingApiClient.HedgeRelationshipGETAsync(
+                hedgeRelationship = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(
                     request.HedgeRelationshipId,
                     cancellationToken);
 
-                _logger.LogInformation("Successfully completed designation process for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                logger.LogInformation("Successfully completed designation process for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 return new Response(false, "Hedge Relationship successfully designated", inceptionPackageResponse.Data, hedgeRelationship);
             }
             catch (ApiException apiEx)
             {
-                _logger.LogError(apiEx, "API error occurred during designation for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}",
+                logger.LogError(apiEx, "API error occurred during designation for hedge relationship ID: {HedgeRelationshipId}. Status: {StatusCode}, Response: {Response}",
                     request.HedgeRelationshipId, apiEx.StatusCode, apiEx.Response);
                 
                 // Return the actual API error message to the user
@@ -107,7 +94,7 @@ public sealed class DesignateHedgeRelationship
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred during designation for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
+                logger.LogError(ex, "An error occurred during designation for hedge relationship ID: {HedgeRelationshipId}", request.HedgeRelationshipId);
                 return new Response(true, $"Failed to designate hedge relationship: {ex.Message}");
             }
         }
