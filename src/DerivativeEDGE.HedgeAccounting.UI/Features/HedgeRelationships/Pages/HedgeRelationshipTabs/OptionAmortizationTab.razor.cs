@@ -5,6 +5,9 @@ public partial class OptionAmortizationTab
     #region Parameters
     [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> HedgeRelationshipOptionTimeValues { get; set; }
     [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM>> HedgeRelationshipOptionTimeValuesChanged { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> OnEditOptionAmortization { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> OnDeleteOptionAmortization { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> OnDownloadExcelOptionAmortization { get; set; }
     #endregion
 
     public List<DerivativeEDGEHAApiViewModelsOptionAmortizationVM> OptionAmortizations { get; set; } = [];
@@ -39,8 +42,28 @@ public partial class OptionAmortizationTab
         await Task.CompletedTask;
     }
 
-    private void OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM data)
+    private async Task OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM data)
     {
-        string concatenatedString = $"{args.Item.Text}: {data.ID}";
+        switch (args.Item.Text)
+        {
+            case "Edit":
+                if (OnEditOptionAmortization.HasDelegate)
+                {
+                    await OnEditOptionAmortization.InvokeAsync(data);
+                }
+                break;
+            case "Delete":
+                if (OnDeleteOptionAmortization.HasDelegate)
+                {
+                    await OnDeleteOptionAmortization.InvokeAsync(data);
+                }
+                break;
+            case "Download Excel":
+                if (OnDownloadExcelOptionAmortization.HasDelegate)
+                {
+                    await OnDownloadExcelOptionAmortization.InvokeAsync(data);
+                }
+                break;
+        }
     }
 }

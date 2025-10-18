@@ -5,6 +5,9 @@ public partial class AmortizationTab
     #region Parameters
     [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> HedgeRelationshipOptionTimeValueAmorts { get; set; }
     [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM>> HedgeRelationshipOptionTimeValueAmortsChanged { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> OnEditAmortization { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> OnDeleteAmortization { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM> OnDownloadExcelAmortization { get; set; }
     #endregion
 
     public List<DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM> OptionTimeValueAmortRollSchedules { get; set; } = [];
@@ -38,8 +41,28 @@ public partial class AmortizationTab
 
         await Task.CompletedTask;
     }
-    private void OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM data)
+    private async Task OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM data)
     {
-        string concatenatedString = $"{args.Item.Text}: {data.ID}";
+        switch (args.Item.Text)
+        {
+            case "Edit":
+                if (OnEditAmortization.HasDelegate)
+                {
+                    await OnEditAmortization.InvokeAsync(data);
+                }
+                break;
+            case "Delete":
+                if (OnDeleteAmortization.HasDelegate)
+                {
+                    await OnDeleteAmortization.InvokeAsync(data);
+                }
+                break;
+            case "Download Excel":
+                if (OnDownloadExcelAmortization.HasDelegate)
+                {
+                    await OnDownloadExcelAmortization.InvokeAsync(data);
+                }
+                break;
+        }
     }
 }

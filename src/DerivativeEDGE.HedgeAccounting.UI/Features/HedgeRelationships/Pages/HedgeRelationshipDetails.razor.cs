@@ -344,14 +344,24 @@ public partial class HedgeRelationshipDetails
         var query = new GetGLAccountsForHedging.Query(HedgeRelationship.ClientID, HedgeRelationship.BankEntityID);
         var result = await Mediator.Send(query);
 
-        AmortizationGLAccounts = result.Data;
-        AmortizationContraAccounts = result.Data;
+        // Add "None" option as first item in GL Account lists (legacy: amortizationView.cshtml line 51, 69)
+        var noneOption = new DerivativeEDGEHAEntityGLAccount
+        {
+            Id = 0,
+            AccountDescription = "None",
+            AccountNumber = "",
+            ClientId = HedgeRelationship.ClientID,
+            BankEntityId = HedgeRelationship.BankEntityID
+        };
 
-        OptionAmortizationGLAccounts = result.Data;
-        OptionAmortizationContraAccounts = result.Data;
+        AmortizationGLAccounts = [noneOption, .. result.Data];
+        AmortizationContraAccounts = [noneOption, .. result.Data];
 
-        IntrinsicAmortizationGLAccounts = result.Data;
-        IntrinsicAmortizationContraAccounts = result.Data;
+        OptionAmortizationGLAccounts = [noneOption, .. result.Data];
+        OptionAmortizationContraAccounts = [noneOption, .. result.Data];
+
+        IntrinsicAmortizationGLAccounts = [noneOption, .. result.Data];
+        IntrinsicAmortizationContraAccounts = [noneOption, .. result.Data];
     }
     #endregion
 
@@ -416,6 +426,37 @@ public partial class HedgeRelationshipDetails
 
     private void NewMenuOnItemSelected(MenuEventArgs args)
     {
+        // Initialize AmortizationModel with defaults when opening new amortization (legacy: InitializeHedgeRelationshipOptionTimeValueAmort)
+        if (args.Item.Text == MODAL_AMORTIZATION)
+        {
+            AmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = 0, // Will be set to "None" option in dialog
+                ContraAccountID = 0, // Will be set to "None" option in dialog
+                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (U.S. Government Securities)
+                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
+                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
+                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.Preceding,
+                AdjDates = true // Default to checked
+            };
+        }
+        else if (args.Item.Text == MODAL_OPTION_AMORTIZATION)
+        {
+            // Initialize OptionAmortizationModel with defaults (legacy: line 3313)
+            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = 0, // Will be set to "None" option in dialog
+                ContraAccountID = 0, // Will be set to "None" option in dialog
+                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (U.S. Government Securities)
+                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
+                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
+                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing,
+                AdjDates = true // Default to checked
+            };
+        }
+        
         OpenModal = args.Item.Text;
     }
 
@@ -1238,6 +1279,118 @@ public partial class HedgeRelationshipDetails
         catch (Exception ex)
         {
             await AlertService.ShowToast($"Error during re-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+    
+    private async Task HandleEditAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
+    {
+        // Set the model to the selected amortization (legacy: $scope.HedgeRelationshipOptionTimeValueAmort = selectedItem)
+        AmortizationModel = amortization;
+        
+        // Open the amortization modal
+        OpenModal = MODAL_AMORTIZATION;
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    
+    private async Task HandleDeleteAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
+    {
+        // Confirm deletion (legacy: confirm dialog)
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this amortization schedule?");
+        
+        if (!confirmed)
+            return;
+        
+        try
+        {
+            // Delete the amortization via handler (legacy: HedgeRelationshipOptionTimeValueAmort destroy)
+            var command = new DeleteHedgeRelationshipOptionTimeValueAmort.Command(amortization.ID);
+            var result = await Mediator.Send(command);
+            
+            if (result.HasError)
+            {
+                await AlertService.ShowToast(result.Message, AlertKind.Error, "Error", showButton: true);
+                return;
+            }
+            
+            // Refresh the hedge relationship data
+            await GetHedgeRelationship(HedgeRelationshipId);
+            
+            await AlertService.ShowToast("Amortization schedule deleted successfully.", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error deleting amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+    
+    private async Task HandleDownloadExcelAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
+    {
+        try
+        {
+            // Download Excel file for amortization schedule (legacy: ExportHedgeAmortizatonSchedule)
+            // TODO: Implement Excel download using Export2Async method
+            await AlertService.ShowToast("Excel export not yet implemented.", AlertKind.Warning, "Warning", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error downloading Excel: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+    
+    private async Task HandleEditOptionAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM optionAmortization)
+    {
+        // Set the model to the selected option amortization (legacy: same pattern as amortization)
+        OptionAmortizationModel = optionAmortization;
+        
+        // Open the option amortization modal
+        OpenModal = MODAL_OPTION_AMORTIZATION;
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    
+    private async Task HandleDeleteOptionAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM optionAmortization)
+    {
+        // Confirm deletion
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this option amortization schedule?");
+        
+        if (!confirmed)
+            return;
+        
+        try
+        {
+            // Delete the option amortization via handler
+            var command = new DeleteHedgeRelationshipOptionTimeValueAmort.Command(optionAmortization.ID);
+            var result = await Mediator.Send(command);
+            
+            if (result.HasError)
+            {
+                await AlertService.ShowToast(result.Message, AlertKind.Error, "Error", showButton: true);
+                return;
+            }
+            
+            // Refresh the hedge relationship data
+            await GetHedgeRelationship(HedgeRelationshipId);
+            
+            await AlertService.ShowToast("Option amortization schedule deleted successfully.", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error deleting option amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+    
+    private async Task HandleDownloadExcelOptionAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM optionAmortization)
+    {
+        try
+        {
+            // Download Excel file for option amortization schedule
+            // TODO: Implement Excel download using Export2Async method
+            await AlertService.ShowToast("Excel export not yet implemented.", AlertKind.Warning, "Warning", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error downloading Excel: {ex.Message}", AlertKind.Error, "Error", showButton: true);
         }
     }
     #endregion
