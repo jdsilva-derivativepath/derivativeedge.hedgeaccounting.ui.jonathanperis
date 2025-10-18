@@ -57,6 +57,28 @@ public sealed class GetDeDesignateData
                     request.Reason,
                     cancellationToken);
 
+                // Check if the API returned null (indicates validation failure)
+                if (dedesignationData == null)
+                {
+                    // For Termination (0), this means the hedge item is not terminated
+                    var errorMessage = request.Reason == DerivativeEDGEHAEntityEnumDedesignationReason.Termination
+                        ? "Status of Hedge Item is not Terminated."
+                        : "Unable to de-designate at this time.";
+                    
+                    var errorResponse = new Response(true, errorMessage, null);
+                    errorResponse.ErrorMessage = errorMessage;
+                    return errorResponse;
+                }
+
+                // Check if the API returned an error message in the response
+                if (!string.IsNullOrEmpty(dedesignationData.ErrorMessage))
+                {
+                    var errorResponse = new Response(true, dedesignationData.ErrorMessage, dedesignationData);
+                    errorResponse.ErrorMessage = dedesignationData.ErrorMessage;
+                    errorResponse.DedesignationDate = dedesignationData.DedesignationDate.UtcDateTime;
+                    return errorResponse;
+                }
+
                 var response = new Response(false, "Successfully retrieved dedesignation data", dedesignationData);
                 
                 // Map the dedesignation data properties to response

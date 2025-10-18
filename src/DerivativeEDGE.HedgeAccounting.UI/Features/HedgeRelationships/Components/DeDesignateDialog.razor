@@ -49,41 +49,88 @@
                 </SfDatePicker>
             </div>
 
-            <div class="form-group dp-inputs">
-                <span class="input-label">Cash Payment Type</span>
-                <div class="custom-radio-container">
-                    <SfRadioButton CssClass="input-radiobutton" 
-                                   TChecked="int" 
-                                   Name="cashPayment" 
-                                   Value="0" 
-                                   Label="Full Cash Payment" 
-                                   @bind-Checked="CashPaymentType"
-                                   ValueChange="@(() => HandleCashPaymentTypeChange(0))" />
-                    <SfRadioButton CssClass="input-radiobutton" 
-                                   TChecked="int" 
-                                   Name="cashPayment" 
-                                   Value="1" 
-                                   Label="Partial Cash Payment" 
-                                   @bind-Checked="CashPaymentType"
-                                   ValueChange="@(() => HandleCashPaymentTypeChange(1))" />
-                    <SfRadioButton CssClass="input-radiobutton" 
-                                   TChecked="int" 
-                                   Name="cashPayment" 
-                                   Value="2" 
-                                   Label="No Cash Payment" 
-                                   @bind-Checked="CashPaymentType"
-                                   ValueChange="@(() => HandleCashPaymentTypeChange(2))" />
+            @if (ShowCashPaymentOptions)
+            {
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Cash Payment Type</span>
+                    <div class="custom-radio-container">
+                        <SfRadioButton CssClass="input-radiobutton" 
+                                       TChecked="int" 
+                                       Name="cashPayment" 
+                                       Value="0" 
+                                       Label="Full Cash Payment" 
+                                       @bind-Checked="CashPaymentType"
+                                       ValueChange="@(() => HandleCashPaymentTypeChange(0))" />
+                        <SfRadioButton CssClass="input-radiobutton" 
+                                       TChecked="int" 
+                                       Name="cashPayment" 
+                                       Value="1" 
+                                       Label="Partial Cash Payment" 
+                                       @bind-Checked="CashPaymentType"
+                                       ValueChange="@(() => HandleCashPaymentTypeChange(1))" />
+                        <SfRadioButton CssClass="input-radiobutton" 
+                                       TChecked="int" 
+                                       Name="cashPayment" 
+                                       Value="2" 
+                                       Label="No Cash Payment" 
+                                       @bind-Checked="CashPaymentType"
+                                       ValueChange="@(() => HandleCashPaymentTypeChange(2))" />
+                    </div>
                 </div>
-            </div>
+            }
 
             <div class="form-group dp-inputs">
-                <span class="input-label">Payment Amount</span>
+                <span class="input-label">@PaymentLabel</span>
                 <SfNumericTextBox TValue="decimal?"
                                   CssClass="input-numeric" 
                                   Placeholder="0.00" 
                                   Enabled="@PaymentFieldsEnabled"
                                   Format="C2"
                                   @bind-Value="Payment" />
+            </div>
+
+            <div class="form-group dp-inputs">
+                <span class="input-label">Hedging Item Accrual</span>
+                <SfTextBox CssClass="input-textbox"
+                           Value="@Accrual?.ToString("C2")"
+                           Enabled="false" />
+            </div>
+
+            @if (ShowBasisAdjustmentFields)
+            {
+                <div class="form-group dp-inputs">
+                    <span class="input-label">Basis Adjustment Balance</span>
+                    <SfNumericTextBox TValue="decimal?"
+                                      CssClass="input-numeric" 
+                                      Placeholder="0.00" 
+                                      Enabled="false"
+                                      Format="C2"
+                                      @bind-Value="BasisAdjustmentBalance" />
+                </div>
+            }
+
+            <div class="form-group dp-inputs">
+                <span class="input-label">Hedged Exposure still Exist?</span>
+                <div class="custom-radio-container">
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="bool" 
+                                   Name="exposure" 
+                                   Value="true" 
+                                   Label="Yes" 
+                                   @bind-Checked="HedgedExposureExist"
+                                   ValueChange="@(() => HandleHedgedExposureChange(true))" />
+                    <SfRadioButton CssClass="input-radiobutton" 
+                                   TChecked="bool" 
+                                   Name="exposure" 
+                                   Value="false" 
+                                   Label="No" 
+                                   @bind-Checked="HedgedExposureExist"
+                                   ValueChange="@(() => HandleHedgedExposureChange(false))" />
+                </div>
+            </div>
+
+            <div class="form-group dp-inputs">
+                <span class="input-label">Time Value Entries:</span>
             </div>
 
             <div class="custom-datepicker-container">
@@ -108,55 +155,6 @@
                                   ShowClearButton="true"
                                   @bind-Value="TimeValuesEndDate">
                     </SfDatePicker>
-                </div>
-            </div>
-
-            <div class="form-group dp-inputs">
-                <span class="input-label">Accrual</span>
-                <SfTextBox CssClass="input-textbox"
-                           Value="@Accrual?.ToString("C2")"
-                           Enabled="false" />
-            </div>
-
-            @if (ShowBasisAdjustmentBalance)
-            {
-                <div class="form-group dp-inputs">
-                    <span class="input-label">Basis Adjustment</span>
-                    <SfNumericTextBox TValue="decimal?"
-                                      CssClass="input-numeric" 
-                                      Placeholder="0.00" 
-                                      Enabled="false"
-                                      Format="C2"
-                                      @bind-Value="BasisAdjustment" />
-                </div>
-                <div class="form-group dp-inputs">
-                    <span class="input-label">Basis Adjustment Balance</span>
-                    <SfNumericTextBox TValue="decimal?"
-                                      CssClass="input-numeric" 
-                                      Placeholder="0.00" 
-                                      Enabled="false"
-                                      Format="C2"
-                                      @bind-Value="BasisAdjustmentBalance" />
-                </div>
-            }
-
-            <div class="form-group dp-inputs">
-                <span class="input-label">Hedged Exposure</span>
-                <div class="custom-radio-container">
-                    <SfRadioButton CssClass="input-radiobutton" 
-                                   TChecked="bool" 
-                                   Name="exposure" 
-                                   Value="true" 
-                                   Label="Exists" 
-                                   @bind-Checked="HedgedExposureExist"
-                                   ValueChange="@(() => HandleHedgedExposureChange(true))" />
-                    <SfRadioButton CssClass="input-radiobutton" 
-                                   TChecked="bool" 
-                                   Name="exposure" 
-                                   Value="false" 
-                                   Label="Does Not Exist" 
-                                   @bind-Checked="HedgedExposureExist"
-                                   ValueChange="@(() => HandleHedgedExposureChange(false))" />
                 </div>
             </div>
 
