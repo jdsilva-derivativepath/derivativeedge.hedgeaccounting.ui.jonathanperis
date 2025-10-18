@@ -1324,6 +1324,4 @@ public partial class HedgeRelationshipDetails
         }
     }
     #endregion
-
-
 }
