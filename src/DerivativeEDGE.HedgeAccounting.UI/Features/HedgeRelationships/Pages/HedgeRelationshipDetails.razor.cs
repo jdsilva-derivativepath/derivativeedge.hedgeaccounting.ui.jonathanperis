@@ -801,6 +801,16 @@ public partial class HedgeRelationshipDetails
                HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;
     }
 
+    private bool IsHedgingInstrumentStructureDisabled()
+    {
+        if (HedgeRelationship == null)
+            return true;
+
+        // Disable the Hedging Instrument Structure dropdown when in Designated or Dedesignated status
+        return HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Designated ||
+               HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated;
+    }
+
     private async Task BackloadAsync()
     {
         if (HedgeRelationship == null)
