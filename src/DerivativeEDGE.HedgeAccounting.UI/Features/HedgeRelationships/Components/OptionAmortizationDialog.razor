@@ -70,29 +70,51 @@
                                 <div class="flex-1">
                                     <div class="form-group dp-inputs">
                                         <span class="input-label">Intrinsic Value GL Account</span>
-                                        <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value GL Account">
-                                            <ComboBoxEvents TValue="string" TItem="DropdownModel" />
-                                            <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                        <SfComboBox TValue="long"
+                                                    CssClass="dropdown-input"
+                                                    Enabled="true"
+                                                    TItem="DerivativeEDGEHAEntityGLAccount"
+                                                    Placeholder="Intrinsic Value GL Account"
+                                                    @bind-Value="OptionAmortizationModel.IVGLAccountID"
+                                                    DataSource="AmortizationGLAccounts">
+                                            <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                            <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                         </SfComboBox>
                                     </div>
                                     <div class="form-group dp-inputs">
                                         <span class="input-label">Intrinsic Value Contra</span>
-                                        <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Contra">
-                                            <ComboBoxEvents TValue="string" TItem="DropdownModel" />
-                                            <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                        <SfComboBox TValue="long"
+                                                    CssClass="dropdown-input"
+                                                    Enabled="true"
+                                                    TItem="DerivativeEDGEHAEntityGLAccount"
+                                                    Placeholder="Intrinsic Value Contra"
+                                                    @bind-Value="OptionAmortizationModel.IVContraAccountID"
+                                                    DataSource="AmortizationContraAccounts">
+                                            <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
+                                            <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                         </SfComboBox>
                                     </div>
                                     <div class="form-group dp-inputs">
                                         <span class="input-label">Intrinsic Value Amortization Method</span>
-                                        <SfComboBox TValue="string" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" Placeholder="Intrinsic Value Amortization Method">
-                                            <ComboBoxEvents TValue="string" TItem="DropdownModel" />
-                                            <ComboBoxFieldSettings Text="Text" Value="ID" />
+                                        <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
+                                                    CssClass="dropdown-input"
+                                                    Enabled="true"
+                                                    TItem="AmortizationMethodOption"
+                                                    Placeholder="Intrinsic Value Amortization Method"
+                                                    @bind-Value="OptionAmortizationModel.IVAmortizationMethod"
+                                                    DataSource="AmortizationMethodOptions">
+                                            <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
+                                            <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                         </SfComboBox>
                                     </div>
                                     <div class="form-group dp-inputs">
                                         <span class="input-label">Intrinsic Value</span>
                                         <NumericHotKeys>
-                                            <SfNumericTextBox CssClass="input-numeric" Placeholder="Intrinsic Value" Enabled="true" TValue="long?" />
+                                            <SfNumericTextBox TValue="double"
+                                                              CssClass="input-numeric"
+                                                              Placeholder="Intrinsic Value"
+                                                              Enabled="true"
+                                                              @bind-Value="OptionAmortizationModel.IntrinsicValue" />
                                         </NumericHotKeys>
                                     </div>
                                 </div>

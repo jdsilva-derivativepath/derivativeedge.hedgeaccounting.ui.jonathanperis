@@ -424,7 +424,7 @@ public partial class HedgeRelationshipDetails
         }
     }
 
-    private void NewMenuOnItemSelected(MenuEventArgs args)
+    private async void NewMenuOnItemSelected(MenuEventArgs args)
     {
         // Initialize AmortizationModel with defaults when opening new amortization (legacy: InitializeHedgeRelationshipOptionTimeValueAmort)
         if (args.Item.Text == MODAL_AMORTIZATION)
@@ -443,21 +443,87 @@ public partial class HedgeRelationshipDetails
         }
         else if (args.Item.Text == MODAL_OPTION_AMORTIZATION)
         {
-            // Initialize OptionAmortizationModel with defaults (legacy: line 3313)
-            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
-            {
-                ID = 0,
-                GLAccountID = 0, // Will be set to "None" option in dialog
-                ContraAccountID = 0, // Will be set to "None" option in dialog
-                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (U.S. Government Securities)
-                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
-                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
-                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing,
-                AdjDates = true // Default to checked
-            };
+            // Call API to get default values (legacy: hr_hedgeRelationshipAddEditCtrl.js line 3300)
+            await InitializeOptionAmortizationModelAsync();
         }
         
         OpenModal = args.Item.Text;
+    }
+
+    private async Task InitializeOptionAmortizationModelAsync()
+    {
+        try
+        {
+            // Fetch option amortization defaults from API (legacy: openOptionTimeValueAmortDialog)
+            var defaultsResult = await Mediator.Send(new GetOptionAmortizationDefaults.Query(HedgeRelationship));
+
+            if (defaultsResult.HasError || defaultsResult.Data == null)
+            {
+                await AlertService.ShowToast("Failed to load option amortization defaults", AlertKind.Warning, "Warning", showButton: true);
+                
+                // Initialize with basic defaults if API call fails
+                OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+                {
+                    ID = 0,
+                    GLAccountID = 0,
+                    ContraAccountID = 0,
+                    FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS],
+                    PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
+                    DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
+                    PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing,
+                    AdjDates = true
+                };
+                return;
+            }
+
+            var defaults = defaultsResult.Data;
+
+            // Initialize OptionAmortizationModel with API defaults (legacy: line 3313-3323)
+            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = defaults.GlAccountId, // From API (legacy: line 3315)
+                ContraAccountID = defaults.GlContraAcctId, // From API (legacy: line 3316)
+                AmortizationMethod = HedgeRelationship?.AmortizationMethod ?? DerivativeEDGEHAEntityEnumAmortizationMethod.None, // From current HR (legacy: line 3317)
+                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (legacy: line 3318)
+                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly, // Default (legacy: line 3319)
+                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360, // Default (legacy: line 3320)
+                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing, // Default (legacy: line 3321)
+                Straightline = HedgeRelationship?.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.Straightline, // From current HR (legacy: line 3322)
+                OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue, // Default (legacy: line 3323)
+                IVGLAccountID = defaults.GlAccountId2, // From API for Intrinsic Value (legacy: line 3324)
+                IVContraAccountID = defaults.GlContraAcctId2, // From API for Intrinsic Value (legacy: line 3325)
+                IVAmortizationMethod = defaults.IVAmortizationMethod, // From API (legacy: line 3326)
+                IntrinsicValue = defaults.IntrinsicValue, // From API (legacy: line 3327)
+                TotalAmount = defaults.TimeValue, // From API (legacy: line 3328)
+                HedgeRelationshipID = HedgeRelationship?.ID ?? 0, // Current HR ID (legacy: line 3329)
+                AdjDates = true // Default to checked
+            };
+
+            // Set start/end dates from HedgingItems if available (legacy: line 3332-3335)
+            if (HedgeRelationship?.HedgingItems?.Any() == true)
+            {
+                OptionAmortizationModel.StartDate = HedgeRelationship.DesignationDate; // Match to designation date (legacy: line 3333)
+                OptionAmortizationModel.EndDate = HedgeRelationship.HedgingItems.First().MaturityDate; // From first hedging item (legacy: line 3334)
+            }
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error loading option amortization defaults: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+            
+            // Initialize with basic defaults if exception occurs
+            OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
+            {
+                ID = 0,
+                GLAccountID = 0,
+                ContraAccountID = 0,
+                FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS],
+                PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly,
+                DayCountConv = DerivativeEDGEDomainEntitiesEnumsDayCountConv.ACT_360,
+                PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing,
+                AdjDates = true
+            };
+        }
     }
 
     public async void OnSelectedTab(SelectEventArgs args)
