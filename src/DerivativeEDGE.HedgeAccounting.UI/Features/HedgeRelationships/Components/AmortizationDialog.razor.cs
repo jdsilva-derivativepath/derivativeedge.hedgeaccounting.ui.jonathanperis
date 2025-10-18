@@ -26,7 +26,7 @@ public partial class AmortizationDialog : IDisposable
     #region Private Properties
     private AmortizationFormModel FormModel { get; set; } = new();
     private EditContext? EditContext { get; set; }
-    private bool IsSaveButtonDisabled => EditContext?.Validate() == false;
+    private bool IsSaveButtonDisabled => EditContext == null || !EditContext.Validate();
     #endregion
 
     #region Lifecycle Methods
