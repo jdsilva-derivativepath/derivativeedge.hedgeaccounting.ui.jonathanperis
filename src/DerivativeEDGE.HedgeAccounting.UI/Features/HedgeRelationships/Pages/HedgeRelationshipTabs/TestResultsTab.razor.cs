@@ -22,15 +22,28 @@ public partial class TestResultsTab
 
     // *** ADD THIS NEW PARAMETER ***
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM LatestHedgeRegressionBatch { get; set; }
+    
+    /// <summary>
+    /// Parent hedge relationship for permission checks and API operations
+    /// </summary>
+    [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; }
+    [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> HedgeRelationshipChanged { get; set; }
     #endregion
 
     #region Injected Services
     [Inject] private IMediator Mediator { get; set; }
     [Inject] private ILogger<TestResultsTab> Logger { get; set; }
+    [Inject] private IJSRuntime JSRuntime { get; set; }
+    [Inject] private IAlertService AlertService { get; set; }
+    [Inject] private IUserAuthData UserAuthData { get; set; }
     #endregion
 
     #region Private Fields
     private bool _disposed = false;
+    private bool _isDeleting = false;
+    private bool _isDownloading = false;
+    private bool _showDeleteConfirmation = false;
+    private DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM _batchToDelete = null;
     #endregion
 
     #region Public Properties
@@ -290,7 +303,7 @@ public partial class TestResultsTab
                     await HandleExcelDownload(data);
                     break;
                 case "Delete":
-                    await HandleDelete(data);
+                    await HandleDeleteRequest(data);
                     break;
                 default:
                     Logger?.LogWarning($"Unknown menu action: {args.Item.Text}");
@@ -303,22 +316,109 @@ public partial class TestResultsTab
         }
     }
 
+    /// <summary>
+    /// Handles Excel download action for a test batch.
+    /// Legacy: hr_hedgeRelationshipAddEditCtrl.js -> selectedItemActionTestChanged() -> 'Download Excel'
+    /// </summary>
     private async Task HandleExcelDownload(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
+    {
+        if (_disposed || HedgeRelationship == null) return;
+
+        try
+        {
+            _isDownloading = true;
+            StateHasChanged();
+
+            Logger?.LogInformation($"Downloading Excel for batch ID: {data.ID}");
+
+            var query = new DownloadTestResultExcelService.Query(data.ID, HedgeRelationship);
+            var result = await Mediator.Send(query);
+
+            // Use DotNetStreamReference for proper binary file download
+            using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
+
+            await AlertService.ShowToast("Test results downloaded successfully!", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (ArgumentNullException)
+        {
+            await AlertService.ShowToast("Hedge relationship data is required", AlertKind.Error, "Error", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, $"Failed to download Excel for batch {data.ID}");
+            await AlertService.ShowToast($"Failed to download Excel: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            _isDownloading = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Shows confirmation dialog for delete action.
+    /// Legacy: hr_hedgeRelationshipAddEditCtrl.js -> selectedItemActionTestChanged() -> 'Delete' -> confirm()
+    /// </summary>
+    private async Task HandleDeleteRequest(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
     {
         if (_disposed) return;
 
-        // TODO: Implement Excel download functionality
-        Logger?.LogInformation($"Excel download requested for batch {data.ID}");
+        _batchToDelete = data;
+        _showDeleteConfirmation = true;
+        StateHasChanged();
         await Task.CompletedTask;
     }
 
-    private async Task HandleDelete(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
+    /// <summary>
+    /// Handles confirmed delete action for a test batch.
+    /// Legacy: hr_hedgeRelationshipAddEditCtrl.js -> setModelData(response.data) after successful delete
+    /// </summary>
+    private async Task HandleDeleteConfirmed()
     {
-        if (_disposed) return;
+        if (_disposed || _batchToDelete == null || HedgeRelationship == null) return;
 
-        // TODO: Implement delete functionality with confirmation
-        Logger?.LogInformation($"Delete requested for batch {data.ID}");
-        await Task.CompletedTask;
+        try
+        {
+            _isDeleting = true;
+            _showDeleteConfirmation = false;
+            StateHasChanged();
+
+            Logger?.LogInformation($"Deleting batch ID: {_batchToDelete.ID}");
+
+            var command = new DeleteTestBatchService.Command(_batchToDelete.ID, HedgeRelationship);
+            var result = await Mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                // Update the parent hedge relationship with the response (legacy: setModelData(response.data))
+                await HedgeRelationshipChanged.InvokeAsync(result.UpdatedHedgeRelationship);
+                
+                await AlertService.ShowToast("Test batch deleted successfully!", AlertKind.Success, "Success", showButton: true);
+            }
+            else
+            {
+                await AlertService.ShowToast("Failed to delete test batch", AlertKind.Error, "Error", showButton: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, $"Failed to delete batch {_batchToDelete?.ID}");
+            await AlertService.ShowToast($"Failed to delete test batch: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            _isDeleting = false;
+            _batchToDelete = null;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleDeleteCancelled()
+    {
+        _showDeleteConfirmation = false;
+        _batchToDelete = null;
+        StateHasChanged();
     }
     #endregion
 
@@ -387,6 +487,44 @@ public partial class TestResultsTab
         {
             return $"$({Math.Abs(x):F0})K";
         }
+    }
+    
+    /// <summary>
+    /// Checks if user has required role for hedge relationship operations.
+    /// Legacy: checkUserRole('24') || checkUserRole('17') || checkUserRole('5')
+    /// </summary>
+    private bool HasRequiredRole()
+    {
+        return CheckUserRole("24") || CheckUserRole("17") || CheckUserRole("5");
+    }
+    
+    /// <summary>
+    /// Checks if user has a specific role.
+    /// Legacy: checkUserRole() function in hr_hedgeRelationshipAddEditCtrl.js
+    /// </summary>
+    private bool CheckUserRole(string role)
+    {
+        if (string.IsNullOrEmpty(role) || UserAuthData?.Roles == null)
+            return false;
+
+        // Parse string role ID to integer and cast to EdgeRole enum
+        if (!int.TryParse(role, out var roleId))
+            return false;
+
+        var edgeRole = (DerivativeEDGE.Authorization.AuthClaims.EdgeRole)roleId;
+        return UserAuthData.Roles.Contains(edgeRole);
+    }
+    
+    /// <summary>
+    /// Determines if Delete option should be visible in dropdown.
+    /// Legacy: data-ng-show="Model.HedgeState === 'Draft' || checkUserRole('24') || checkUserRole('17') || checkUserRole('5')"
+    /// </summary>
+    private bool CanShowDeleteOption()
+    {
+        if (HedgeRelationship == null)
+            return false;
+            
+        return HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft || HasRequiredRole();
     }
     #endregion
 

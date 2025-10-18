@@ -259,7 +259,10 @@
                                         <DropDownButtonEvents ItemSelected="@((args) => OnItemSelectedMatrix(args, model))" />
                                         <DropDownMenuItems>
                                             <DropDownMenuItem Text="Download Excel" />
-                                            <DropDownMenuItem Text="Delete" />
+                                            @if (CanShowDeleteOption())
+                                            {
+                                                <DropDownMenuItem Text="Delete" />
+                                            }
                                         </DropDownMenuItems>
                                     </SfDropDownButton>
                                 }
@@ -271,6 +274,16 @@
         </div>
     </div>
 </div>
+
+@* Delete Confirmation Modal - Legacy: confirm('Are you sure to delete the selected test?') *@
+<DpConfirmationModal Visible="@_showDeleteConfirmation"
+                     VisibleChanged="@((bool v) => _showDeleteConfirmation = v)"
+                     Title="Confirm Delete"
+                     Message="Are you sure to delete the selected test?"
+                     ConfirmText="Delete"
+                     CancelText="Cancel"
+                     OnConfirmed="@HandleDeleteConfirmed"
+                     OnCancelled="@HandleDeleteCancelled" />
 
 @code {
 
