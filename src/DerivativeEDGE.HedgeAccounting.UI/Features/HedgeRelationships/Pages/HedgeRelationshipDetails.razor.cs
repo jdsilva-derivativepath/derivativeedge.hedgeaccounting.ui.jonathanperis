@@ -592,6 +592,22 @@ public partial class HedgeRelationshipDetails
             IsSavingHedgeRelationship = true;
             StateHasChanged();
 
+            // Pre-Issuance Hedge logic: Only applicable to CashFlow hedge types
+            // For FairValue and NetInvestment hedge types, PreIssuanceHedge must be false
+            if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue ||
+                HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.NetInvestment)
+            {
+                HedgeRelationship.PreIssuanceHedge = false;
+            }
+
+            // Portfolio Layer Method logic: Only applicable to FairValue hedge types
+            // For CashFlow and NetInvestment hedge types, PortfolioLayerMethod must be false
+            if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow ||
+                HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.NetInvestment)
+            {
+                HedgeRelationship.PortfolioLayerMethod = false;
+            }
+
             var result = await Mediator.Send(new UpdateHedgeRelationship.Command(HedgeRelationship));
             if (!result.HasError)
             {
@@ -760,6 +776,12 @@ public partial class HedgeRelationshipDetails
 
     private bool CanEditCheckbox() =>
         HedgeRelationship?.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft || CheckUserRole("24");
+
+    private bool CanEditPreIssuanceHedge() =>
+        HedgeRelationship?.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;
+
+    private bool CanEditPortfolioLayerMethod() =>
+        HedgeRelationship?.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;
 
     private bool CanEditFairValueMethod() =>
         HedgeRelationship?.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;

@@ -430,7 +430,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                             {
                                 <div class="dp-inputs">
                                     <SfCheckBox CssClass="input-checkbox"
-                                    Disabled="@(!CanEditCheckbox())"
+                                    Disabled="@(!CanEditPreIssuanceHedge())"
                                     @bind-Checked="HedgeRelationship.PreIssuanceHedge"
                                     Label="Pre-Issuance Hedge" />
                                 </div>
@@ -439,7 +439,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                             {
                                 <div class="dp-inputs">
                                     <SfCheckBox CssClass="input-checkbox"
-                                    Disabled="@(!CanEditCheckbox())"
+                                    Disabled="@(!CanEditPortfolioLayerMethod())"
                                     @bind-Checked="HedgeRelationship.PortfolioLayerMethod"
                                     Label="Portfolio Layer Method" />
                                 </div>
