@@ -49,7 +49,7 @@
                                                 TItem="AmortizationMethodOption"
                                                 Placeholder="Amortization Method"
                                                 @bind-Value="OptionAmortizationModel.AmortizationMethod"
-                                                DataSource="@AmortizationMethodOptions">
+                                                DataSource="@GetFilteredAmortizationMethodOptions()">
                                         <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
                                         <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                     </SfComboBox>
@@ -101,7 +101,7 @@
                     </div>
                 </div>
                 <div class="custom-datepicker-container">
-                    <div class="dp-inputs" style="width: 100%">
+                    <div class="dp-inputs">
                         <label class="input-label">Start Date</label>
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker"
@@ -112,7 +112,7 @@
                                       @bind-Value="OptionAmortizationStartDate">
                         </SfDatePicker>
                     </div>
-                    <div class="dp-inputs" style="width: 100%">
+                    <div class="dp-inputs">
                         <label class="input-label">End Date</label>
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker"
