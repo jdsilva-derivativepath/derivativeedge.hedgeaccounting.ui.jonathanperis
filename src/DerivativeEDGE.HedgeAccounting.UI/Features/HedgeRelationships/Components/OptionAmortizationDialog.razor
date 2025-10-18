@@ -125,7 +125,10 @@
                 <div class="custom-action-container ">
                     <div class="dp-buttons">
                         <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
-                        <SfButton CssClass="button-primary button-default" Content="Generate" IsPrimary="true" />
+                        <SfButton CssClass="button-primary button-default" 
+                                  Content="@(OptionAmortizationModel.ID > 0 ? "Update" : "Generate")" 
+                                  IsPrimary="true" 
+                                  Disabled="@IsGenerateButtonDisabled" />
                     </div>
                 </div>
             </EditForm>

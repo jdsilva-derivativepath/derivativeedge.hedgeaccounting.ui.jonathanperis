@@ -25,6 +25,7 @@ public partial class OptionAmortizationDialog
     public DocumentContent Model { get; set; } = new();
     
     // Legacy: AmortizeOptionPremimum defaults to true (line 3325 in legacy openOptionTimeValueAmortDialog)
+    // For new records, defaults to true. For existing records being edited, set to IsAnOptionHedge (line 1032)
     private bool AmortizeOptionPremium { get; set; } = true;
     
     // Legacy: GL Account and Contra dropdown lists with "None" option (lines 55, 76 in legacy optionTimeValue.cshtml)
@@ -40,6 +41,15 @@ public partial class OptionAmortizationDialog
             .Where(option => !(OptionAmortizationModel.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue 
                             && option.Value == DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet))
             .ToList();
+    
+    // Legacy: Generate button disabled logic (lines 149-151 in optionTimeValue.cshtml)
+    // Disabled when: !AmortizeOptionPremimum OR AmortizationMethod === 'None' OR form is invalid
+    private bool IsGenerateButtonDisabled => 
+        !AmortizeOptionPremium || 
+        OptionAmortizationModel?.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.None ||
+        OptionAmortizationModel?.GLAccountID == 0 || // Required field
+        string.IsNullOrEmpty(OptionAmortizationModel?.StartDate) || // Required field
+        string.IsNullOrEmpty(OptionAmortizationModel?.EndDate); // Required field
     
     private DateTime? OptionAmortizationStartDate
     {
