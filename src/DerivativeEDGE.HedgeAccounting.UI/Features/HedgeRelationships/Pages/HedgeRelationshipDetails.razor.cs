@@ -117,6 +117,22 @@ public partial class HedgeRelationshipDetails
     private bool IsDeDesignateModal => OpenModal == MODAL_DEDESIGNATE;
     private bool IsReDesignateModal => OpenModal == MODAL_REDESIGNATE;
     private string BenchMarkLabel => HedgeRelationshipLabelHelper.GetBenchMarkLabel(HedgeRelationship);
+    
+    private string _templateDisplayName = string.Empty;
+    private string TemplateDisplayName
+    {
+        get
+        {
+            if (HedgeRelationship?.InceptionMemoTemplateID == null)
+                return string.Empty;
+
+            var templates = DropdownDataHelper.GetDropdownDatasource("hedgingobjective");
+            var selectedTemplate = templates.FirstOrDefault(t => t.ID == HedgeRelationship.InceptionMemoTemplateID);
+            _templateDisplayName = selectedTemplate?.Text ?? string.Empty;
+            return _templateDisplayName;
+        }
+        set => _templateDisplayName = value ?? string.Empty;
+    }
 
     // TODO: Replace with actual business logic
     private bool IsHedgeDesignated => false; // Replace with real data check
@@ -477,7 +493,9 @@ public partial class HedgeRelationshipDetails
 
     private Task RedirectToHedgeDocumentService(string pathAndQuery)
     {
-        NavManager.NavigateTo(pathAndQuery, forceLoad: true);
+        // Append HedgeRelationshipId and ClientId parameters as done in legacy system
+        var url = $"{pathAndQuery}HedgeRelationshipId={HedgeId}&ClientId={HedgeRelationship.ClientID}";
+        NavManager.NavigateTo(url, forceLoad: true);
         return Task.CompletedTask;
     }
 
