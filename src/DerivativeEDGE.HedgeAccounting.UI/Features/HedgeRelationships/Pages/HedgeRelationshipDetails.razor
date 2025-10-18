@@ -596,7 +596,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <TabHeader Text="Instruments and Analysis"></TabHeader>
                     </ChildContent>
                     <ContentTemplate>
-                        <InstrumentAnalysisTab @ref="instrumentAnalysisTabRef" @bind-HedgeRelationship="@HedgeRelationship" />
+                        <InstrumentAnalysisTab @ref="instrumentAnalysisTabRef" @bind-HedgeRelationship="@HedgeRelationship" IsDpiUser="@IsDpiUser" />
                     </ContentTemplate>
                 </TabItem>
                 <TabItem>
