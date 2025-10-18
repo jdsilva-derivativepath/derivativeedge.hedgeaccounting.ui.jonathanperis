@@ -169,34 +169,119 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                 <span class="input-label">Description</span>
                                 <SfTextBox CssClass="input-textbox" Placeholder="Description" @bind-Value="HedgeRelationship.Description" />
                             </div>
-                            @if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)
+                            @if (!HedgeRelationship.IsCaarHedgeTemplate)
                             {
-                                <div class="form-group dp-inputs min-w-100">
-                                    <span class="input-label">Hedging Objective</span>
-                                    <SfDropDownList TValue="long?"
-                                    CssClass="dropdown-input flex-grow-1"
-                                    Enabled="true"
-                                    TItem="DropdownModel"
-                                    Placeholder="Hedging Objective"
-                                    @bind-Value="HedgeRelationship.InceptionMemoTemplateID"
-                                    DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgingobjective")">
-                                        <DropDownListEvents TValue="long?" TItem="DropdownModel" />
-                                        <DropDownListFieldSettings Text="Text" Value="ID" />
-                                    </SfDropDownList>
+                                @* Legacy template system *@
+                                @if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)
+                                {
+                                    <div class="form-group dp-inputs min-w-100">
+                                        <span class="input-label">Hedging Objective</span>
+                                    </div>
+                                    <div class="form-group dp-inputs min-w-100">
+                                        <span class="input-label">Template</span>
+                                        <SfDropDownList TValue="long?"
+                                        CssClass="dropdown-input flex-grow-1"
+                                        Enabled="true"
+                                        TItem="DropdownModel"
+                                        Placeholder="Template"
+                                        @bind-Value="HedgeRelationship.InceptionMemoTemplateID"
+                                        DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgingobjective")">
+                                            <DropDownListEvents TValue="long?" TItem="DropdownModel" />
+                                            <DropDownListFieldSettings Text="Text" Value="ID" />
+                                        </SfDropDownList>
+                                    </div>
+                                    <div class="richtexteditorouter w-50 my-2">
+                                        <SfRichTextEditor EnableResize="true" CssClass="e-richtexteditor" @bind-Value="HedgeRelationship.Objective">
+                                            <RichTextEditorToolbarSettings Items="@BasicTools" />
+                                        </SfRichTextEditor>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="form-group">
+                                        <span class="input-label">Hedging Objective</span>
+                                    </div>
+                                    <div class="form-group dp-inputs min-w-100">
+                                        <span class="input-label">Template</span>
+                                        <SfTextBox CssClass="input-textbox"
+                                        Placeholder="Template"
+                                        Enabled="false"
+                                        @bind-Value="@GetTemplateDisplayName()" />
+                                    </div>
+                                    <div class="dp-inputs min-w-100">
+                                        <SfTextBox CssClass="input-multiline"
+                                        Placeholder="Objective"
+                                        Enabled="false"
+                                        @bind-Value="HedgeRelationship.Objective" />
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                @* New CAAR template system *@
+                                <div class="form-group">
+                                    <span class="input-label">@(IsNewHedgeDocumentTemplate ? "Hedge Documentation" : "Hedging Objective")</span>
                                 </div>
-                                <div class="richtexteditorouter w-50 my-2">
-                                    <SfRichTextEditor EnableResize="true" CssClass="e-richtexteditor" @bind-Value="HedgeRelationship.Objective">
-                                        <RichTextEditorToolbarSettings Items="@BasicTools" />
-                                    </SfRichTextEditor>
-                                </div>
-                            } else {
-                                <div class="dp-inputs min-w-100">
-                                    <span class="input-label">Hedge Documentation</span>
-                                    <SfTextBox CssClass="input-multiline"
-                                    Placeholder="Hedge Documentation"
-                                    Enabled="false"
-                                    @bind-Value="HedgeRelationship.Objective" />
-                                </div>
+                                @if (!IsNewHedgeDocumentTemplate)
+                                {
+                                    @* Show legacy template dropdown when not using new templates *@
+                                    @if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)
+                                    {
+                                        <div class="form-group dp-inputs min-w-100">
+                                            <span class="input-label">Template</span>
+                                            <SfDropDownList TValue="long?"
+                                            CssClass="dropdown-input flex-grow-1"
+                                            Enabled="true"
+                                            TItem="DropdownModel"
+                                            Placeholder="Template"
+                                            @bind-Value="HedgeRelationship.InceptionMemoTemplateID"
+                                            DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgingobjective")">
+                                                <DropDownListEvents TValue="long?" TItem="DropdownModel" />
+                                                <DropDownListFieldSettings Text="Text" Value="ID" />
+                                            </SfDropDownList>
+                                        </div>
+                                        <div class="richtexteditorouter w-50 my-2">
+                                            <SfRichTextEditor EnableResize="true" CssClass="e-richtexteditor" @bind-Value="HedgeRelationship.Objective">
+                                                <RichTextEditorToolbarSettings Items="@BasicTools" />
+                                            </SfRichTextEditor>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group dp-inputs min-w-100">
+                                            <span class="input-label">Template</span>
+                                            <SfTextBox CssClass="input-textbox"
+                                            Placeholder="Template"
+                                            Enabled="false"
+                                            @bind-Value="@GetTemplateDisplayName()" />
+                                        </div>
+                                        <div class="dp-inputs min-w-100">
+                                            <SfTextBox CssClass="input-multiline"
+                                            Placeholder="Objective"
+                                            Enabled="false"
+                                            @bind-Value="HedgeRelationship.Objective" />
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    @* New hedge document template display *@
+                                    <div class="form-group dp-inputs min-w-100">
+                                        <SfTextBox CssClass="input-textbox"
+                                        Placeholder="None"
+                                        Enabled="false"
+                                        Value="@(HedgeRelationship.HedgeDocumentTemplateName ?? "None")" />
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(HedgeRelationship.HedgeDocumentTemplateDescription))
+                                    {
+                                        <div class="dp-inputs min-w-100">
+                                            <SfTextBox CssClass="input-multiline"
+                                            Placeholder="Description"
+                                            Enabled="false"
+                                            Value="@HedgeRelationship.HedgeDocumentTemplateDescription" />
+                                        </div>
+                                    }
+                                }
                             }
                         </div>
                         <div class="flex-1">
@@ -268,44 +353,65 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                     <DropDownListFieldSettings Text="Text" Value="Value" />
                                 </SfDropDownList>
                             </div>
-                            @if (HedgeRelationship?.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated
-                              && !string.IsNullOrEmpty(HedgeRelationship?.HedgeDocumentTemplateName))
+                            @if (HedgeRelationship.IsCaarHedgeTemplate)
                             {
-                                <div class="dp-buttons">
-                                    <SfButton CssClass="button-link button-default"
-                                    IconCss="fa fa-external-link"
-                                    OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/gallery-hrdocument?"))"
-                                    Content="Select Template" />
-                                </div>
+                                @* Select Template button - shown when no template is selected and using new template system *@
+                                @if (HedgeRelationship?.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated
+                                  && string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
+                                  && IsNewHedgeDocumentTemplate)
+                                {
+                                    <div class="dp-buttons">
+                                        <SfButton CssClass="button-link button-default"
+                                        IconCss="fa fa-external-link"
+                                        OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/gallery-hrdocument?"))"
+                                        Content="Select Template" />
+                                    </div>
+                                }
+
+                                @* Preview Document button for legacy templates (no new document template) *@
+                                @if (string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
+                                  && !IsNewHedgeDocumentTemplate)
+                                {
+                                    <div class="dp-buttons">
+                                        <SfButton CssClass="button-link button-default"
+                                        IconCss="fa fa-external-link"
+                                        Content="Preview Document"
+                                        OnClick="PreviewHedgeDocumentObjective" />
+                                    </div>
+                                }
+
+                                @* Preview Document button for new templates *@
+                                @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
+                                  && IsNewHedgeDocumentTemplate)
+                                {
+                                    <div class="dp-buttons">
+                                        <SfButton CssClass="button-link button-default"
+                                        IconCss="fa fa-external-link"
+                                        Content="Preview Document"
+                                        OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/preview-hrdocument?"))" />
+                                    </div>
+                                }
+
+                                @* Edit Document button - shown when a new template is selected *@
+                                @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName))
+                                {
+                                    <div class="dp-buttons">
+                                        <SfButton CssClass="button-link button-default"
+                                        IconCss="fa fa-external-link"
+                                        Content="Edit Document"
+                                        Disabled="@(HedgeRelationship?.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)"
+                                        OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/edit-hrdocument?"))" />
+                                    </div>
+                                }
                             }
-                            @if (string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
-                              && !(IsNewHedgeDocumentTemplate))
+                            else
                             {
+                                @* For non-CAAR templates, show Preview Document button *@
                                 <div class="dp-buttons">
                                     <SfButton CssClass="button-link button-default"
                                     IconCss="fa fa-external-link"
                                     Content="Preview Document"
                                     OnClick="PreviewHedgeDocumentObjective" />
-                                </div>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName)
-                              && (IsNewHedgeDocumentTemplate))
-                            {
-                                <div class="dp-buttons">
-                                    <SfButton CssClass="button-link button-default"
-                                    IconCss="fa fa-external-link"
-                                    Content="Preview Document"
-                                    OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/preview-hrdocument?"))" />
-                                </div>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(HedgeRelationship?.HedgeDocumentTemplateName))
-                            {
-                                <div class="dp-buttons">
-                                    <SfButton CssClass="button-link button-default"
-                                    IconCss="fa fa-external-link"
-                                    Content="Edit Document"
-                                    OnClick="@(() => RedirectToHedgeDocumentService("/hedgeaccountingapp/edit-hrdocument?"))" />
                                 </div>
                             }
                         </div>
