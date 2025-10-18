@@ -57,8 +57,8 @@ public partial class InstrumentAnalysisTab
     }
 
     // Computed property to check if regression can be changed
-    // Based on legacy logic: regression can only be changed when HedgeState is Draft
-    // Or when Designated AND user is DPI user OR contract type is SaaS/SwaS
+    // Based on legacy logic: regression can ONLY be changed when HedgeState is Draft
+    // This matches the toggleRegression function in the legacy code that only allows changes in Draft state
     private bool IsRegressionEnabled
     {
         get
@@ -66,21 +66,9 @@ public partial class InstrumentAnalysisTab
             if (HedgeRelationship == null)
                 return false;
 
-            // If it's Draft, regression can always be changed
-            if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft)
-                return true;
-
-            // If Designated, check if user has permission
-            if (HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Designated)
-            {
-                // User can change if they are DPI user OR contract type is SaaS/SwaS
-                return IsDpiUser || 
-                       HedgeRelationship.ContractType == "SaaS" || 
-                       HedgeRelationship.ContractType == "SwaS";
-            }
-
-            // For any other state (Dedesignated), don't allow changes
-            return false;
+            // Regression can ONLY be changed when in Draft state
+            // This is different from other fields which may allow changes when Designated with DPI user
+            return HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;
         }
     }
     #endregion
