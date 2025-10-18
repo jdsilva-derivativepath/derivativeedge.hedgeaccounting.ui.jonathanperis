@@ -1281,6 +1281,55 @@ public partial class HedgeRelationshipDetails
             await AlertService.ShowToast($"Error during re-designation: {ex.Message}", AlertKind.Error, "Error", showButton: true);
         }
     }
+    
+    private async Task HandleEditAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
+    {
+        // Set the model to the selected amortization (legacy: $scope.HedgeRelationshipOptionTimeValueAmort = selectedItem)
+        AmortizationModel = amortization;
+        
+        // Open the amortization modal
+        OpenModal = MODAL_AMORTIZATION;
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    
+    private async Task HandleDeleteAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
+    {
+        // Confirm deletion (legacy: confirm dialog)
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this amortization schedule?");
+        
+        if (!confirmed)
+            return;
+        
+        try
+        {
+            // Delete the amortization via API (legacy: HedgeRelationshipOptionTimeValueAmort destroy)
+            await HedgeAccountingApiService.HedgeRelationshipOptionTimeValueAmortDELETEAsync(amortization.ID);
+            
+            // Refresh the hedge relationship data
+            await GetHedgeRelationship(HedgeRelationshipId);
+            
+            await AlertService.ShowToast("Amortization schedule deleted successfully.", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error deleting amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
+    
+    private async Task HandleDownloadExcelAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
+    {
+        try
+        {
+            // Download Excel file for amortization schedule (legacy: ExportHedgeAmortizatonSchedule)
+            // TODO: Implement Excel download using Export2Async method
+            await AlertService.ShowToast("Excel export not yet implemented.", AlertKind.Warning, "Warning", showButton: true);
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Error downloading Excel: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+    }
     #endregion
 
     #region Modal Callbacks

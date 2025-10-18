@@ -151,7 +151,10 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <TabHeader Text="Amortization"></TabHeader>
                     </ChildContent>
                     <ContentTemplate>
-                        <AmortizationTab @bind-HedgeRelationshipOptionTimeValueAmorts="@HedgeRelationship.HedgeRelationshipOptionTimeValueAmorts" />
+                        <AmortizationTab @bind-HedgeRelationshipOptionTimeValueAmorts="@HedgeRelationship.HedgeRelationshipOptionTimeValueAmorts" 
+                                        OnEditAmortization="@HandleEditAmortization"
+                                        OnDeleteAmortization="@HandleDeleteAmortization"
+                                        OnDownloadExcelAmortization="@HandleDownloadExcelAmortization" />
                     </ContentTemplate>
                 </TabItem>
                 <TabItem>
