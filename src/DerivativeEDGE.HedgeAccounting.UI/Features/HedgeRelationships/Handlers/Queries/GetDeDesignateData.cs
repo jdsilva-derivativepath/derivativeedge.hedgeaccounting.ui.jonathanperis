@@ -14,6 +14,7 @@ public sealed class GetDeDesignateData
         public DateTime TimeValuesStartDate { get; set; }
         public DateTime TimeValuesEndDate { get; set; }
         public decimal Payment { get; set; }
+        public decimal Accrual { get; set; }
         public bool ShowBasisAdjustmentBalance { get; set; }
         public decimal BasisAdjustment { get; set; }
         public decimal BasisAdjustmentBalance { get; set; }
@@ -92,6 +93,7 @@ public sealed class GetDeDesignateData
 
                     // Safely convert numeric values (handles nullable/non-nullable double)
                     response.Payment = Convert.ToDecimal(dedesignationData?.Payment ?? 0d);
+                    response.Accrual = Convert.ToDecimal(dedesignationData?.Accrual ?? 0d);
                     response.ShowBasisAdjustmentBalance = dedesignationData.ShowBasisAdjustmentBalance;
                     response.BasisAdjustment = Convert.ToDecimal(dedesignationData?.BasisAdjustment ?? 0d);
                     response.BasisAdjustmentBalance = Convert.ToDecimal(dedesignationData?.BasisAdjustmentBalance ?? 0d);

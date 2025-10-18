@@ -1050,6 +1050,7 @@ public partial class HedgeRelationshipDetails
                 DedesignateTimeValuesEndDate = response.TimeValuesEndDate;
                 DedesignationDateDialog = response.DedesignationDate;
                 DedesignatePayment = response.Payment;
+                DedesignateAccrual = response.Accrual;
                 ShowBasisAdjustmentBalance = response.ShowBasisAdjustmentBalance;
                 BasisAdjustment = response.BasisAdjustment;
                 BasisAdjustmentBalance = response.BasisAdjustmentBalance;
