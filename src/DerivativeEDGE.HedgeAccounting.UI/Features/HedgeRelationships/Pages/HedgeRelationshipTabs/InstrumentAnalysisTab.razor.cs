@@ -127,6 +127,11 @@ public partial class InstrumentAnalysisTab
             HedgedItems = HedgeRelationship.HedgedItems?.ToList() ?? [];
             HedgingItems = HedgeRelationship.HedgingItems?.ToList() ?? [];
 
+            // Populate ItemStatusText from ItemStatus enum if it's missing
+            // This handles cases where the API doesn't populate the text field
+            PopulateItemStatusText(HedgedItems);
+            PopulateItemStatusText(HedgingItems);
+
             // Ensure mutual exclusivity - if both are true (shouldn't happen), prefer Cumulative Changes
             if (HedgeRelationship.CumulativeChanges && HedgeRelationship.PeriodicChanges)
             {
@@ -213,6 +218,60 @@ public partial class InstrumentAnalysisTab
     public async Task RefreshGridData()
     {
         await LoadInstrumentAnalysisData();
+    }
+
+    /// <summary>
+    /// Populates ItemStatusText from ItemStatus enum when the text field is null or empty.
+    /// This handles cases where the API doesn't populate the ItemStatusText field.
+    /// Legacy code reference: old/hr_hedgeRelationshipAddEditCtrl.js line 2977-2978
+    /// </summary>
+    private void PopulateItemStatusText(List<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM> items)
+    {
+        if (items == null) return;
+
+        foreach (var item in items)
+        {
+            if (string.IsNullOrWhiteSpace(item.ItemStatusText))
+            {
+                // Convert enum to string using the EnumMember attribute value
+                item.ItemStatusText = GetTradeStatusText(item.ItemStatus);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Converts TradeStatus enum to its string representation.
+    /// Matches the enum values defined in the API: DerivativeEDGEDomainEntitiesEnumsTradeStatus
+    /// </summary>
+    private static string GetTradeStatusText(DerivativeEDGEDomainEntitiesEnumsTradeStatus status)
+    {
+        return status switch
+        {
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Pricing => "Pricing",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Executed => "Executed",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Validated => "Validated",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Amended => "Amended",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Cancelled => "Cancelled",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Inactive => "Inactive",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Booked => "Booked",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Terminated => "Terminated",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Novated => "Novated",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.RPABought => "RPABought",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.RPASold => "RPASold",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Matured => "Matured",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Terminate => "Terminate",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Archived => "Archived",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.HA => "HA",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Hedge => "Hedge",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Template => "Template",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.DealContingent => "DealContingent",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.FixPaymentRequested => "FixPaymentRequested",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.ReversalRequested => "ReversalRequested",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.MarkedAsReversed => "MarkedAsReversed",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.CancellationRequested => "CancellationRequested",
+            DerivativeEDGEDomainEntitiesEnumsTradeStatus.Tradeable => "Tradeable",
+            _ => status.ToString()
+        };
     }
     #endregion
     #region Event Handlers
@@ -304,6 +363,12 @@ public partial class InstrumentAnalysisTab
 
             if (hedgeItemVM is not null)
             {
+                // Populate ItemStatusText from ItemStatus if missing (same as LoadInstrumentAnalysisData)
+                if (string.IsNullOrWhiteSpace(hedgeItemVM.ItemStatusText))
+                {
+                    hedgeItemVM.ItemStatusText = GetTradeStatusText(hedgeItemVM.ItemStatus);
+                }
+
                 if (ExistingTradeModalHeaderText == "Hedged")
                 {
                     hedgeItemVM.HedgeRelationshipID = HedgeRelationship.ID;
