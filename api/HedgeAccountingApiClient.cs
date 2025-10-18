@@ -17740,6 +17740,9 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("OptionSwapletAmortizations", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM>? OptionSwapletAmortizations { get; set; } = default!;
 
+        [Newtonsoft.Json.JsonProperty("AmortizeOptionPremimum", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool AmortizeOptionPremimum { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
