@@ -1,5 +1,7 @@
 # DerivativeEDGE Hedge Accounting UI - AI Coding Instructions
 
+> **Quick Summary:** Blazor Server (.NET 8) hedge accounting UI migrated from AngularJS. Use `./old/` for reference. **DO NOT BUILD** (requires private AWS packages). Focus on exact lift-and-shift - no features added/removed. See migration tables below.
+
 ## What This Repository Does
 This repository contains the **Next Generation Hedge Accounting User Interface** for DerivativeEDGE, a financial derivatives management platform. The UI enables users to:
 - Create and manage hedge relationships (Draft → Designated → Dedesignated lifecycle)
@@ -327,6 +329,66 @@ The application manages hedge relationship lifecycle with state transitions:
 ### Testing
 - `src/DerivativeEDGE.HedgeAccounting.UI.Tests/` - Playwright E2E tests
 - `src/DerivativeEDGE.HedgeAccounting.UI.Bunit.Tests/` - Bunit component tests
+
+## AI Agent Workflow for Migration Tasks
+
+### Step-by-Step Approach for Copilot/AI Agents
+When you receive a migration task, follow this workflow:
+
+#### 1. Understand the Request (5 minutes)
+- [ ] Read the task description carefully
+- [ ] Identify which legacy file(s) need to be migrated
+- [ ] Identify the target new file(s)
+- [ ] Check if the feature is already partially implemented
+
+#### 2. Study Legacy Code (15-30 minutes)
+- [ ] Open the corresponding `./old/` file(s)
+- [ ] Identify all business logic, conditions, calculations
+- [ ] Note all user role checks and permissions
+- [ ] Document any quirks or unusual patterns
+- [ ] Trace through workflow state transitions if applicable
+
+#### 3. Understand API Models (10 minutes)
+- [ ] Check `api/HedgeAccountingApiClient.cs` for relevant DTOs/models
+- [ ] Understand data structure and relationships
+- [ ] Note any enums or constants used
+
+#### 4. Review Existing Patterns (10 minutes)
+- [ ] Check `Features/HedgeRelationships/Handlers/` for similar implementations
+- [ ] Review other migrated tabs for UI patterns
+- [ ] Check `WORKFLOW_COMPARISON.md` if working on workflow logic
+
+#### 5. Implement Migration (30-60 minutes)
+- [ ] Create MediatR handler if needed (query/command pattern)
+- [ ] Implement code-behind logic matching legacy controller
+- [ ] Create Razor view matching legacy HTML structure
+- [ ] Use Syncfusion components with appropriate CSS classes
+- [ ] Add Tailwind for layout (never on Syncfusion components)
+- [ ] Include comments referencing legacy file/line for complex logic
+
+#### 6. Self-Review (15 minutes)
+- [ ] Compare line-by-line with legacy code
+- [ ] Verify all conditions/branches are present
+- [ ] Check role permissions match exactly
+- [ ] Ensure no new features added
+- [ ] Ensure no old features removed
+- [ ] Verify array/collection operations produce same results
+
+#### 7. Document & Report (10 minutes)
+- [ ] Add comments explaining migration choices
+- [ ] Note any assumptions or uncertainties
+- [ ] Request manual testing for critical paths
+- [ ] Update progress with clear summary
+
+#### What NOT to Do During Migration
+- ❌ **Don't create markdown files** explaining what you did - only code changes
+- ❌ **Don't try to build** - it will fail without AWS credentials
+- ❌ **Don't add new validation** - migrate exactly what exists
+- ❌ **Don't remove old logic** - even if it seems redundant
+- ❌ **Don't optimize** - preserve original logic patterns
+- ❌ **Don't skip role checks** - security is critical
+- ❌ **Don't assume behavior** - verify against legacy code
+- ❌ **Don't use different API endpoints** - match legacy exactly
 
 ## Quick Start for Migration Tasks
 
