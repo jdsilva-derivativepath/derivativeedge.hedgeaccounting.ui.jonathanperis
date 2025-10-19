@@ -415,15 +415,6 @@ public partial class HedgeRelationshipDetails
         }
     }
 
-    private void HandleEntityValueChangeAsync(ChangeEventArgs<long, DerivativeEDGEHAEntityLegalEntity> args)
-    {
-        if (HedgeRelationship != null)
-        {
-            HedgeRelationship.BankEntityID = args.Value;
-            StateHasChanged();
-        }
-    }
-
     private async void NewMenuOnItemSelected(MenuEventArgs args)
     {
         // Initialize AmortizationModel with defaults when opening new amortization (legacy: InitializeHedgeRelationshipOptionTimeValueAmort)
@@ -1470,12 +1461,12 @@ public partial class HedgeRelationshipDetails
         {
             // Download Excel file for option amortization schedule (legacy: ExportHedgeOptionAmortizationSchedule)
             var query = new ExportOptionAmortizationScheduleService.Query(
-                HedgeRelationship, 
-                optionAmortization.ID, 
-                optionAmortization.OptionTimeValueAmortType);
+                HedgeRelationship,
+                optionAmortization.ID,
+                optionAmortization.OptionTimeValueAmortType.ToString());
+
             var result = await Mediator.Send(query);
 
-            // Use DotNetStreamReference for proper binary file download
             using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
 
