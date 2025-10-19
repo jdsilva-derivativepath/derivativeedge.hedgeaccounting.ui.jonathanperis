@@ -491,10 +491,6 @@ public partial class HedgeRelationshipDetails
                 PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing, // Default (legacy: line 3321)
                 Straightline = HedgeRelationship?.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.Straightline, // From current HR (legacy: line 3322)
                 OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue, // Default (legacy: line 3323)
-                IVGLAccountID = defaults.GlAccountId2, // From API for Intrinsic Value (legacy: line 3324)
-                IVContraAccountID = defaults.GlContraAcctId2, // From API for Intrinsic Value (legacy: line 3325)
-                IVAmortizationMethod = defaults.IVAmortizationMethod, // From API (legacy: line 3326)
-                IntrinsicValue = defaults.IntrinsicValue, // From API (legacy: line 3327)
                 TotalAmount = defaults.TimeValue, // From API (legacy: line 3328)
                 HedgeRelationshipID = HedgeRelationship?.ID ?? 0, // Current HR ID (legacy: line 3329)
                 AdjDates = true // Default to checked

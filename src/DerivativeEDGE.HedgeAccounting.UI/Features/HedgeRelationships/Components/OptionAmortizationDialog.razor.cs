@@ -147,15 +147,5 @@ public partial class OptionAmortizationDialog
             await AlertService.ShowToast($"Error saving Option Amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
         }
     }
-
-    private void OnOptionAmortizationComboBoxCreated(object args)
-    {
-        // When opening modal for new entry (ID = 0), GLAccountID and ContraAccountID will be 0
-        // which corresponds to "None" option, so no need to override
-        // When editing existing entry, values are already set from the model
-        
-        // Legacy behavior: first item was selected by default, but now we default to "None" (ID = 0)
-        // This matches the legacy system where <option value="">None</option> was the default
-    }
     #endregion
 }

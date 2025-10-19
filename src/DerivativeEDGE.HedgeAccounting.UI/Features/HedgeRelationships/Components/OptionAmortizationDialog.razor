@@ -25,7 +25,6 @@
                                                 Placeholder="GL Account"
                                                 @bind-Value="OptionAmortizationModel.GLAccountID"
                                                 DataSource="AmortizationGLAccounts">
-                                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
                                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                     </SfComboBox>
                                 </div>
@@ -38,7 +37,6 @@
                                                 Placeholder="Contra"
                                                 @bind-Value="OptionAmortizationModel.ContraAccountID"
                                                 DataSource="AmortizationContraAccounts">
-                                        <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
                                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                     </SfComboBox>
                                 </div>
@@ -77,7 +75,6 @@
                                                     Placeholder="Intrinsic Value GL Account"
                                                     @bind-Value="IVGLAccountID"
                                                     DataSource="AmortizationGLAccounts">
-                                            <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
                                             <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                         </SfComboBox>
                                     </div>
@@ -90,7 +87,6 @@
                                                     Placeholder="Intrinsic Value Contra"
                                                     @bind-Value="IVContraAccountID"
                                                     DataSource="AmortizationContraAccounts">
-                                            <ComboBoxEvents TValue="long" TItem="DerivativeEDGEHAEntityGLAccount" Created="OnOptionAmortizationComboBoxCreated" />
                                             <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                         </SfComboBox>
                                     </div>
