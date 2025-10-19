@@ -226,6 +226,8 @@ public partial class InstrumentAnalysisTab
     public async Task RefreshGridData()
     {
         await LoadInstrumentAnalysisData();
+        // Trigger re-render to refresh dropdown options based on current HedgeType and IsAnOptionHedge
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
