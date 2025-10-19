@@ -1500,7 +1500,7 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Checkbox Event Handlers
-    private void OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    private async void OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
     {
         if (HedgeRelationship != null)
         {
@@ -1520,6 +1520,15 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.AmortizeOptionPremimum = false;
                 HedgeRelationship.IsDeltaMatchOption = false;
                 HedgeRelationship.ExcludeIntrinsicValue = false;
+            }
+            // When checking the "Hedge is an Option" checkbox, automatically open the Option Amortization dialog
+            // This matches the behavior of clicking "New Option Amortization" button
+            else if (args.Checked)
+            {
+                // Initialize Option Amortization model with defaults from API
+                await InitializeOptionAmortizationModelAsync();
+                // Open the Option Amortization dialog
+                OpenModal = MODAL_OPTION_AMORTIZATION;
             }
             
             StateHasChanged();
