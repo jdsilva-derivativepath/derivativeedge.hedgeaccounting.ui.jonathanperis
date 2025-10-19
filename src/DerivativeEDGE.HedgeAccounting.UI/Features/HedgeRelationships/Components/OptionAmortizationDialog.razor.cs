@@ -27,6 +27,14 @@ public partial class OptionAmortizationDialog
     // Legacy: hr_hedgeRelationshipAddEditCtrl.js lines 1032, 3325 and optionTimeValue.cshtml line 149
     private bool AmortizeOptionPremium { get; set; } = true;
     
+    // Intrinsic Value fields - These exist on Entity but not on ViewModel
+    // Store locally and map to Entity when submitting
+    // Legacy: optionTimeValue.cshtml lines 63-117
+    private long IVGLAccountID { get; set; }
+    private long IVContraAccountID { get; set; }
+    private DerivativeEDGEHAEntityEnumAmortizationMethod IVAmortizationMethod { get; set; } = DerivativeEDGEHAEntityEnumAmortizationMethod.None;
+    private double IntrinsicValue { get; set; }
+    
     private DateTime? OptionAmortizationStartDate
     {
         get => !string.IsNullOrEmpty(OptionAmortizationModel?.StartDate)
@@ -63,11 +71,19 @@ public partial class OptionAmortizationDialog
         {
             // Editing existing entry - set from IsAnOptionHedge (legacy: line 1032)
             AmortizeOptionPremium = IsAnOptionHedge;
+            // Note: Intrinsic value fields are only shown when ID === 0 (legacy: optionTimeValue.cshtml lines 63, 81, 98, 113)
+            // So we don't need to load them when editing
         }
         else
         {
             // Creating new entry - default to true (legacy: line 3325)
             AmortizeOptionPremium = true;
+            
+            // Reset intrinsic value fields for new entry
+            IVGLAccountID = 0;
+            IVContraAccountID = 0;
+            IVAmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None;
+            IntrinsicValue = 0;
         }
     }
     #endregion
@@ -106,7 +122,16 @@ public partial class OptionAmortizationDialog
             var isUpdate = OptionAmortizationModel.ID > 0;
             var successMessage = isUpdate ? "Success! Option Amortization Updated." : "Success! Option Amortization Created.";
 
-            var response = await Mediator.Send(new CreateHedgeRelationshipOptionTimeValueAmort.Command(OptionAmortizationModel, HedgeRelationship));
+            // Map the local intrinsic value properties to a custom command that includes them
+            // These fields exist on Entity but not on ViewModel, so we pass them separately
+            var response = await Mediator.Send(new CreateHedgeRelationshipOptionTimeValueAmort.Command(
+                OptionAmortizationModel, 
+                HedgeRelationship,
+                IsAnOptionHedge,
+                IVGLAccountID,
+                IVContraAccountID,
+                IVAmortizationMethod,
+                IntrinsicValue));
 
             await AlertService.ShowToast(successMessage, AlertKind.Success, "Success", showButton: true);
 
