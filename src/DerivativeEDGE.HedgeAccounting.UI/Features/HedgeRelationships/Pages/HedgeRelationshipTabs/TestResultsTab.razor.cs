@@ -394,6 +394,9 @@ public partial class TestResultsTab
                 // Update the parent hedge relationship with the response (legacy: setModelData(response.data))
                 await HedgeRelationshipChanged.InvokeAsync(result.UpdatedHedgeRelationship);
                 
+                // Update the HedgeRegressionBatches parameter to refresh the "All Tests" grid
+                await HedgeRegressionBatchesChanged.InvokeAsync(result.UpdatedHedgeRelationship.HedgeRegressionBatches);
+                
                 await AlertService.ShowToast("Test batch deleted successfully!", AlertKind.Success, "Success", showButton: true);
             }
             else
