@@ -1388,11 +1388,27 @@ public partial class HedgeRelationshipDetails
     
     private async Task HandleDownloadExcelAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM amortization)
     {
+        if (HedgeRelationship == null)
+        {
+            await AlertService.ShowToast("No hedge relationship data available", AlertKind.Warning, "Warning", showButton: true);
+            return;
+        }
+
         try
         {
             // Download Excel file for amortization schedule (legacy: ExportHedgeAmortizatonSchedule)
-            // TODO: Implement Excel download using Export2Async method
-            await AlertService.ShowToast("Excel export not yet implemented.", AlertKind.Warning, "Warning", showButton: true);
+            var query = new ExportAmortizationScheduleService.Query(HedgeRelationship, amortization.ID);
+            var result = await Mediator.Send(query);
+
+            // Use DotNetStreamReference for proper binary file download
+            using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
+
+            await AlertService.ShowToast("Amortization schedule exported successfully!", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (ArgumentNullException)
+        {
+            await AlertService.ShowToast("Hedge relationship data is required", AlertKind.Error, "Error", showButton: true);
         }
         catch (Exception ex)
         {
@@ -1444,11 +1460,30 @@ public partial class HedgeRelationshipDetails
     
     private async Task HandleDownloadExcelOptionAmortization(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM optionAmortization)
     {
+        if (HedgeRelationship == null)
+        {
+            await AlertService.ShowToast("No hedge relationship data available", AlertKind.Warning, "Warning", showButton: true);
+            return;
+        }
+
         try
         {
-            // Download Excel file for option amortization schedule
-            // TODO: Implement Excel download using Export2Async method
-            await AlertService.ShowToast("Excel export not yet implemented.", AlertKind.Warning, "Warning", showButton: true);
+            // Download Excel file for option amortization schedule (legacy: ExportHedgeOptionAmortizationSchedule)
+            var query = new ExportOptionAmortizationScheduleService.Query(
+                HedgeRelationship, 
+                optionAmortization.ID, 
+                optionAmortization.OptionTimeValueAmortType);
+            var result = await Mediator.Send(query);
+
+            // Use DotNetStreamReference for proper binary file download
+            using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
+
+            await AlertService.ShowToast("Option amortization schedule exported successfully!", AlertKind.Success, "Success", showButton: true);
+        }
+        catch (ArgumentNullException)
+        {
+            await AlertService.ShowToast("Hedge relationship data is required", AlertKind.Error, "Error", showButton: true);
         }
         catch (Exception ex)
         {
