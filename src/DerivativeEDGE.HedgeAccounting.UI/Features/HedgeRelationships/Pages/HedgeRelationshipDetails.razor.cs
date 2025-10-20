@@ -1521,14 +1521,15 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.IsDeltaMatchOption = false;
                 HedgeRelationship.ExcludeIntrinsicValue = false;
             }
-            // When checking the "Hedge is an Option" checkbox, automatically open the Option Amortization dialog
-            // This matches the behavior of clicking "New Option Amortization" button
+            // When checking the "Hedge is an Option" checkbox, automatically switch to the Option Amortization tab
             else if (args.Checked)
             {
-                // Initialize Option Amortization model with defaults from API
-                await InitializeOptionAmortizationModelAsync();
-                // Open the Option Amortization dialog
-                OpenModal = MODAL_OPTION_AMORTIZATION;
+                StateHasChanged(); // Update UI to show the tab
+                if (hedgerelationshiptabRef != null)
+                {
+                    // Switch to Option Amortization tab (index 6)
+                    await hedgerelationshiptabRef.SelectAsync(6);
+                }
             }
             
             StateHasChanged();
