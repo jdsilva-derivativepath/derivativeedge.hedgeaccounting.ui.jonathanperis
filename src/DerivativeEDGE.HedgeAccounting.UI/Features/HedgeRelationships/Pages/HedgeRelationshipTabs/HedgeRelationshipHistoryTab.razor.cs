@@ -17,7 +17,7 @@ public partial class HedgeRelationshipHistoryTab
 
     private void LoadHistoryData()
     {
-        if (HedgeRelationshipActivities == null || !HedgeRelationshipActivities.Any())
+        if (HedgeRelationshipActivities == null || HedgeRelationshipActivities.Count == 0)
         {
             HistoryActivities = [];
             return;

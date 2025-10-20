@@ -28,7 +28,7 @@ public partial class HedgeRelationshipLogsTab
     #region Data Loading Methods
     private void HedgeRegressionBatchesLogsData()
     {
-        if (HedgeRegressionBatches == null || !HedgeRegressionBatches.Any())
+        if (HedgeRegressionBatches == null || HedgeRegressionBatches.Count == 0)
         {
             Logs = [];
             return;
