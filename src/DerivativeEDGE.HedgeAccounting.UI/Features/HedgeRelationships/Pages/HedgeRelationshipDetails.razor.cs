@@ -1500,7 +1500,7 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Checkbox Event Handlers
-    private async void OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    private void OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
     {
         if (HedgeRelationship != null)
         {
@@ -1520,16 +1520,6 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.AmortizeOptionPremimum = false;
                 HedgeRelationship.IsDeltaMatchOption = false;
                 HedgeRelationship.ExcludeIntrinsicValue = false;
-            }
-            // When checking the "Hedge is an Option" checkbox, automatically switch to the Option Amortization tab
-            else if (args.Checked)
-            {
-                StateHasChanged(); // Update UI to show the tab
-                if (hedgerelationshiptabRef != null)
-                {
-                    // Switch to Option Amortization tab (index 6)
-                    await hedgerelationshiptabRef.SelectAsync(6);
-                }
             }
             
             StateHasChanged();
