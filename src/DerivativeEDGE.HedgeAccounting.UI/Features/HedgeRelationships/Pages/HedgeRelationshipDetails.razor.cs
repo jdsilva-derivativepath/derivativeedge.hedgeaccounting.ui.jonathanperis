@@ -662,7 +662,7 @@ public partial class HedgeRelationshipDetails
             // If confirmation is needed (3-month dedesignation warning), show confirmation dialog
             if (needsConfirmation)
             {
-                var confirmed = await IJSRuntime.InvokeAsync<bool>("confirm", confirmationMessage);
+                var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", confirmationMessage);
                 if (!confirmed)
                 {
                     return;

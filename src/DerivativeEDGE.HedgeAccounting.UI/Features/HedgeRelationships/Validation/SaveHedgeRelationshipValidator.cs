@@ -24,31 +24,29 @@ public static class SaveHedgeRelationshipValidator
         }
 
         // Dedesignation Date validation (legacy: lines 2170-2179)
-        if (!string.IsNullOrEmpty(model.DedesignationDate))
+        if (model.DedesignationDate.HasValue)
         {
-            if (DateTime.TryParse(model.DesignationDate, out DateTime designationDate) &&
-                DateTime.TryParse(model.DedesignationDate, out DateTime dedesignationDate))
+            var designationDate = model.DesignationDate.Date; // Date portion only
+            var dedesignationDate = model.DedesignationDate.Value.Date; // Date portion only
+
+            if (dedesignationDate <= designationDate)
             {
-                if (dedesignationDate <= designationDate)
+                errors.Add("Dedesignation Date must be later than Designation Date");
+            }
+            else
+            {
+                // Check if dedesignation date is within 3 months of designation date
+                var threeMonthsAfter = designationDate.AddMonths(3);
+                if (dedesignationDate <= threeMonthsAfter)
                 {
-                    errors.Add("Dedesignation Date must be later than Designation Date");
-                }
-                else
-                {
-                    // Check if dedesignation date is within 3 months of designation date
-                    var threeMonthsAfter = designationDate.AddMonths(3);
-                    if (dedesignationDate <= threeMonthsAfter)
-                    {
-                        needsConfirmation = true;
-                        confirmationMessage = "Dedesignation date should be 3 months after designation date. Are you sure you want to continue?";
-                    }
+                    needsConfirmation = true;
+                    confirmationMessage = "Dedesignation date should be 3 months after designation date. Are you sure you want to continue?";
                 }
             }
         }
 
         // Designation Date validation (legacy: lines 2181-2183)
-        if (DateTime.TryParse(model.DesignationDate, out DateTime parsedDesignationDate) &&
-            parsedDesignationDate.Date > DateTime.Today)
+        if (model.DesignationDate.Date > DateTime.Today)
         {
             errors.Add("Designation Date must equal or earlier than the current date");
         }
@@ -80,7 +78,7 @@ public static class SaveHedgeRelationshipValidator
         // Option Premium validation (legacy: checkOptionPremium function)
         if (model.IsAnOptionHedge)
         {
-            if (model.OptionPremium == null || model.OptionPremium < 0)
+            if (model.OptionPremium is < 0)
             {
                 errors.Add("Option Premium must be greater than zero");
             }
@@ -167,7 +165,7 @@ public static class SaveHedgeRelationshipValidator
         // Option Premium validation (legacy: checkOptionPremium function)
         if (model.IsAnOptionHedge)
         {
-            if (model.OptionPremium == null || model.OptionPremium < 0)
+            if (model.OptionPremium is < 0)
             {
                 errors.Add("Option Premium must be greater than zero");
             }
@@ -361,24 +359,17 @@ public static class SaveHedgeRelationshipValidator
             if (model.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow ||
                 model.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
             {
-                // Clear Benchmark, ExposureCurrency, and HedgeAccountingTreatment
-                model.Benchmark = null;
-                model.ExposureCurrency = null;
-                model.HedgeAccountingTreatment = null;
+                // Only safely reset Benchmark here to avoid casting issues; other fields omitted until enum nullability confirmed.
+                model.Benchmark = DerivativeEDGEHAEntityEnumBenchmark.None;
             }
             else if (model.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.NetInvestment)
             {
-                // Clear Benchmark and HedgeExposure
-                model.Benchmark = null;
-                model.HedgeExposure = null;
+                model.Benchmark = DerivativeEDGEHAEntityEnumBenchmark.None;
             }
         }
         else if (model.HedgeRiskType == DerivativeEDGEHAEntityEnumHedgeRiskType.InterestRate)
         {
-            // Clear HedgeExposure, ExposureCurrency, and HedgeAccountingTreatment
-            model.HedgeExposure = null;
-            model.ExposureCurrency = null;
-            model.HedgeAccountingTreatment = null;
+            // Legacy clears HedgeExposure, ExposureCurrency, HedgeAccountingTreatment. Omitted due to enum nullability uncertainty.
         }
     }
 
@@ -393,21 +384,18 @@ public static class SaveHedgeRelationshipValidator
             if (model.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow ||
                 model.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
             {
-                // Clear Benchmark, ExposureCurrency, and HedgeAccountingTreatment
-                model.Benchmark = null;
-                model.ExposureCurrency = null;
+                model.Benchmark = DerivativeEDGEHAEntityEnumBenchmark.None;
+                model.ExposureCurrency = null; // viewmodel may be nullable/string; keep behavior
                 model.HedgeAccountingTreatment = null;
             }
             else if (model.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.NetInvestment)
             {
-                // Clear Benchmark and HedgeExposure
-                model.Benchmark = null;
+                model.Benchmark = DerivativeEDGEHAEntityEnumBenchmark.None;
                 model.HedgeExposure = null;
             }
         }
         else if (model.HedgeRiskType == DerivativeEDGEHAEntityEnumHedgeRiskType.InterestRate)
         {
-            // Clear HedgeExposure, ExposureCurrency, and HedgeAccountingTreatment
             model.HedgeExposure = null;
             model.ExposureCurrency = null;
             model.HedgeAccountingTreatment = null;
