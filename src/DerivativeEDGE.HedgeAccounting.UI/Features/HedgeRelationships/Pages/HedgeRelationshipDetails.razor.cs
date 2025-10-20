@@ -1500,7 +1500,7 @@ public partial class HedgeRelationshipDetails
     #endregion
 
     #region Checkbox Event Handlers
-    private void OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    private async Task OnIsAnOptionHedgeChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
     {
         if (HedgeRelationship != null)
         {
@@ -1520,11 +1520,17 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.ExcludeIntrinsicValue = false;
             }
             
+            // Refresh the tab component to update visibility of Option Amortization tab
+            if (hedgerelationshiptabRef != null)
+            {
+                await hedgerelationshiptabRef.RefreshAsync();
+            }
+            
             StateHasChanged();
         }
     }
     
-    private void OnOffMarketChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    private async Task OnOffMarketChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
     {
         if (HedgeRelationship != null)
         {
@@ -1538,6 +1544,12 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.AmortizeOptionPremimum = false;
                 HedgeRelationship.IsDeltaMatchOption = false;
                 HedgeRelationship.ExcludeIntrinsicValue = false;
+                
+                // Refresh the tab component to update visibility of Option Amortization tab
+                if (hedgerelationshiptabRef != null)
+                {
+                    await hedgerelationshiptabRef.RefreshAsync();
+                }
             }
             
             StateHasChanged();
