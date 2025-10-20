@@ -645,20 +645,28 @@ public partial class HedgeRelationshipDetails
             IsSavingHedgeRelationship = true;
             StateHasChanged();
 
-            // Pre-Issuance Hedge logic: Only applicable to CashFlow hedge types
-            // For FairValue and NetInvestment hedge types, PreIssuanceHedge must be false
-            if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue ||
-                HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.NetInvestment)
+            // Apply field cleanup and defaults before validation (legacy: submit function lines 2158-2208)
+            SaveHedgeRelationshipValidator.ApplyFieldCleanupAndDefaults(HedgeRelationship);
+
+            // Validate hedge relationship (legacy: submit function validation logic)
+            var (isValid, errors, needsConfirmation, confirmationMessage) = SaveHedgeRelationshipValidator.Validate(HedgeRelationship);
+
+            if (!isValid)
             {
-                HedgeRelationship.PreIssuanceHedge = false;
+                // Display validation errors
+                ValidationErrors = errors;
+                StateHasChanged();
+                return;
             }
 
-            // Portfolio Layer Method logic: Only applicable to FairValue hedge types
-            // For CashFlow and NetInvestment hedge types, PortfolioLayerMethod must be false
-            if (HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.CashFlow ||
-                HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.NetInvestment)
+            // If confirmation is needed (3-month dedesignation warning), show confirmation dialog
+            if (needsConfirmation)
             {
-                HedgeRelationship.PortfolioLayerMethod = false;
+                var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", confirmationMessage);
+                if (!confirmed)
+                {
+                    return;
+                }
             }
 
             var result = await Mediator.Send(new UpdateHedgeRelationship.Command(HedgeRelationship));
