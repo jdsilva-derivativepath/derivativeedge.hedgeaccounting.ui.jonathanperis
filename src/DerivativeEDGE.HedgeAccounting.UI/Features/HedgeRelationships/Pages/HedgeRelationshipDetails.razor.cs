@@ -1504,15 +1504,13 @@ public partial class HedgeRelationshipDetails
     {
         if (HedgeRelationship != null)
         {
-            // Legacy rule: IsAnOptionHedge and OffMarket are mutually exclusive
+            HedgeRelationship.IsAnOptionHedge = args.Checked;
+            
+            // When IsAnOptionHedge is checked, reset OffMarket
             if (args.Checked && HedgeRelationship.OffMarket)
             {
-                // Prevent checking the box if OffMarket is true
-                HedgeRelationship.IsAnOptionHedge = false;
-                return;
+                HedgeRelationship.OffMarket = false;
             }
-            
-            HedgeRelationship.IsAnOptionHedge = args.Checked;
             
             // Legacy rule: When IsAnOptionHedge is unchecked, also clear related option hedge fields
             if (!args.Checked)
@@ -1530,15 +1528,18 @@ public partial class HedgeRelationshipDetails
     {
         if (HedgeRelationship != null)
         {
-            // Legacy rule: IsAnOptionHedge and OffMarket are mutually exclusive
+            HedgeRelationship.OffMarket = args.Checked;
+            
+            // When OffMarket is checked, reset IsAnOptionHedge and related fields
             if (args.Checked && HedgeRelationship.IsAnOptionHedge)
             {
-                // Prevent checking the box if IsAnOptionHedge is true
-                HedgeRelationship.OffMarket = false;
-                return;
+                HedgeRelationship.IsAnOptionHedge = false;
+                // Also clear related option hedge fields
+                HedgeRelationship.AmortizeOptionPremimum = false;
+                HedgeRelationship.IsDeltaMatchOption = false;
+                HedgeRelationship.ExcludeIntrinsicValue = false;
             }
             
-            HedgeRelationship.OffMarket = args.Checked;
             StateHasChanged();
         }
     }

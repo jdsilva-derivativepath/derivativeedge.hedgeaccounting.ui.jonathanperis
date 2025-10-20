@@ -360,7 +360,7 @@
                     {
                         <div class="dp-inputs">
                             <SfCheckBox CssClass="input-checkbox"
-                            Disabled="@(!CanEditCheckbox)"
+                            Disabled="@(!CanEditCheckbox || HedgeRelationship.OffMarket)"
                             @bind-Checked="HedgeRelationship.IsAnOptionHedge"
                             Label="Hedge is an Option">
                                 <CheckBoxEvents TChecked="bool" ValueChange="OnIsAnOptionHedgeChanged" />
