@@ -284,6 +284,7 @@ public partial class InstrumentAnalysisTab
         };
     }
     #endregion
+
     #region Event Handlers
     private async Task UpdateParentData()
     {
@@ -484,9 +485,9 @@ public partial class InstrumentAnalysisTab
 
         // Set FairValueMethod to 'None' if HedgeType is not FairValue
         // Legacy: if ($scope != undefined && $scope.Model !== undefined && $scope.Model.HedgeType !== 'FairValue')
-        if (HedgeRelationship.HedgeType != DerivativeEDGEHAEntityEnumHedgeType.FairValue)
+        if (HedgeRelationship.HedgeType != DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
         {
-            HedgeRelationship.FairValueMethod = "None";
+            HedgeRelationship.FairValueMethod = DerivativeEDGEHAEntityEnumFairValueMethod.None;
         }
 
         foreach (var method in AllEffectivenessMethods)
@@ -503,8 +504,8 @@ public partial class InstrumentAnalysisTab
                 // Include if:
                 // 1. HedgeType is FairValue AND method IsForFairValue
                 // 2. OR HedgeType is NOT FairValue (includes all methods except those specifically for FairValue only)
-                if ((HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHedgeType.FairValue && method.IsForFairValue) ||
-                    HedgeRelationship.HedgeType != DerivativeEDGEHAEntityEnumHedgeType.FairValue)
+                if ((HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHRHedgeType.FairValue && method.IsForFairValue) ||
+                    HedgeRelationship.HedgeType != DerivativeEDGEHAEntityEnumHRHedgeType.FairValue)
                 {
                     // Skip "Regression - Change in Intrinsic Value" for non-option hedges
                     // Legacy: if ($scope != undefined && $scope.Model !== undefined && !$scope.Model.IsAnOptionHedge && v.Name === 'Regression - Change in Intrinsic Value')
