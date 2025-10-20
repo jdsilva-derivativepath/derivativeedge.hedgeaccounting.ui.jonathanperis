@@ -25,6 +25,7 @@ public partial class InstrumentAnalysisTab
 
     #region Private Properties
     private List<HedgeCurrencyDropdownItem> Currency { get; set; } = [];
+    private List<DerivativeEDGEHAEntityEffectivenessMethod> AllEffectivenessMethods { get; set; } = [];
     private string ExistingTradeModalHeaderText { get; set; }
     #endregion
 
@@ -100,6 +101,7 @@ public partial class InstrumentAnalysisTab
     protected override async Task OnInitializedAsync()
     {
         await LoadCurrency();
+        await LoadEffectivenessMethods();
         // Don't load instrument data here as HedgeRelationship parameter might not be set yet
     }
 
@@ -168,6 +170,12 @@ public partial class InstrumentAnalysisTab
         }
     }
 
+    private async Task LoadEffectivenessMethods()
+    {
+        var response = await Mediator.Send(new GetEffectivenessMethodList.Query());
+        AllEffectivenessMethods = response.EffectivenessMethods;
+    }
+
     private async Task LoadHedgeTradeList()
     {
         IsLoadingTradeData = true;
@@ -218,6 +226,8 @@ public partial class InstrumentAnalysisTab
     public async Task RefreshGridData()
     {
         await LoadInstrumentAnalysisData();
+        // Trigger re-render to refresh dropdown options based on current HedgeType and IsAnOptionHedge
+        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -455,20 +465,79 @@ public partial class InstrumentAnalysisTab
         };
     }
 
-    private static IEnumerable<DropdownModel> GetAssessmentMethodOptions()
+    /// <summary>
+    /// Filters effectiveness methods based on HedgeType and IsAnOptionHedge.
+    /// This matches the legacy filtering logic from old/hr_hedgeRelationshipAddEditCtrl.js setDropDownListEffectivenessMethods()
+    /// Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js lines 149-180
+    /// </summary>
+    private IEnumerable<DropdownModel> GetAssessmentMethodOptions()
     {
-        return new List<DropdownModel>
+        var filteredMethods = new List<DropdownModel>();
+        
+        // Always add "None" option
+        filteredMethods.Add(new DropdownModel { ID = 0, Text = "None" });
+        
+        if (HedgeRelationship == null || AllEffectivenessMethods == null || AllEffectivenessMethods.Count == 0)
         {
-            new() { ID = 0, Text = "None" },
-            new() { ID = 1, Text = "Regression - Change in Fair Value" },
-            new() { ID = 2, Text = "Dollar Offset" },
-            new() { ID = 3, Text = "Cummulative Dollar Offset" },
-            new() { ID = 4, Text = "Index Regression" },
-            new() { ID = 5, Text = "Cumulative Index Regression" },
-            new() { ID = 6, Text = "Scenario Analysis" },
-            new() { ID = 7, Text = "Scenario Regression" },
-            new() { ID = 9, Text = "Cumulative Dollar Offset" },
-        };
+            return filteredMethods;
+        }
+
+        // Set FairValueMethod to 'None' if HedgeType is not FairValue
+        // Legacy: if ($scope != undefined && $scope.Model !== undefined && $scope.Model.HedgeType !== 'FairValue')
+        if (HedgeRelationship.HedgeType != DerivativeEDGEHAEntityEnumHedgeType.FairValue)
+        {
+            HedgeRelationship.FairValueMethod = "None";
+        }
+
+        foreach (var method in AllEffectivenessMethods)
+        {
+            // Legacy filtering logic:
+            // if ($scope != undefined && $scope.Model !== undefined && ((($scope.Model.HedgeType === 'FairValue' && v.IsForFairValue)
+            //     || $scope.Model.HedgeType !== 'FairValue')) && !$scope.Model.IsAnOptionHedge)
+            
+            bool shouldInclude = false;
+            
+            // Non-option hedge logic
+            if (!HedgeRelationship.IsAnOptionHedge)
+            {
+                // Include if:
+                // 1. HedgeType is FairValue AND method IsForFairValue
+                // 2. OR HedgeType is NOT FairValue (includes all methods except those specifically for FairValue only)
+                if ((HedgeRelationship.HedgeType == DerivativeEDGEHAEntityEnumHedgeType.FairValue && method.IsForFairValue) ||
+                    HedgeRelationship.HedgeType != DerivativeEDGEHAEntityEnumHedgeType.FairValue)
+                {
+                    // Skip "Regression - Change in Intrinsic Value" for non-option hedges
+                    // Legacy: if ($scope != undefined && $scope.Model !== undefined && !$scope.Model.IsAnOptionHedge && v.Name === 'Regression - Change in Intrinsic Value')
+                    if (!method.Name.Contains("Regression - Change in Intrinsic Value"))
+                    {
+                        shouldInclude = true;
+                    }
+                }
+            }
+            else // Option hedge logic
+            {
+                // Legacy: else if (v.Name.includes('Regression - Change in') && $scope.Model.IsAnOptionHedge)
+                // For option hedges, only include methods that have "Regression - Change in" in the name
+                if (method.Name.Contains("Regression - Change in"))
+                {
+                    shouldInclude = true;
+                }
+            }
+
+            if (shouldInclude)
+            {
+                filteredMethods.Add(new DropdownModel
+                {
+                    ID = (int)method.ID,
+                    Text = method.Name,
+                    // In legacy code, all methods except ID=1 were disabled initially
+                    // Legacy: "Disabled": v.ID.toString() !== "1"
+                    // For now, we'll enable all as the disabled state might be contextual
+                });
+            }
+        }
+
+        return filteredMethods;
     }
 
     private static IEnumerable<ReportFrequencyDropdownModel> GetReportFrequencyOptions()
