@@ -27,6 +27,16 @@ public partial class OptionAmortizationDialog
     // Legacy: hr_hedgeRelationshipAddEditCtrl.js lines 1032, 3325 and optionTimeValue.cshtml line 149
     private bool AmortizeOptionPremium { get; set; } = true;
     
+    // Legacy behavior: Generate/Update button is disabled when validation fails
+    // Required fields: AmortizeOptionPremium checked, AmortizationMethod not None, GLAccountID, StartDate, EndDate
+    // Legacy: optionTimeValue.cshtml lines 148-151
+    private bool IsGenerateDisabled => 
+        !AmortizeOptionPremium ||
+        OptionAmortizationModel.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.None ||
+        OptionAmortizationModel.GLAccountID == 0 ||
+        string.IsNullOrEmpty(OptionAmortizationModel.StartDate) ||
+        string.IsNullOrEmpty(OptionAmortizationModel.EndDate);
+    
     // Intrinsic Value fields - These exist on Entity but not on ViewModel
     // Store locally and map to Entity when submitting
     // Legacy: optionTimeValue.cshtml lines 63-117

@@ -174,7 +174,7 @@
                 <div class="custom-action-container ">
                     <div class="dp-buttons">
                         <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
-                        <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" />
+                        <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" Disabled="@IsSaveDisabled" />
                     </div>
                 </div>
             </EditForm>

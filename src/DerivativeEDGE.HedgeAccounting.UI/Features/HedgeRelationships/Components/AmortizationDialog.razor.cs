@@ -26,6 +26,16 @@ public partial class AmortizationDialog
     #region Private Properties
     private List<string> AmortizationFinancialCenters { get; set; }
     
+    // Legacy behavior: Save button is disabled when required fields are not filled
+    // Required fields: GLAccountID, ContraAccountID, StartDate, EndDate, FrontRollDate, BackRollDate
+    private bool IsSaveDisabled => 
+        AmortizationModel.GLAccountID == 0 ||
+        AmortizationModel.ContraAccountID == 0 ||
+        string.IsNullOrEmpty(AmortizationModel.StartDate) ||
+        string.IsNullOrEmpty(AmortizationModel.EndDate) ||
+        string.IsNullOrEmpty(AmortizationModel.FrontRollDate) ||
+        string.IsNullOrEmpty(AmortizationModel.BackRollDate);
+    
     private DateTime? AmortizationStartDate
     {
         get => !string.IsNullOrEmpty(AmortizationModel?.StartDate)
