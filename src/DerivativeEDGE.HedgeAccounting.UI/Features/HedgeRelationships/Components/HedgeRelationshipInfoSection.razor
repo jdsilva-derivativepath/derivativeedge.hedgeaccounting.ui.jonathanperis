@@ -291,19 +291,23 @@
         <div class="flex-grow">
             <div class="flex gap-5 justify-between">
                 <div class="flex-1">
-                    <div class="form-group dp-inputs min-w-100">
-                        <span class="input-label">@BenchMarkLabel</span>
-                        <SfDropDownList TValue="DerivativeEDGEHAEntityEnumBenchmark"
-                        CssClass="dropdown-input"
-                        Enabled="true"
-                        TItem="DropdownModel"
-                        Placeholder="@BenchMarkLabel"
-                        @bind-Value="HedgeRelationship.Benchmark"
-                        DataSource="@DropdownDataHelper.GetDropdownDatasource("contractualrate")">
-                            <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumBenchmark" TItem="DropdownModel" />
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                        </SfDropDownList>
-                    </div>
+                    @* Benchmark/Contractual Rate field - Only show when HedgeRiskType is InterestRate (legacy: old/initialView.cshtml line 67) *@
+                    @if (HedgeRelationship.HedgeRiskType == DerivativeEDGEHAEntityEnumHedgeRiskType.InterestRate)
+                    {
+                        <div class="form-group dp-inputs min-w-100">
+                            <span class="input-label">@BenchMarkLabel</span>
+                            <SfDropDownList TValue="DerivativeEDGEHAEntityEnumBenchmark"
+                            CssClass="dropdown-input"
+                            Enabled="true"
+                            TItem="DropdownModel"
+                            Placeholder="@BenchMarkLabel"
+                            @bind-Value="HedgeRelationship.Benchmark"
+                            DataSource="@DropdownDataHelper.GetDropdownDatasource("contractualrate")">
+                                <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumBenchmark" TItem="DropdownModel" />
+                                <DropDownListFieldSettings Text="Text" Value="Value" />
+                            </SfDropDownList>
+                        </div>
+                    }
                     <div class="form-group dp-inputs min-w-100">
                         <span class="input-label">Notional</span>
                         <NumericHotKeys>
@@ -441,10 +445,9 @@
                     {
                         <div class="dp-inputs">
                             <SfCheckBox CssClass="input-checkbox"
-                            Visible="HedgeRelationship.Acquisition"
                             Disabled="@(!CanEditCheckbox)"
                             @bind-Checked="HedgeRelationship.Acquisition" 
-                            Label="Aquisition" />
+                            Label="Acquisition" />
                         </div>
                     }
                     @if (HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated && HedgeRelationship.ExcludeIntrinsicValue)
