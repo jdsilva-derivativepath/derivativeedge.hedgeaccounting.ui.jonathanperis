@@ -26,6 +26,9 @@ public sealed class CreateHedgeRelationship
             {
                 logger.LogInformation("Sending request to create hedge relationship.");
 
+                // Apply field cleanup and defaults before creating (matches legacy submit logic)
+                SaveHedgeRelationshipValidator.ApplyFieldCleanupAndDefaults(request.HedgeRelationship);
+
                 // Map DTO to API entity
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
