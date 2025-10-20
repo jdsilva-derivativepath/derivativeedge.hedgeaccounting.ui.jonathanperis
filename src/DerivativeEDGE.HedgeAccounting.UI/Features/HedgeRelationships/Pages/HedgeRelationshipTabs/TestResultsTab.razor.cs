@@ -234,7 +234,7 @@ public partial class TestResultsTab
     {
         if (_disposed) return;
 
-        if (xValues.Any() && yValues.Any())
+        if (xValues.Count != 0 && yValues.Count != 0)
         {
             var minXY = Math.Min(xValues.Min(), yValues.Min());
             var maxXY = Math.Max(xValues.Max(), yValues.Max());

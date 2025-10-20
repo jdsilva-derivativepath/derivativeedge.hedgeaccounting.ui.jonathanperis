@@ -52,7 +52,7 @@ public sealed class ReDesignateHedgeRelationship
                     currentHedgeRelationship, 
                     request.RedesignationDate);
                     
-                if (validationErrors.Any())
+                if (validationErrors.Count != 0)
                 {
                     var errorMessage = string.Join("; ", validationErrors);
                     logger.LogWarning("Re-designation validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 

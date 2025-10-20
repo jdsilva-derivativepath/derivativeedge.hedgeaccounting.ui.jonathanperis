@@ -3,11 +3,11 @@
 public partial class HedgeRelationshipHistoryTab
 {
     #region Parameters
-    [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HedgeRegressionBatches { get; set; }
-    [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>> HedgeRegressionBatchesChanged { get; set; }
+    [Parameter] public ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM> HedgeRelationshipActivities { get; set; }
+    [Parameter] public EventCallback<ICollection<DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM>> HedgeRelationshipActivitiesChanged { get; set; }
     #endregion
 
-    public List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM> HistoryBatches { get; set; } = [];
+    public List<DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM> HistoryActivities { get; set; } = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -17,48 +17,45 @@ public partial class HedgeRelationshipHistoryTab
 
     private void LoadHistoryData()
     {
-        if (HedgeRegressionBatches == null || !HedgeRegressionBatches.Any())
+        if (HedgeRelationshipActivities == null || HedgeRelationshipActivities.Count == 0)
         {
-            HistoryBatches = [];
+            HistoryActivities = [];
             return;
         }
 
-        HistoryBatches = [.. HedgeRegressionBatches
-            .Where(batch => batch.Enabled)
-            .OrderByDescending(batch => batch.CreatedOn)];
+        // Legacy: data-ng-repeat="a in Model.HedgeRelationshipActivities"
+        // Filter by Enabled and order by CreatedOn descending to match legacy behavior
+        HistoryActivities = [.. HedgeRelationshipActivities
+            .Where(activity => activity.Enabled)
+            .OrderByDescending(activity => activity.CreatedOn)];
     }
 
-    private string GetDisplayDate(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM batch)
+    private string GetDisplayDate(DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM activity)
     {
-        // Try to get the date from HedgeRelationshipLog first
-        if (batch.HedgeRelationshipLogs?.Any() == true)
+        // Legacy: {{a.CreatedOn | date: 'MMMM dd, yyyy'}} at {{a.CreatedOn | date: 'h:mm a'}}
+        if (activity.CreatedOn != DateTimeOffset.MinValue)
         {
-            var firstLog = batch.HedgeRelationshipLogs.First();
-            if (firstLog.CreatedOn != DateTime.MinValue)
-            {
-                return firstLog.CreatedOn.ToString("MMMM dd, yyyy 'at' h:mm tt");
-            }
+            return activity.CreatedOn.ToString("MMMM dd, yyyy 'at' h:mm tt");
         }
 
-        // Try RunDate if it's a valid string and can be parsed
-        if (!string.IsNullOrEmpty(batch.RunDate) && DateTime.TryParse(batch.RunDate, out DateTime runDate))
-        {
-            return runDate.ToString("MMMM dd, yyyy 'at' h:mm tt");
-        }
+        // Fallback to current date
+        return DateTimeOffset.Now.ToString("MMMM dd, yyyy 'at' h:mm tt");
+    }
 
-        // Try ValueDate if it's a valid string and can be parsed
-        if (!string.IsNullOrEmpty(batch.ValueDate) && DateTime.TryParse(batch.ValueDate, out DateTime valueDate))
+    private string GetActivityIcon(DerivativeEDGEHAEntityEnumActivityType activityType)
+    {
+        // Legacy: data-ng-class="{'fa-briefcase':a.ActivityTypeEnum==='BackloadRegression' || a.ActivityTypeEnum==='RelationshipDesignated',
+        //                         'fa-line-chart':a.ActivityTypeEnum==='UserRegression'||a.ActivityTypeEnum==='PeriodicRegression',
+        //                         'fa-check':a.ActivityTypeEnum==='RelationshipCreated'||a.ActivityTypeEnum==='RelationshipUpdated'}"
+        return activityType switch
         {
-            return valueDate.ToString("MMMM dd, yyyy 'at' h:mm tt");
-        }
-
-        // Fallback to CreatedOn if it's not the default value
-        if (batch.CreatedOn != DateTime.MinValue)
-        {
-            return batch.CreatedOn.ToString("MMMM dd, yyyy 'at' h:mm tt");
-        }
-
-        // Last resort - use current date
-        return DateTime.Now.ToString("MMMM dd, yyyy 'at' h:mm tt");
+            DerivativeEDGEHAEntityEnumActivityType.BackloadRegression => "fa-briefcase",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipDesignated => "fa-briefcase",
+            DerivativeEDGEHAEntityEnumActivityType.UserRegression => "fa-line-chart",
+            DerivativeEDGEHAEntityEnumActivityType.PeriodicRegression => "fa-line-chart",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipCreated => "fa-check",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipUpdated => "fa-check",
+            _ => "fa-circle-info" // Default icon for other types
+        };
     }
 }

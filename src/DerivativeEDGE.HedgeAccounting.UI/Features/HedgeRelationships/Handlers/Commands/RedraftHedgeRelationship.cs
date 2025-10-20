@@ -39,7 +39,7 @@ public sealed class RedraftHedgeRelationship
 
                 // Validate redraft requirements
                 var validationErrors = RedraftValidator.Validate(currentHedgeRelationship);
-                if (validationErrors.Any())
+                if (validationErrors.Count != 0)
                 {
                     var errorMessage = string.Join("; ", validationErrors);
                     logger.LogWarning("Redraft validation failed for hedge relationship ID: {HedgeRelationshipId}. Errors: {Errors}", 
