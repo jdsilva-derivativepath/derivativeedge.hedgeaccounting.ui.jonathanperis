@@ -42,8 +42,10 @@
                                 </div>
                                 <div class="form-group dp-inputs">
                                     <span class="input-label">Amortization Method</span>
+                                    @* Legacy: optionTimeValue.cshtml line 93 - Disabled when !Model.IsAnOptionHedge *@
                                     <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
                                                 CssClass="dropdown-input"
+                                                Enabled="@IsAnOptionHedge"
                                                 TItem="AmortizationMethodOption"
                                                 Placeholder="Amortization Method"
                                                 @bind-Value="OptionAmortizationModel.AmortizationMethod"
