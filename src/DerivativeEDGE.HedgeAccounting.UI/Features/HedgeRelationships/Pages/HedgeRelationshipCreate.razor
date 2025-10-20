@@ -79,15 +79,15 @@
                                 </div>
                                 <div class="form-group dp-inputs">
                                     <label class="input-label">Designation Date</label>
-                                    <SfDatePicker TValue="DateTimeOffset" @bind-Value="HedgeRelationship.DesignationDate" CssClass="calendar-datepicker" Enabled="true" Format="MM/dd/yyyy" Placeholder="mm/dd/yyyy" ShowClearButton="true" Max="@DateTime.Today">
-                                        <DatePickerEvents TValue="DateTimeOffset" />
+                                    <SfDatePicker TValue="string" @bind-Value="HedgeRelationship.DesignationDate" CssClass="calendar-datepicker" Enabled="true" Format="MM/dd/yyyy" Placeholder="mm/dd/yyyy" ShowClearButton="true" Max="@DateTime.Today">
+                                        <DatePickerEvents TValue="string" />
                                     </SfDatePicker>
                                     <ValidationMessage For="@(() => HedgeRelationship.DesignationDate)" />
                                 </div>
                                 <div class="form-group dp-inputs">
                                     <label class="input-label">Dedesignation Date</label>
-                                    <SfDatePicker TValue="DateTimeOffset?" @bind-Value="HedgeRelationship.DedesignationDate" CssClass="calendar-datepicker" Enabled="true" Format="MM/dd/yyyy" Placeholder="mm/dd/yyyy" ShowClearButton="true">
-                                        <DatePickerEvents TValue="DateTimeOffset?" />
+                                    <SfDatePicker TValue="string" @bind-Value="HedgeRelationship.DedesignationDate" CssClass="calendar-datepicker" Enabled="true" Format="MM/dd/yyyy" Placeholder="mm/dd/yyyy" ShowClearButton="true">
+                                        <DatePickerEvents TValue="string" />
                                     </SfDatePicker>
                                 </div
                                 <div class="form-group dp-inputs">

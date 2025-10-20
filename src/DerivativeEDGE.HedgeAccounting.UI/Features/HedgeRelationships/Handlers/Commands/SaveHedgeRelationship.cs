@@ -1,13 +1,13 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
-public sealed class CreateHedgeRelationship
+public sealed class SaveHedgeRelationship
 {
-    public sealed record Command(DerivativeEDGEHAEntityHedgeRelationship HedgeRelationship) : IRequest<Response>;
+    public sealed record Command(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship) : IRequest<Response>;
 
     public sealed class Response : ResponseBase
     {
-        public DerivativeEDGEHAEntityHedgeRelationship Data { get; set; }
-        public Response(bool hasError, string message, DerivativeEDGEHAEntityHedgeRelationship data = null)
+        public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM Data { get; set; }
+        public Response(bool hasError, string message, DerivativeEDGEHAApiViewModelsHedgeRelationshipVM data = null)
         {
             HasError = hasError;
             Message = message;
@@ -18,15 +18,15 @@ public sealed class CreateHedgeRelationship
 
     }
 
-    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<CreateHedgeRelationship.Handler> logger, IMapper mapper) : IRequestHandler<Command, Response>
+    public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<SaveHedgeRelationship.Handler> logger, IMapper mapper) : IRequestHandler<Command, Response>
     {
         public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                logger.LogInformation("Sending request to create hedge relationship.");
+                logger.LogInformation("Sending request to save hedge relationship.");
 
-                // Apply field cleanup and defaults before creating (matches legacy submit logic)
+                // Apply field cleanup and defaults before saving (matches legacy submit logic)
                 SaveHedgeRelationshipValidator.ApplyFieldCleanupAndDefaults(request.HedgeRelationship);
 
                 // Map DTO to API entity
@@ -46,28 +46,21 @@ public sealed class CreateHedgeRelationship
                     return new Response(true, "Failed to create hedge relationship");
                 }
 
-                DerivativeEDGEHAEntityHedgeRelationship createdVm = null;
-                // If the client assigns an ID (some APIs echo back in body but spec shows void). If caller provided ID we can fetch.
+                DerivativeEDGEHAApiViewModelsHedgeRelationshipVM createdVm = null;
+
+                // If the client assigns an ID we can fetch (updating Hedge Relationship goes by here too).
                 if (request.HedgeRelationship.ID > 0)
                 {
-                    try
-                    {
-                        var apiVm = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(request.HedgeRelationship.ID, cancellationToken);
-                        createdVm = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(apiVm);
-                    }
-                    catch
-                    {
-                        // Swallow fetch errors to keep original success logging pattern
-                    }
+                    createdVm = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(request.HedgeRelationship.ID, cancellationToken);
                 }
 
-                logger.LogInformation("Successfully created hedge relationship.");
-                return new Response(false, "Successfully created hedge relationship", createdVm);
+                logger.LogInformation("Successfully saved hedge relationship.");
+                return new Response(false, "Successfully saved hedge relationship", createdVm);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred while creating hedge relationship.");
-                return new Response(true, "Failed to create hedge relationship");
+                logger.LogError(ex, "An error occurred while saving hedge relationship.");
+                return new Response(true, "Failed to save hedge relationship");
             }
         }
     }

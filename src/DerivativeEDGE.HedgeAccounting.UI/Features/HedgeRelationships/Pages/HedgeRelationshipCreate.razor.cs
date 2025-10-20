@@ -5,7 +5,7 @@ public partial class HedgeRelationshipCreate
     public bool ShowNewProcessModal { get; set; }
     private List<Client> AvailableClients { get; set; } = [];
     private List<Entity> AvailableEntities { get; set; } = [];
-    public DerivativeEDGEHAEntityHedgeRelationship HedgeRelationship { get; set; } = new();
+    public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; } = new();
 
     #region Loading States
     public bool IsLoadingClients { get; set; }
@@ -29,6 +29,27 @@ public partial class HedgeRelationshipCreate
         await IJSRuntime.InvokeVoidAsync("triggerHiddenSubmit");
     }
 
+    // Added helper for robust date parsing (migration-safe)
+    private static bool TryParseDate(object value, out DateTime date)
+    {
+        switch (value)
+        {
+            case DateTime dt:
+                date = dt.Date;
+                return true;
+            case DateOnly dOnly:
+                date = dOnly.ToDateTime(TimeOnly.MinValue).Date;
+                return true;
+            case string s when DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AssumeLocal, out var parsed):
+                date = parsed.Date;
+                return true;
+            default:
+                date = default;
+                return false;
+        }
+    }
+
     private async Task RequestNewHedgeRelationship(EditContext context)
     {
         HideFormMessage();
@@ -48,19 +69,23 @@ public partial class HedgeRelationshipCreate
             return; // Prevent submit
         }
 
-        // Manual validation: DedesignationDate > DesignationDate
-        if (HedgeRelationship.DedesignationDate <= HedgeRelationship.DesignationDate)
+        // Manual validation: DedesignationDate > DesignationDate (cast to dates for accurate comparison)
+        if (TryParseDate(HedgeRelationship.DedesignationDate, out var dedesignationDt) &&
+            TryParseDate(HedgeRelationship.DesignationDate, out var designationDt))
         {
-            ShowCustomMessage(
-                "Please fix the following errors:",
-                "Dedesignation Date must be later than Designation Date",
-                MapFormMessageTypeToSeverity(FormMessageType.ValidationError)
-            );
-            return; // Prevent submit
+            if (dedesignationDt <= designationDt)
+            {
+                ShowCustomMessage(
+                    "Please fix the following errors:",
+                    "Dedesignation Date must be later than Designation Date",
+                    MapFormMessageTypeToSeverity(FormMessageType.ValidationError)
+                );
+                return; // Prevent submit
+            }
         }
 
         // Proceed with creating the relationship
-        var result = await Mediator.Send(new CreateHedgeRelationship.Command(HedgeRelationship));
+        var result = await Mediator.Send(new SaveHedgeRelationship.Command(HedgeRelationship));
         if (!result.HasError)
         {
             ShowNewProcessModal = false;

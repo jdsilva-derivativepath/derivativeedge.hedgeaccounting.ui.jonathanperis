@@ -669,12 +669,12 @@ public partial class HedgeRelationshipDetails
                 }
             }
 
-            var result = await Mediator.Send(new UpdateHedgeRelationship.Command(HedgeRelationship));
+            var result = await Mediator.Send(new SaveHedgeRelationship.Command(HedgeRelationship));
             if (!result.HasError)
             {
                 // Reload from backend to ensure all fields are correct
                 await GetHedgeRelationship(HedgeRelationshipId);
-                await AlertService.ShowToast("Hedge relationship updated successfully!", AlertKind.Success, "Success", showButton: true);
+                await AlertService.ShowToast("Hedge relationship saved successfully!", AlertKind.Success, "Success", showButton: true);
             }
             else
             {
