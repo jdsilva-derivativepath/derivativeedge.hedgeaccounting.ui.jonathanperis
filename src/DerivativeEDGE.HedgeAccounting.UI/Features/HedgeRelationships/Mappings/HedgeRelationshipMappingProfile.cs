@@ -15,20 +15,38 @@ public class HedgeRelationshipMappingProfile : Profile
             .ForMember(dest => dest.HedgeRelationshipOptionTimeValues, opt => opt.MapFrom(src => src.HedgeRelationshipOptionTimeValues));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRegressionBatch, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
-        CreateMap<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM, DerivativeEDGEHAEntityHedgeRegressionBatch>();
+        CreateMap<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM, DerivativeEDGEHAEntityHedgeRegressionBatch>()
+            .ForMember(dest => dest.HedgeRegressionBatchResults, opt => opt.MapFrom(src => src.HedgeRegressionBatchResults))
+            .ForMember(dest => dest.HedgeRelationshipLogs, opt => opt.MapFrom(src => src.HedgeRelationshipLogs));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipItem, DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>()
             .ForMember(d => d.ItemID, o => o.NullSubstitute(string.Empty))
-            .ForMember(d => d.Description, o => o.NullSubstitute(string.Empty));
+            .ForMember(d => d.Description, o => o.NullSubstitute(string.Empty))
+            .ForMember(dest => dest.HedgeRelationshipItemLegs, opt => opt.MapFrom(src => src.HedgeRelationshipItemLegs));
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM, DerivativeEDGEHAEntityHedgeRelationshipItem>()
             .ForMember(d => d.ItemID, o => o.NullSubstitute(string.Empty))
-            .ForMember(d => d.Description, o => o.NullSubstitute(string.Empty));
+            .ForMember(d => d.Description, o => o.NullSubstitute(string.Empty))
+            .ForMember(dest => dest.HedgeRelationshipItemLegs, opt => opt.MapFrom(src => src.HedgeRelationshipItemLegs));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipActivity, DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM, DerivativeEDGEHAEntityHedgeRelationshipActivity>();
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipOptionTimeValueAmort, DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM>();
-        CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM, DerivativeEDGEHAEntityHedgeRelationshipOptionTimeValueAmort>();
+        CreateMap<DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM, DerivativeEDGEHAEntityHedgeRelationshipOptionTimeValueAmort>()
+            .ForMember(dest => dest.OptionTimeValueAmortRollSchedules, opt => opt.MapFrom(src => src.OptionTimeValueAmortRollSchedules))
+            .ForMember(dest => dest.OptionAmortizations, opt => opt.MapFrom(src => src.OptionAmortizations))
+            .ForMember(dest => dest.OptionSwapletAmortizations, opt => opt.MapFrom(src => src.OptionSwapletAmortizations))
+            .ForMember(dest => dest.FinancialCenters, opt => opt.MapFrom(src => src.FinancialCenters));
+
+        // Mappings for nested collection element types
+        CreateMap<DerivativeEDGEHAEntityOptionAmortization, DerivativeEDGEHAApiViewModelsOptionAmortizationVM>();
+        CreateMap<DerivativeEDGEHAApiViewModelsOptionAmortizationVM, DerivativeEDGEHAEntityOptionAmortization>();
+
+        CreateMap<DerivativeEDGEHAEntityOptionTimeValueAmortRollSchedule, DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM>();
+        CreateMap<DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM, DerivativeEDGEHAEntityOptionTimeValueAmortRollSchedule>();
+
+        CreateMap<DerivativeEDGEHAEntityOptionSwapletAmortization, DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM>();
+        CreateMap<DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM, DerivativeEDGEHAEntityOptionSwapletAmortization>();
 
         CreateMap<DerivativeEDGEHAEntityClient, DerivativeEDGEHAApiViewModelsClientVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsClientVM, DerivativeEDGEHAEntityClient>();
