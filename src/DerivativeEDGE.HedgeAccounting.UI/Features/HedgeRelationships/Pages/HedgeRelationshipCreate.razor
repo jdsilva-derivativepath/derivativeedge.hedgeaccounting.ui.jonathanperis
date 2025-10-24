@@ -5,7 +5,7 @@
 @inject IAlertService AlertService
 @inject NavigationManager NavManager
 
-<DpFullscreenModal ShowModal="ShowNewProcessModal" HeaderText="New Hedge Relationship">
+<DpFullscreenModal ShowModal="IsVisible" HeaderText="New Hedge Relationship">
     <Content>
         <EditForm Model="@HedgeRelationship" OnValidSubmit="RequestNewHedgeRelationship" OnInvalidSubmit="OnInvalidSubmit">
             <DataAnnotationsValidator />

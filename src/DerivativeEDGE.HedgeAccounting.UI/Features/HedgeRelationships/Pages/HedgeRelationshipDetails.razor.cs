@@ -217,6 +217,9 @@ public partial class HedgeRelationshipDetails
                 LoadClientsAsync(),
                 LoadClientEntitiesAsync(HedgeRelationship.ClientID)
             );
+
+            // Finally, load GL accounts if HedgeRelationship is available
+            await LoadGLAccounts();
         }
         else
         {
@@ -224,8 +227,7 @@ public partial class HedgeRelationshipDetails
             await LoadClientsAsync();
         }
 
-        // Finally, load GL accounts if HedgeRelationship is available
-        await LoadGLAccounts();
+
     }
     #endregion
 
@@ -238,11 +240,19 @@ public partial class HedgeRelationshipDetails
             StateHasChanged();
 
             var response = await Mediator.Send(new GetHedgeRelationshipById.Query(hedgeId));
+
+            if (response.HasError)
+            {
+                await AlertService.ShowToast($"Failed to load hedge relationship {hedgeId}: {response.Message}", AlertKind.Error, "Error", showButton: true);
+                HedgeRelationship = null;
+                return;
+            }
+
             HedgeRelationship = response.Data;
 
             if (HedgeRelationship != null)
             {
-                HedgeRelationship.BenchmarkText = HedgeRelationshipLabelHelper.GetBenchMarkLabel(HedgeRelationship); // Set BenchMarkLabel on initial load
+                HedgeRelationship.BenchmarkText = HedgeRelationshipLabelHelper.GetBenchMarkLabel(HedgeRelationship);
             }
 
             // Generate effectiveness chart data after loading hedge relationship
@@ -251,6 +261,7 @@ public partial class HedgeRelationshipDetails
         catch (Exception ex)
         {
             await AlertService.ShowToast($"There was a problem retrieving the Hedge Relationship: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+            HedgeRelationship = null;
         }
         finally
         {
@@ -341,8 +352,16 @@ public partial class HedgeRelationshipDetails
 
     private async Task LoadGLAccounts()
     {
-        var query = new GetGLAccountsForHedging.Query(HedgeRelationship.ClientID, HedgeRelationship.BankEntityID);
-        var result = await Mediator.Send(query);
+        if (HedgeRelationship == null)
+        {
+            ClearRecords();
+            return;
+        }
+
+        try
+        {
+            var query = new GetGLAccountsForHedging.Query(HedgeRelationship.ClientID, HedgeRelationship.BankEntityID);
+            var result = await Mediator.Send(query);
 
         // Add "None" option as first item in GL Account lists (legacy: amortizationView.cshtml line 51, 69)
         var noneOption = new DerivativeEDGEHAEntityGLAccount
@@ -362,6 +381,12 @@ public partial class HedgeRelationshipDetails
 
         IntrinsicAmortizationGLAccounts = [noneOption, .. result.Data];
         IntrinsicAmortizationContraAccounts = [noneOption, .. result.Data];
+        }
+        catch (Exception ex)
+        {
+            await AlertService.ShowToast($"Failed to load GL accounts for HR {HedgeRelationship.ID}: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+            ClearRecords();
+        }
     }
     #endregion
 
@@ -1599,6 +1624,16 @@ public partial class HedgeRelationshipDetails
             
             StateHasChanged();
         }
+    }
+
+    private void ClearRecords()
+    {
+        AmortizationGLAccounts = [];
+        AmortizationContraAccounts = [];
+        OptionAmortizationGLAccounts = [];
+        OptionAmortizationContraAccounts = [];
+        IntrinsicAmortizationGLAccounts = [];
+        IntrinsicAmortizationContraAccounts = [];
     }
     #endregion
 }

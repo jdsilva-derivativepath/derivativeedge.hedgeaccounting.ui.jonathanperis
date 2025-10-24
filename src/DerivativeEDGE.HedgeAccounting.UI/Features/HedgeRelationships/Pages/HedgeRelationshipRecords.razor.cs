@@ -11,6 +11,7 @@ public partial class HedgeRelationshipRecords
     #region Public Properties
     public List<Client> AvailableClients { get; set; } = [];
     public bool IsLoadingClients { get; set; }
+    public bool IsNewHedgeModalVisible { get; set; }
     public record CancelContext(bool IsUpload, bool IsByClient);
     #endregion
 
@@ -263,7 +264,7 @@ public partial class HedgeRelationshipRecords
     private async Task HandleNewRelationshipClick()
     {
         if (_newRelationshipModal == null) return;
-        _newRelationshipModal.ShowNewProcessModal = true;
+        IsNewHedgeModalVisible = true;
         _newRelationshipModal.HedgeRelationship.ID = 0;
         _newRelationshipModal.HedgeRelationship.ClientID = SelectedClientId.GetValueOrDefault();
         await _newRelationshipModal.LoadClientEntitiesAsync(SelectedClientId);

@@ -57,7 +57,9 @@ else
         </div>
     </div>
 
-    <HedgeRelationshipCreate @ref="_newRelationshipModal" />
+    <HedgeRelationshipCreate @ref="_newRelationshipModal"
+                             IsVisible="@IsNewHedgeModalVisible"
+                             IsVisibleChanged="@((bool visible) => IsNewHedgeModalVisible = visible)" />
 
     <DpConfirmationModal Visible="@ShowRegressionModal"
                          VisibleChanged="@((bool v) => ShowRegressionModal = v)"

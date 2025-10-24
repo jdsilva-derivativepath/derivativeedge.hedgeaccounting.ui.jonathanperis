@@ -2,6 +2,11 @@
 
 public partial class HedgeRelationshipCreate
 {
+    #region Parameters
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    #endregion
+
     public bool ShowNewProcessModal { get; set; }
     private List<Client> AvailableClients { get; set; } = [];
     private List<Entity> AvailableEntities { get; set; } = [];
@@ -18,10 +23,11 @@ public partial class HedgeRelationshipCreate
         StateHasChanged();
     }
 
-    private void OnClickCancelHandler()
+    private async Task OnClickCancelHandler()
     {
         HideFormMessage();
-        ShowNewProcessModal = false;
+        IsVisible = false;
+        await IsVisibleChanged.InvokeAsync(IsVisible);
     }
 
     private async Task OnTriggerSubmitFromHeader()
