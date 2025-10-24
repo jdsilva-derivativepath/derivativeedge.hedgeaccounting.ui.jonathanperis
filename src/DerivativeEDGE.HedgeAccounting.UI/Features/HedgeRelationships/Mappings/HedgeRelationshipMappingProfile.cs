@@ -27,7 +27,7 @@ public class HedgeRelationshipMappingProfile : Profile
             .ForMember(dest => dest.HedgeRelationship, opt => opt.Ignore())
             .ForMember(dest => dest.HedgedRelationshipItem, opt => opt.Ignore())
             .ForMember(dest => dest.HedgingRelationshipItem, opt => opt.Ignore())
-            .ForMember(dest => dest.ValueDate, opt => opt.Ignore());
+            .ForMember(dest => dest.ValueDate, opt => opt.MapFrom(src => ParseDateTimeOffset(src.ValueDate)));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipItem, DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>()
             .ForMember(d => d.ItemID, o => o.NullSubstitute(string.Empty))
