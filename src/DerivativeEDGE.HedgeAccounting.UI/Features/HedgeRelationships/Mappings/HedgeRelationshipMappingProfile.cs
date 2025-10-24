@@ -19,7 +19,13 @@ public class HedgeRelationshipMappingProfile : Profile
         CreateMap<DerivativeEDGEHAEntityHedgeRegressionBatch, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM, DerivativeEDGEHAEntityHedgeRegressionBatch>()
             .ForMember(dest => dest.HedgeRegressionBatchResults, opt => opt.MapFrom(src => src.HedgeRegressionBatchResults))
-            .ForMember(dest => dest.HedgeRelationshipLogs, opt => opt.MapFrom(src => src.HedgeRelationshipLogs));
+            .ForMember(dest => dest.HedgeRelationshipLogs, opt => opt.MapFrom(src => src.HedgeRelationshipLogs))
+            .ForMember(dest => dest.RunBy, opt => opt.Ignore())
+            .ForMember(dest => dest.ProspectiveHedgeRegressionBatchEffMethod, opt => opt.Ignore())
+            .ForMember(dest => dest.RetrospectiveRegressionBatchEffMethod, opt => opt.Ignore())
+            .ForMember(dest => dest.HedgeRelationship, opt => opt.Ignore())
+            .ForMember(dest => dest.HedgedRelationshipItem, opt => opt.Ignore())
+            .ForMember(dest => dest.HedgingRelationshipItem, opt => opt.Ignore());
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipItem, DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>()
             .ForMember(d => d.ItemID, o => o.NullSubstitute(string.Empty))
