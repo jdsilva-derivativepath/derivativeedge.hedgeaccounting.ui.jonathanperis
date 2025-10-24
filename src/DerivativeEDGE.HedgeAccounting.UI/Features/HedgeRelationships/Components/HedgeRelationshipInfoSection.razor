@@ -187,7 +187,7 @@
                         Placeholder="Hedged Type"
                         @bind-Value="HedgeRelationship.HedgeType"
                         DataSource="@DropdownDataHelper.GetDropdownDatasource("hedgetype")">
-                            <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHRHedgeType" TItem="DropdownModel" />
+                            <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumHRHedgeType" TItem="DropdownModel" ValueChange="@OnHedgeTypeChanged" />
                             <DropDownListFieldSettings Text="Text" Value="Value" />
                         </SfDropDownList>
                     </div>

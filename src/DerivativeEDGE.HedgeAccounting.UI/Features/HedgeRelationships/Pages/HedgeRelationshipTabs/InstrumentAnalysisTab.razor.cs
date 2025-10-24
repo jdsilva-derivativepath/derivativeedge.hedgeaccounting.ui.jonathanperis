@@ -72,6 +72,33 @@ public partial class InstrumentAnalysisTab
             return HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;
         }
     }
+
+    /// <summary>
+    /// Computed property to determine if Prospective/Retrospective Assessment Method fields should be enabled.
+    /// Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js line 600
+    /// Legacy logic: DesignatedIsDPIUser = HedgeState === 'Designated' && !(IsDPIUser || ContractType === 'SaaS' || ContractType === 'SwaS')
+    /// The fields are disabled when DesignatedIsDPIUser is true (legacy: data-ng-disabled="DesignatedIsDPIUser")
+    /// Therefore, fields are ENABLED when DesignatedIsDPIUser is false, which means:
+    /// - Either HedgeState is NOT 'Designated'
+    /// - OR (HedgeState is 'Designated' AND (IsDPIUser OR ContractType is 'SaaS' OR ContractType is 'SwaS'))
+    /// </summary>
+    private bool IsEffectivenessMethodEnabled
+    {
+        get
+        {
+            if (HedgeRelationship == null)
+                return true; // Default to enabled if HedgeRelationship is null
+
+            // Calculate DesignatedIsDPIUser (legacy line 600)
+            bool designatedIsDPIUser = HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Designated &&
+                                       !(IsDpiUser || 
+                                         HedgeRelationship.ContractType == "SaaS" || 
+                                         HedgeRelationship.ContractType == "SwaS");
+
+            // Fields are enabled when DesignatedIsDPIUser is false
+            return !designatedIsDPIUser;
+        }
+    }
     #endregion
 
     #region Constants
@@ -475,8 +502,8 @@ public partial class InstrumentAnalysisTab
     {
         var filteredMethods = new List<DropdownModel>();
         
-        // Always add "None" option
-        filteredMethods.Add(new DropdownModel { ID = 0, Text = "None" });
+        // Don't add a hardcoded "None" option - it should come from the API if needed
+        // Legacy code doesn't add "None" manually, it just filters the list from API
         
         if (HedgeRelationship == null || AllEffectivenessMethods == null || AllEffectivenessMethods.Count == 0)
         {
@@ -541,25 +568,55 @@ public partial class InstrumentAnalysisTab
         return filteredMethods;
     }
 
+    /// <summary>
+    /// Gets Report Frequency options from the enum.
+    /// Uses Enum.GetValues to dynamically get all enum values instead of hardcoding them.
+    /// This ensures we always have the latest enum values from the domain model.
+    /// </summary>
     private static IEnumerable<ReportFrequencyDropdownModel> GetReportFrequencyOptions()
     {
-        return new List<ReportFrequencyDropdownModel>
+        var options = new List<ReportFrequencyDropdownModel>();
+        
+        // Add None option with null value
+        options.Add(new ReportFrequencyDropdownModel { Value = null, Text = "None" });
+        
+        // Dynamically get all enum values from the ReportingFrequency enum
+        foreach (DerivativeEDGEHAEntityEnumReportingFrequency enumValue in Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumReportingFrequency)))
         {
-            new() { Value = null, Text = "None" },
-            new() { Value = DerivativeEDGEHAEntityEnumReportingFrequency.Monthly, Text = "Monthly" },
-            new() { Value = DerivativeEDGEHAEntityEnumReportingFrequency.Quarterly, Text = "Quarterly" }
-        };
+            // Skip None (0) as we already added it with null value
+            if (enumValue != DerivativeEDGEHAEntityEnumReportingFrequency.None)
+            {
+                options.Add(new ReportFrequencyDropdownModel 
+                { 
+                    Value = enumValue, 
+                    Text = enumValue.ToString() 
+                });
+            }
+        }
+        
+        return options;
     }
 
+    /// <summary>
+    /// Gets Period Size options from the enum.
+    /// Uses Enum.GetValues to dynamically get all enum values instead of hardcoding them.
+    /// This ensures we always have the latest enum values from the domain model.
+    /// </summary>
     private static IEnumerable<DropdownModel> GetPeriodSizeOptions()
     {
-        return new List<DropdownModel>
+        var options = new List<DropdownModel>();
+        
+        // Dynamically get all enum values from the PeriodSize enum
+        foreach (DerivativeEDGEHAEntityEnumPeriodSize enumValue in Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumPeriodSize)))
         {
-            new() { Value = "None", Text = "None" },
-            new() { Value = "Week", Text = "Week" },
-            new() { Value = "Month", Text = "Month" },
-            new() { Value = "Quarter", Text = "Quarter" },
-        };
+            options.Add(new DropdownModel
+            {
+                Value = enumValue.ToString(),
+                Text = enumValue.ToString()
+            });
+        }
+        
+        return options;
     }
     #endregion
 

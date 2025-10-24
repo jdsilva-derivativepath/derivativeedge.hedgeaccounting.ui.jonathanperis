@@ -63,7 +63,8 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
             OnDownloadSpecsAndChecksClick="@DownloadSpecsAndChecksAsync" />
 
         <HedgeRelationshipInfoSection
-            @bind-HedgeRelationship="@HedgeRelationship"
+            HedgeRelationship="@HedgeRelationship"
+            HedgeRelationshipChanged="@OnHedgeRelationshipInfoChanged"
             IsLoadingClients="@IsLoadingClients"
             IsLoadingEntities="@IsLoadingEntities"
             AvailableClients="@AvailableClients"
