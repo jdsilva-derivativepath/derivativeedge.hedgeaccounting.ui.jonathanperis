@@ -48,7 +48,11 @@ public class HedgeRelationshipMappingProfile : Profile
             .ForMember(dest => dest.OptionTimeValueAmortRollSchedules, opt => opt.MapFrom(src => src.OptionTimeValueAmortRollSchedules))
             .ForMember(dest => dest.OptionAmortizations, opt => opt.MapFrom(src => src.OptionAmortizations))
             .ForMember(dest => dest.OptionSwapletAmortizations, opt => opt.MapFrom(src => src.OptionSwapletAmortizations))
-            .ForMember(dest => dest.FinancialCenters, opt => opt.MapFrom(src => src.FinancialCenters));
+            .ForMember(dest => dest.FinancialCenters, opt => opt.MapFrom(src => src.FinancialCenters))
+            .ForMember(dest => dest.ContraAccount, opt => opt.Ignore())
+            .ForMember(dest => dest.GLAccount, opt => opt.Ignore())
+            .ForMember(dest => dest.FinancialCenter, opt => opt.Ignore())
+            .ForMember(dest => dest.HedgeRelationship, opt => opt.Ignore());
 
         // Mappings for nested collection element types
         CreateMap<DerivativeEDGEHAEntityOptionAmortization, DerivativeEDGEHAApiViewModelsOptionAmortizationVM>();
