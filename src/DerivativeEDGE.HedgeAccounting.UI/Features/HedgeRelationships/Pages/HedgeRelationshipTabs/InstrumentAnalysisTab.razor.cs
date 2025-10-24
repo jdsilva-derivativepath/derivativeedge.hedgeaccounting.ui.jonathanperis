@@ -568,25 +568,55 @@ public partial class InstrumentAnalysisTab
         return filteredMethods;
     }
 
+    /// <summary>
+    /// Gets Report Frequency options from the enum.
+    /// Uses Enum.GetValues to dynamically get all enum values instead of hardcoding them.
+    /// This ensures we always have the latest enum values from the domain model.
+    /// </summary>
     private static IEnumerable<ReportFrequencyDropdownModel> GetReportFrequencyOptions()
     {
-        return new List<ReportFrequencyDropdownModel>
+        var options = new List<ReportFrequencyDropdownModel>();
+        
+        // Add None option with null value
+        options.Add(new ReportFrequencyDropdownModel { Value = null, Text = "None" });
+        
+        // Dynamically get all enum values from the ReportingFrequency enum
+        foreach (DerivativeEDGEHAEntityEnumReportingFrequency enumValue in Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumReportingFrequency)))
         {
-            new() { Value = null, Text = "None" },
-            new() { Value = DerivativeEDGEHAEntityEnumReportingFrequency.Monthly, Text = "Monthly" },
-            new() { Value = DerivativeEDGEHAEntityEnumReportingFrequency.Quarterly, Text = "Quarterly" }
-        };
+            // Skip None (0) as we already added it with null value
+            if (enumValue != DerivativeEDGEHAEntityEnumReportingFrequency.None)
+            {
+                options.Add(new ReportFrequencyDropdownModel 
+                { 
+                    Value = enumValue, 
+                    Text = enumValue.ToString() 
+                });
+            }
+        }
+        
+        return options;
     }
 
+    /// <summary>
+    /// Gets Period Size options from the enum.
+    /// Uses Enum.GetValues to dynamically get all enum values instead of hardcoding them.
+    /// This ensures we always have the latest enum values from the domain model.
+    /// </summary>
     private static IEnumerable<DropdownModel> GetPeriodSizeOptions()
     {
-        return new List<DropdownModel>
+        var options = new List<DropdownModel>();
+        
+        // Dynamically get all enum values from the PeriodSize enum
+        foreach (DerivativeEDGEHAEntityEnumPeriodSize enumValue in Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumPeriodSize)))
         {
-            new() { Value = "None", Text = "None" },
-            new() { Value = "Week", Text = "Week" },
-            new() { Value = "Month", Text = "Month" },
-            new() { Value = "Quarter", Text = "Quarter" },
-        };
+            options.Add(new DropdownModel
+            {
+                Value = enumValue.ToString(),
+                Text = enumValue.ToString()
+            });
+        }
+        
+        return options;
     }
     #endregion
 
