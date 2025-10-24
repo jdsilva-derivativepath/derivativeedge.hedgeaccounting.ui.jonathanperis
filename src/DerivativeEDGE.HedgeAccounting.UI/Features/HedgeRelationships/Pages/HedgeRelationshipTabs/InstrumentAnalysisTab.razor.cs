@@ -72,6 +72,33 @@ public partial class InstrumentAnalysisTab
             return HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft;
         }
     }
+
+    /// <summary>
+    /// Computed property to determine if Prospective/Retrospective Assessment Method fields should be enabled.
+    /// Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js line 600
+    /// Legacy logic: DesignatedIsDPIUser = HedgeState === 'Designated' && !(IsDPIUser || ContractType === 'SaaS' || ContractType === 'SwaS')
+    /// The fields are disabled when DesignatedIsDPIUser is true (legacy: data-ng-disabled="DesignatedIsDPIUser")
+    /// Therefore, fields are ENABLED when DesignatedIsDPIUser is false, which means:
+    /// - Either HedgeState is NOT 'Designated'
+    /// - OR (HedgeState is 'Designated' AND (IsDPIUser OR ContractType is 'SaaS' OR ContractType is 'SwaS'))
+    /// </summary>
+    private bool IsEffectivenessMethodEnabled
+    {
+        get
+        {
+            if (HedgeRelationship == null)
+                return true; // Default to enabled if HedgeRelationship is null
+
+            // Calculate DesignatedIsDPIUser (legacy line 600)
+            bool designatedIsDPIUser = HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Designated &&
+                                       !(IsDpiUser || 
+                                         HedgeRelationship.ContractType == "SaaS" || 
+                                         HedgeRelationship.ContractType == "SwaS");
+
+            // Fields are enabled when DesignatedIsDPIUser is false
+            return !designatedIsDPIUser;
+        }
+    }
     #endregion
 
     #region Constants

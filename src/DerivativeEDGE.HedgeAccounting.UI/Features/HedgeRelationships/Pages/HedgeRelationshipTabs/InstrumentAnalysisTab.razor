@@ -174,7 +174,7 @@
                     <span class="input-label">Prospective Assessment Method</span>
                     <SfDropDownList TValue="long?"
                                     CssClass="dropdown-input"
-                                    Enabled="true"
+                                    Enabled="@IsEffectivenessMethodEnabled"
                                     TItem="DropdownModel"
                                     Placeholder="Select"
                                     @bind-Value="HedgeRelationship.ProspectiveEffectivenessMethodID"
@@ -187,7 +187,7 @@
                     <span class="input-label">Retrospective Assessment Method</span>
                     <SfDropDownList TValue="long?"
                                     CssClass="dropdown-input"
-                                    Enabled="true"
+                                    Enabled="@IsEffectivenessMethodEnabled"
                                     TItem="DropdownModel"
                                     Placeholder="Retrospective Assessment Method"
                                     @bind-Value="HedgeRelationship.RetrospectiveEffectivenessMethodID"
