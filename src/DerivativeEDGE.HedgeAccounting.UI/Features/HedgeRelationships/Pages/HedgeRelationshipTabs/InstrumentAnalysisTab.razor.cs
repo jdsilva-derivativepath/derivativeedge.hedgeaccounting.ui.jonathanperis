@@ -502,8 +502,8 @@ public partial class InstrumentAnalysisTab
     {
         var filteredMethods = new List<DropdownModel>();
         
-        // Always add "None" option
-        filteredMethods.Add(new DropdownModel { ID = 0, Text = "None" });
+        // Don't add a hardcoded "None" option - it should come from the API if needed
+        // Legacy code doesn't add "None" manually, it just filters the list from API
         
         if (HedgeRelationship == null || AllEffectivenessMethods == null || AllEffectivenessMethods.Count == 0)
         {
