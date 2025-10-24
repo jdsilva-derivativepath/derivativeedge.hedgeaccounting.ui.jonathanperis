@@ -42,4 +42,22 @@ public partial class HedgeRelationshipInfoSection
     [Parameter] public EventCallback OnPreviewDocumentNewClick { get; set; }
     [Parameter] public EventCallback OnEditDocumentClick { get; set; }
     #endregion
+    
+    #region Event Handlers
+    /// <summary>
+    /// Handles HedgeType dropdown value changes.
+    /// Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js line 234 - $watch on HedgeType triggers setDropDownListEffectivenessMethods()
+    /// </summary>
+    private async Task OnHedgeTypeChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<DerivativeEDGEHAEntityEnumHRHedgeType, DropdownModel> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            HedgeRelationship.HedgeType = args.Value;
+            
+            // Notify parent component that HedgeRelationship has changed
+            // This will trigger refresh of effectiveness method dropdown options in InstrumentAnalysisTab
+            await HedgeRelationshipChanged.InvokeAsync(HedgeRelationship);
+        }
+    }
+    #endregion
 }

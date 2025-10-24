@@ -1553,6 +1553,13 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.ExcludeIntrinsicValue = false;
             }
             
+            // Refresh the Instruments and Analysis tab to update effectiveness method dropdown options
+            // Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js line 424 - $watch on IsAnOptionHedge triggers setDropDownListEffectivenessMethods()
+            if (instrumentAnalysisTabRef != null)
+            {
+                await instrumentAnalysisTabRef.RefreshGridData();
+            }
+            
             // Refresh the tab component to update visibility of Option Amortization tab
             if (hedgerelationshiptabRef != null)
             {
@@ -1561,6 +1568,24 @@ public partial class HedgeRelationshipDetails
             
             StateHasChanged();
         }
+    }
+    
+    /// <summary>
+    /// Handles changes from HedgeRelationshipInfoSection component.
+    /// Refreshes InstrumentAnalysisTab when HedgeType changes to update effectiveness method dropdown options.
+    /// Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js line 234 - $watch on HedgeType triggers setDropDownListEffectivenessMethods()
+    /// </summary>
+    private async Task OnHedgeRelationshipInfoChanged(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM updatedHedgeRelationship)
+    {
+        HedgeRelationship = updatedHedgeRelationship;
+        
+        // Refresh the Instruments and Analysis tab to update effectiveness method dropdown options when HedgeType changes
+        if (instrumentAnalysisTabRef != null)
+        {
+            await instrumentAnalysisTabRef.RefreshGridData();
+        }
+        
+        StateHasChanged();
     }
     
     private async Task OnOffMarketChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
