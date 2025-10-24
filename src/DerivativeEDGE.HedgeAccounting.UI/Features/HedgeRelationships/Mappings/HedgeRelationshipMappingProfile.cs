@@ -12,7 +12,9 @@ public class HedgeRelationshipMappingProfile : Profile
             .ForMember(dest => dest.HedgingItems, opt => opt.MapFrom(src => src.HedgingItems))
             .ForMember(dest => dest.HedgeRegressionBatches, opt => opt.MapFrom(src => src.HedgeRegressionBatches))
             .ForMember(dest => dest.HedgeRelationshipActivities, opt => opt.MapFrom(src => src.HedgeRelationshipActivities))
-            .ForMember(dest => dest.HedgeRelationshipOptionTimeValues, opt => opt.MapFrom(src => src.HedgeRelationshipOptionTimeValues));
+            .ForMember(dest => dest.HedgeRelationshipOptionTimeValues, opt => opt.MapFrom(src => src.HedgeRelationshipOptionTimeValues))
+            .ForMember(dest => dest.BankEntity, opt => opt.MapFrom(src => src.BankEntity))
+            .ForMember(dest => dest.Client, opt => opt.MapFrom(src => src.Client));
 
         CreateMap<DerivativeEDGEHAEntityHedgeRegressionBatch, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>();
         CreateMap<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM, DerivativeEDGEHAEntityHedgeRegressionBatch>()
