@@ -26,7 +26,8 @@ public class HedgeRelationshipMappingProfile : Profile
             .ForMember(dest => dest.RetrospectiveRegressionBatchEffMethod, opt => opt.Ignore())
             .ForMember(dest => dest.HedgeRelationship, opt => opt.Ignore())
             .ForMember(dest => dest.HedgedRelationshipItem, opt => opt.Ignore())
-            .ForMember(dest => dest.HedgingRelationshipItem, opt => opt.Ignore());
+            .ForMember(dest => dest.HedgingRelationshipItem, opt => opt.Ignore())
+            .ForMember(dest => dest.ValueDate, opt => opt.Ignore());
 
         CreateMap<DerivativeEDGEHAEntityHedgeRelationshipItem, DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM>()
             .ForMember(d => d.ItemID, o => o.NullSubstitute(string.Empty))
