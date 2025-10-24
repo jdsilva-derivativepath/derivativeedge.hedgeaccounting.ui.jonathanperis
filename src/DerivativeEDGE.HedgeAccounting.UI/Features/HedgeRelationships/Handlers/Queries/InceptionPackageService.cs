@@ -30,10 +30,14 @@ public sealed class InceptionPackageService
                 // Map to API entity (only mapped fields will be used)
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
                 
-                // Set ValueDate to today's date (matching legacy behavior - see line 489 in hr_hedgeRelationshipAddEditCtrl.js)
-                // Legacy: var valueDate = (today.getMonth() + 1).toString() + '/' + today.getDate().toString() + '/' + today.getFullYear().toString();
-                // Legacy: $scope.Model.ValueDate = valueDate;
-                apiEntity.ValueDate = DateTimeOffset.Now;
+                // Set required date fields to today's date (matching legacy behavior)
+                // Legacy line 489: $scope.Model.ValueDate = valueDate (today's date)
+                // Legacy line 2804-2805: $scope.Model.TimeValuesStartDate/EndDate = moment().format('M/D/YYYY')
+                var now = DateTimeOffset.Now;
+                apiEntity.ValueDate = now;
+                apiEntity.TimeValuesStartDate = now;
+                apiEntity.TimeValuesEndDate = now;
+                apiEntity.TimeValuesFrontRollDate = now;
 
                 // Call generated API (preview=True to match original URL query)
                 var fileResponse = await hedgeAccountingApiClient.GenerateInceptionPackageAsync(true, apiEntity, cancellationToken);
