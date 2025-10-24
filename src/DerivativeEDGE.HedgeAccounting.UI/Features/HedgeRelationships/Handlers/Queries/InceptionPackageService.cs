@@ -29,6 +29,11 @@ public sealed class InceptionPackageService
 
                 // Map to API entity (only mapped fields will be used)
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
+                
+                // Set ValueDate to today's date (matching legacy behavior - see line 489 in hr_hedgeRelationshipAddEditCtrl.js)
+                // Legacy: var valueDate = (today.getMonth() + 1).toString() + '/' + today.getDate().toString() + '/' + today.getFullYear().toString();
+                // Legacy: $scope.Model.ValueDate = valueDate;
+                apiEntity.ValueDate = DateTimeOffset.Now;
 
                 // Call generated API (preview=True to match original URL query)
                 var fileResponse = await hedgeAccountingApiClient.GenerateInceptionPackageAsync(true, apiEntity, cancellationToken);

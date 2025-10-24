@@ -33,6 +33,9 @@ public sealed class RunRegression
                 // Map the full HedgeRelationshipVM to HedgeRelationship entity (following UpdateHedgeRelationship pattern)
                 // The API needs the complete hedge relationship data including hedged items, hedging items, effectiveness methods, etc.
                 var body = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
+                
+                // Set ValueDate to today's date (matching legacy behavior)
+                body.ValueDate = DateTimeOffset.Now;
 
                 var apiResponse = await hedgeAccountingApiClient.RegressAsync(request.HedgeResultType, body, cancellationToken);
 
