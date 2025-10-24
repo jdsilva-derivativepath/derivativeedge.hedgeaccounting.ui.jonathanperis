@@ -28,6 +28,7 @@ public sealed class DownloadSpecsAndChecksService
                 apiEntity.TimeValuesStartDate = now;
                 apiEntity.TimeValuesEndDate = now;
                 apiEntity.TimeValuesFrontRollDate = now;
+                apiEntity.TimeValuesBackRollDate = now;
 
                 var fileResponse = await hedgeAccountingApiClient.DownloadSpecsAndChecksAsync(apiEntity, cancellationToken);
                 if (fileResponse == null)

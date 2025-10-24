@@ -40,6 +40,7 @@ public sealed class RunRegression
                 body.TimeValuesStartDate = now;
                 body.TimeValuesEndDate = now;
                 body.TimeValuesFrontRollDate = now;
+                body.TimeValuesBackRollDate = now;
 
                 var apiResponse = await hedgeAccountingApiClient.RegressAsync(request.HedgeResultType, body, cancellationToken);
 

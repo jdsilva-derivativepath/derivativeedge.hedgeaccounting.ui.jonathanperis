@@ -38,6 +38,7 @@ public sealed class InceptionPackageService
                 apiEntity.TimeValuesStartDate = now;
                 apiEntity.TimeValuesEndDate = now;
                 apiEntity.TimeValuesFrontRollDate = now;
+                apiEntity.TimeValuesBackRollDate = now;
 
                 // Call generated API (preview=True to match original URL query)
                 var fileResponse = await hedgeAccountingApiClient.GenerateInceptionPackageAsync(true, apiEntity, cancellationToken);
