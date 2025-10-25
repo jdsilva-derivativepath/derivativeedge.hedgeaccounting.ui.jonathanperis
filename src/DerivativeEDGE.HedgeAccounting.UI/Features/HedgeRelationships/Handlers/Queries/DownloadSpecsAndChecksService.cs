@@ -21,6 +21,14 @@ public sealed class DownloadSpecsAndChecksService
                     request.HedgeRelationship.ID);
 
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
+                
+                // Set required date fields to today's date (matching legacy behavior)
+                var now = DateTimeOffset.Now;
+                apiEntity.ValueDate = now;
+                apiEntity.TimeValuesStartDate = now;
+                apiEntity.TimeValuesEndDate = now;
+                apiEntity.TimeValuesFrontRollDate = now;
+                apiEntity.TimeValuesBackRollDate = now;
 
                 var fileResponse = await hedgeAccountingApiClient.DownloadSpecsAndChecksAsync(apiEntity, cancellationToken);
                 if (fileResponse == null)
