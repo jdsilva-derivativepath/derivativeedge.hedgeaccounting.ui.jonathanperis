@@ -208,6 +208,15 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DerivativeEDGEHAEntityEffectivenessMethod>> GetactiveAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DerivativeEDGEHAEntityEffectivenessMethod>> GetactiveAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DerivativeEDGEHAEntityEffectivenessMethod>> EffectivenessMethodAllAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3297,6 +3306,100 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Internal Server Error", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DerivativeEDGEHAEntityEffectivenessMethod>> GetactiveAsync()
+        {
+            return GetactiveAsync(System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DerivativeEDGEHAEntityEffectivenessMethod>> GetactiveAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "v1/EffectivenessMethod/getactive"
+                    urlBuilder_.Append("v1/EffectivenessMethod/getactive");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<DerivativeEDGEHAEntityEffectivenessMethod>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("Unauthorized", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         if (status_ == 500)
@@ -18461,12 +18564,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Leg", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityLeg? Leg { get; set; } = default!;
 
@@ -18487,12 +18584,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("GMEI", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(80)]
         public string? GMEI { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("HedgeRelationships", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<DerivativeEDGEHAEntityHedgeRelationship>? HedgeRelationships { get; set; } = default!;
@@ -18529,12 +18620,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("Person_Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Person_Id { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("BankEntity", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityBankEntity? BankEntity { get; set; } = default!;
 
@@ -18549,12 +18634,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -18565,12 +18644,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
     {
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -18599,12 +18672,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("LowStrike", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool? LowStrike { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -18703,12 +18770,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Leg", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityLeg? Leg { get; set; } = default!;
@@ -18885,12 +18946,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("EmailAccountId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? EmailAccountId { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("GenerateJournalEntry", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool GenerateJournalEntry { get; set; } = default!;
 
@@ -19048,12 +19103,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public DerivativeEDGEDomainEntitiesEnumsCollarStrikeSource CollarStrikeSource { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -19084,12 +19133,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public DerivativeEDGEDomainEntitiesEnumsMessageDeliveryMethod? DeliveryMethod { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Person", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityPerson? Person { get; set; } = default!;
 
@@ -19106,12 +19149,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("ContactRole_Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long ContactRole_Id { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("ContactRole", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityContactRole? ContactRole { get; set; } = default!;
@@ -19150,12 +19187,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("AddedByUser", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityUser? AddedByUser { get; set; } = default!;
 
@@ -19172,12 +19203,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
     {
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -19209,12 +19234,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("CounterpartyExtendedType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public DerivativeEDGEDomainEntitiesEnumsCounterpartyExtendedType CounterpartyExtendedType { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("LegalEntity", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityLegalEntity? LegalEntity { get; set; } = default!;
@@ -19269,12 +19288,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Label", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string? Label { get; set; } = default!;
@@ -19335,12 +19348,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -19392,12 +19399,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("EndDateDescriptor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(25)]
         public string? EndDateDescriptor { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -19554,12 +19555,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("EmailGuid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid? EmailGuid { get; set; } = default!;
 
@@ -19625,12 +19620,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Email", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityEmail? Email { get; set; } = default!;
@@ -20375,12 +20364,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -20449,12 +20432,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("BankEntity", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityBankEntity? BankEntity { get; set; } = default!;
 
@@ -20509,12 +20486,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Fees", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<DerivativeEDGEHAEntityFee>? Fees { get; set; } = default!;
 
@@ -20553,12 +20524,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("Fixing", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double Fixing { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -20607,12 +20572,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("ActualSpread", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double? ActualSpread { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -20632,12 +20591,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
     {
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -20701,12 +20654,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("Instruction", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string? Instruction { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -20758,12 +20705,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("LedgerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? LedgerId { get; set; } = default!;
@@ -20828,12 +20769,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Client", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityClient? Client { get; set; } = default!;
@@ -20949,12 +20884,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("IsActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool IsActive { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("FeeType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityFeeType? FeeType { get; set; } = default!;
 
@@ -21014,12 +20943,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("ModifiedByID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long ModifiedByID { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("HedgeInceptionMemoTemplateHedgeRelationships", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<DerivativeEDGEHAEntityHedgeRelationship>? HedgeInceptionMemoTemplateHedgeRelationships { get; set; } = default!;
@@ -22791,12 +22714,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UserSpecifiedModifiedMortgageAveragingPeriod", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int? UserSpecifiedModifiedMortgageAveragingPeriod { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("FrontResetDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTimeOffset? FrontResetDate { get; set; } = default!;
 
@@ -22922,12 +22839,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("BankEntity", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityBankEntity? BankEntity { get; set; } = default!;
 
@@ -22996,12 +22907,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("LegalEntity", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityLegalEntity? LegalEntity { get; set; } = default!;
 
@@ -23063,12 +22968,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("AddedByUser", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityUser? AddedByUser { get; set; } = default!;
@@ -23354,12 +23253,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("SalesTeamGuid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid? SalesTeamGuid { get; set; } = default!;
 
@@ -23422,12 +23315,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("CallableDebt", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityCallableDebt? CallableDebt { get; set; } = default!;
@@ -23628,12 +23515,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
 
@@ -23644,12 +23525,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
     {
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long Id { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -23702,12 +23577,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("EndDateDescriptor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(25)]
         public string? EndDateDescriptor { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("Product", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public DerivativeEDGEHAEntityProduct? Product { get; set; } = default!;
@@ -23875,12 +23744,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
         [Newtonsoft.Json.JsonProperty("UpdatedById", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long? UpdatedById { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
-
         [Newtonsoft.Json.JsonProperty("GenerateFuturePaymentsOnly", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool GenerateFuturePaymentsOnly { get; set; } = default!;
 
@@ -23987,12 +23850,6 @@ namespace DerivativeEdge.HedgeAccounting.Api.Client
 
         [Newtonsoft.Json.JsonProperty("NeedsActivation", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool NeedsActivation { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysStartTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysStartTime { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("SysEndTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset SysEndTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("AssignAllBEs", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool? AssignAllBEs { get; set; } = default!;
