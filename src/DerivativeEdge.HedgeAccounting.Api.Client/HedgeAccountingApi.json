@@ -1143,6 +1143,41 @@
         }
       }
     },
+    "/v1/EffectivenessMethod/getactive": {
+      "get": {
+        "tags": [
+          "EffectivenessMethod"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DerivativeEDGEHAEntityEffectivenessMethod"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MicrosoftAspNetCoreMvcProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/v1/EffectivenessMethod": {
       "get": {
         "tags": [
@@ -10895,14 +10930,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Leg": {
             "allOf": [
               {
@@ -10942,14 +10969,6 @@
             "minLength": 0,
             "type": "string",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "HedgeRelationships": {
             "type": "array",
@@ -11022,14 +11041,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "BankEntity": {
             "allOf": [
               {
@@ -11056,14 +11067,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -11081,14 +11084,6 @@
           "Id": {
             "type": "integer",
             "format": "int64"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -11133,14 +11128,6 @@
           "LowStrike": {
             "type": "boolean",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -11281,14 +11268,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Leg": {
             "allOf": [
@@ -11574,14 +11553,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "GenerateJournalEntry": {
             "type": "boolean"
           },
@@ -11841,14 +11812,6 @@
               }
             ]
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -11900,14 +11863,6 @@
             ],
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Person": {
             "allOf": [
               {
@@ -11936,14 +11891,6 @@
           "ContactRole_Id": {
             "type": "integer",
             "format": "int64"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "ContactRole": {
             "allOf": [
@@ -12007,14 +11954,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "AddedByUser": {
             "allOf": [
               {
@@ -12047,14 +11986,6 @@
           "Id": {
             "type": "integer",
             "format": "int64"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -12099,14 +12030,6 @@
                 "$ref": "#/components/schemas/DerivativeEDGEDomainEntitiesEnumsCounterpartyExtendedType"
               }
             ]
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "LegalEntity": {
             "allOf": [
@@ -12200,14 +12123,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Label": {
             "type": "string",
@@ -12319,14 +12234,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -12413,14 +12320,6 @@
             "minLength": 0,
             "type": "string",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -12657,14 +12556,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "EmailGuid": {
             "type": "string",
             "format": "uuid",
@@ -12773,14 +12664,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Email": {
             "allOf": [
@@ -13436,14 +13319,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -13553,14 +13428,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "BankEntity": {
             "allOf": [
               {
@@ -13662,14 +13529,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Fees": {
             "type": "array",
             "items": {
@@ -13738,14 +13597,6 @@
           "Fixing": {
             "type": "number",
             "format": "double"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -13824,14 +13675,6 @@
             "format": "double",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -13869,14 +13712,6 @@
           "Id": {
             "type": "integer",
             "format": "int64"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -13973,14 +13808,6 @@
             "type": "string",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -14066,14 +13893,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "LedgerId": {
             "type": "integer",
@@ -14193,14 +14012,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Client": {
             "allOf": [
@@ -14406,14 +14217,6 @@
           "IsActive": {
             "type": "boolean"
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "FeeType": {
             "allOf": [
               {
@@ -14516,14 +14319,6 @@
           "ModifiedByID": {
             "type": "integer",
             "format": "int64"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "HedgeInceptionMemoTemplateHedgeRelationships": {
             "type": "array",
@@ -17297,14 +17092,6 @@
             "format": "int32",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "FrontResetDate": {
             "type": "string",
             "format": "date-time",
@@ -17509,14 +17296,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "BankEntity": {
             "allOf": [
               {
@@ -17643,14 +17422,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "LegalEntity": {
             "allOf": [
               {
@@ -17753,14 +17524,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "AddedByUser": {
             "allOf": [
@@ -18177,14 +17940,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "SalesTeamGuid": {
             "type": "string",
             "format": "uuid",
@@ -18303,14 +18058,6 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "CallableDebt": {
             "allOf": [
@@ -18705,14 +18452,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "Product": {
             "allOf": [
               {
@@ -18730,14 +18469,6 @@
           "Id": {
             "type": "integer",
             "format": "int64"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -18825,14 +18556,6 @@
             "minLength": 0,
             "type": "string",
             "nullable": true
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "Product": {
             "allOf": [
@@ -19075,14 +18798,6 @@
             "format": "int64",
             "nullable": true
           },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "GenerateFuturePaymentsOnly": {
             "type": "boolean"
           },
@@ -19265,14 +18980,6 @@
           },
           "NeedsActivation": {
             "type": "boolean"
-          },
-          "SysStartTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "SysEndTime": {
-            "type": "string",
-            "format": "date-time"
           },
           "AssignAllBEs": {
             "type": "boolean",
