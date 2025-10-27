@@ -50,6 +50,14 @@ public sealed class RedraftHedgeRelationship
                 // Map to entity for API call
                 var hedgeRelationshipEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(currentHedgeRelationship);
 
+                // Set required date fields to today's date (matching legacy behavior)
+                var now = DateTimeOffset.Now;
+                hedgeRelationshipEntity.ValueDate = now;
+                hedgeRelationshipEntity.TimeValuesStartDate = now;
+                hedgeRelationshipEntity.TimeValuesEndDate = now;
+                hedgeRelationshipEntity.TimeValuesFrontRollDate = now;
+                hedgeRelationshipEntity.TimeValuesBackRollDate = now;
+
                 // Call the Redraft API endpoint
                 var redraftedHedgeRelationship = await hedgeAccountingApiClient.RedraftAsync(
                     hedgeRelationshipEntity, 

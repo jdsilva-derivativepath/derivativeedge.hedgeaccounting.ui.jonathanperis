@@ -32,6 +32,14 @@ public sealed class SaveHedgeRelationship
                 // Map DTO to API entity
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
 
+                // Set required date fields to today's date (matching legacy behavior)
+                var now = DateTimeOffset.Now;
+                apiEntity.ValueDate = now;
+                apiEntity.TimeValuesStartDate = now;
+                apiEntity.TimeValuesEndDate = now;
+                apiEntity.TimeValuesFrontRollDate = now;
+                apiEntity.TimeValuesBackRollDate = now;
+
                 try
                 {
                     await hedgeAccountingApiClient.HedgeRelationshipPOSTAsync(apiEntity, cancellationToken);
