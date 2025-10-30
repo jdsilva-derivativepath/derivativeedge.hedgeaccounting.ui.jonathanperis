@@ -34,8 +34,8 @@
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.ClientID)" HeaderText="ClientID" Visible="false" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.Description)" HeaderText="Description" Width="160" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.Notional)" Format="@ComponentLibraryConstants.NumberFormat" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="160" />
-        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.DesignationDate)" HeaderText="Designation Date" Width="200" />
-        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.DedesignationDate)" HeaderText="De-designation Date" Width="220" />
+        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.DesignationDateDt)" HeaderText="Designation Date" Width="200" Format="dd/MM/yyyy" Type="Syncfusion.Blazor.Grids.ColumnType.DateTime" />
+        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.DedesignationDateDt)" HeaderText="De-designation Date" Width="220" Format="dd/MM/yyyy" Type="Syncfusion.Blazor.Grids.ColumnType.DateTime" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.HedgeRiskTypeText)" HeaderText="Hedged Risk Type" Width="200" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.HedgeStateText)" HeaderText="Current State" Width="200" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.HedgedItemTypeText)" HeaderText="Hedged Item Type" Width="200" />

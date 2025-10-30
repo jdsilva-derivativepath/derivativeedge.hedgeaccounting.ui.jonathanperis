@@ -8,6 +8,28 @@ public class HedgeRelationshipRecordViewModel(DerivativeEDGEHAApiViewModelsHedge
     public string? EntityName => _source.BankEntity?.LegalEntity?.Name;
     public string? HedgedItemID => _source.HedgedItem?.ItemID;
 
+    // Safe (soft) DateTime? casts of the string date fields (returns null if parse fails)
+    // Does NOT alter original properties to preserve legacy behavior.
+    public DateTime? DesignationDateDt => ParseDate(_source.DesignationDate);
+    public DateTime? DedesignationDateDt => ParseDate(_source.DedesignationDate);
+
+    private static DateTime? ParseDate(string? dateString)
+    {
+        if (string.IsNullOrWhiteSpace(dateString))
+            return null;
+
+        // Try invariant culture first (legacy systems often stored ISO or invariant formats)
+        if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal | DateTimeStyles.AllowWhiteSpaces, out var dt))
+            return dt;
+
+        // Fallback to current culture
+        if (DateTime.TryParse(dateString, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal | DateTimeStyles.AllowWhiteSpaces, out dt))
+            return dt;
+
+        // Could add explicit formats if legacy code specifies; omitted to keep behavior minimal
+        return null;
+    }
+
     // Proxy all original properties
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM Source => _source;
     public long ID => _source.ID;
@@ -15,8 +37,6 @@ public class HedgeRelationshipRecordViewModel(DerivativeEDGEHAApiViewModelsHedge
     public string? Description => _source.Description;
     public string? HedgeTypeText => _source.HedgeTypeText;
     public double? Notional => _source.Notional;
-    public string? DesignationDate => _source.DesignationDate;
-    public string? DedesignationDate => _source.DedesignationDate;
     public string? HedgeRiskTypeText => _source.HedgeRiskTypeText;
     public string? HedgeStateText => _source.HedgeStateText;
     public string? HedgedItemTypeText => _source.HedgedItemTypeText;
@@ -35,5 +55,4 @@ public class HedgeRelationshipRecordViewModel(DerivativeEDGEHAApiViewModelsHedge
     public bool Shortcut => _source.Shortcut;
     public bool? AvailableForSale => _source.AvailableForSale;
     public bool PortfolioLayerMethod => _source.PortfolioLayerMethod;
-
 }
