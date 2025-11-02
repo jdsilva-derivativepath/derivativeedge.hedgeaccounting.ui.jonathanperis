@@ -1,4 +1,4 @@
-﻿using EnumDescriptionAttribute = DerivativeEDGE.HedgeAccounting.UI.Attributes.EnumDescriptionAttribute;
+﻿using EnumDescriptionAttribute = DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Attributes.EnumDescriptionAttribute;
 
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums;
 

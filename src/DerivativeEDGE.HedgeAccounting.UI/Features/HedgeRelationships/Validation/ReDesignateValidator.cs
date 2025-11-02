@@ -1,9 +1,5 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
-/// <summary>
-/// Validates requirements for re-designating a hedge relationship.
-/// Re-designation is only available for Cash Flow hedge relationships that are in Designated state.
-/// </summary>
 public static class ReDesignateValidator
 {
     public static List<string> Validate(

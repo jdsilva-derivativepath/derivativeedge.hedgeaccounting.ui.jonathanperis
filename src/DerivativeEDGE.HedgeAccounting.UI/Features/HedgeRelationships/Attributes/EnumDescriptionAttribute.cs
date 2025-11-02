@@ -1,4 +1,4 @@
-namespace DerivativeEDGE.HedgeAccounting.UI.Attributes;
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Attributes;
 
 [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class EnumDescriptionAttribute(string description) : Attribute

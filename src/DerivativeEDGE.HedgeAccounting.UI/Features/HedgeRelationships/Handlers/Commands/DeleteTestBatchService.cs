@@ -1,11 +1,5 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
-/// <summary>
-/// Handler for deleting a test batch (regression batch).
-/// Legacy: hr_hedgeRelationshipAddEditCtrl.js - selectedItemActionTestChanged() -> 'Delete' action
-/// API: POST v1/HedgeRelationship/DeleteBatch/{batchid}
-/// Returns updated hedge relationship after deletion
-/// </summary>
 public sealed class DeleteTestBatchService
 {
     public sealed record Command(

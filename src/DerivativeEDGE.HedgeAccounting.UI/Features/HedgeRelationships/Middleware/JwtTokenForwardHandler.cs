@@ -1,6 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Middlware;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Middleware;
 
 public class JwtTokenForwardHandler(IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : HttpClientHandler
 {
@@ -14,7 +12,7 @@ public class JwtTokenForwardHandler(IHttpContextAccessor httpContextAccessor, IC
             return await base.SendAsync(request, cancellationToken);
         }
 
-        string? existingToken = context.Request.Headers[AccessTokenHeader].FirstOrDefault();
+        string existingToken = context.Request.Headers[AccessTokenHeader].FirstOrDefault();
         if (string.IsNullOrWhiteSpace(existingToken) || IsExpired(existingToken))
         {
             try
@@ -39,7 +37,7 @@ public class JwtTokenForwardHandler(IHttpContextAccessor httpContextAccessor, IC
             {
                 request.Headers.Accept.ParseAdd("application/json");
             }
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", existingToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", existingToken);
         }
 
         return await base.SendAsync(request, cancellationToken);

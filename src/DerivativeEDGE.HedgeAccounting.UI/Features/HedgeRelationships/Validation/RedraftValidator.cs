@@ -1,9 +1,5 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
-/// <summary>
-/// Validates requirements for redrafting a hedge relationship.
-/// A hedge relationship can only be redrafted if it is in Designated or Dedesignated state.
-/// </summary>
 public static class RedraftValidator
 {
     public static List<string> Validate(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM model)

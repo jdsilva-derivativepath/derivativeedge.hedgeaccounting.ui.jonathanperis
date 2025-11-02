@@ -1,4 +1,5 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Handlers;
+
 public class ResponseBase
 {
     public bool HasError { get; init; }

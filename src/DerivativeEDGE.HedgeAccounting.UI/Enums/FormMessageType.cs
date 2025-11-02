@@ -1,4 +1,5 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Enums;
+
 public enum FormMessageType
 {
     ValidationError,

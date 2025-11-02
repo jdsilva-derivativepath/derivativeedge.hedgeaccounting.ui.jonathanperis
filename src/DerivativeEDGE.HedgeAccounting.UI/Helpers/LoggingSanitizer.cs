@@ -1,4 +1,5 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Helpers;
+
 public static class LoggingSanitizer
 {
     /// <summary>

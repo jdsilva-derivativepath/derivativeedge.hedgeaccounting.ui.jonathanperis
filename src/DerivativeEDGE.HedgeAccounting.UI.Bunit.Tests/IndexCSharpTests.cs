@@ -1,7 +1,7 @@
 ﻿using DerivativeEdge.Blazor.ComponentLibrary.Services;
 using DerivativeEDGE.HedgeAccounting.UI.Components;
 using DerivativeEDGE.HedgeAccounting.UI.Handlers;
-using DerivativeEDGE.HedgeAccounting.UI.Handlers.Handler.Queries;
+using DerivativeEDGE.HedgeAccounting.UI.Handlers.Queries;
 using DerivativeEDGE.HedgeAccounting.UI.Mock;
 using Syncfusion.Blazor;
 using System.Threading.Tasks;

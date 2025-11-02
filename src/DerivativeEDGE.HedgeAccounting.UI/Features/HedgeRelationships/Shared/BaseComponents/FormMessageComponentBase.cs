@@ -1,4 +1,4 @@
-﻿using Syncfusion.Blazor.Notifications;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Shared.BaseComponents;
 
 public class FormMessageComponentBase : ComponentBase
 {

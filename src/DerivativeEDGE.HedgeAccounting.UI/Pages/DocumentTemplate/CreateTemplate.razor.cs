@@ -249,7 +249,25 @@ public partial class CreateTemplate
 
         if (IsErrorMessageVisible)
         {
-            ErrorMsg = ContentEmptyValidationMsg;
+            // Check if validation errors include character limit violations
+            var validationMessages = EditContext.GetValidationMessages();
+            var hasCharacterLimitError = validationMessages.Any(msg => 
+                msg.Contains("maximum character") || 
+                msg.Contains("Template name is limited to 50 characters") ||
+                msg.Contains("Template description is limited to 150 characters"));
+
+            if (hasCharacterLimitError)
+            {
+                ErrorMsg = new ErrorMessage
+                {
+                    Title = "Character limit exceeded",
+                    Message = "Template name or description exceeds the maximum character limit. Please shorten the text to proceed."
+                };
+            }
+            else
+            {
+                ErrorMsg = ContentEmptyValidationMsg;
+            }
             return;
         }
 

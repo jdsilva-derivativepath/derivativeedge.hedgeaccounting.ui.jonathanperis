@@ -1,6 +1,4 @@
-﻿using IdentityModel.Client;
-
-namespace DerivativeEDGE.HedgeAccounting.UI.Extensions;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Extensions;
 
 public static class AuthServiceExtensions
 {

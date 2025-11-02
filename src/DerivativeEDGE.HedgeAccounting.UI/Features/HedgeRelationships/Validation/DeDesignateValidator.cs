@@ -1,8 +1,5 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
-/// <summary>
-/// Validates requirements for de-designating a hedge relationship.
-/// </summary>
 public static class DeDesignateValidator
 {
     public static List<string> Validate(

@@ -1,9 +1,5 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Validation;
 
-/// <summary>
-/// Validator for save operations on hedge relationships.
-/// Matches legacy validation from hr_hedgeRelationshipAddEditCtrl.js $scope.submit() function.
-/// </summary>
 public static class SaveHedgeRelationshipValidator
 {
     /// <summary>

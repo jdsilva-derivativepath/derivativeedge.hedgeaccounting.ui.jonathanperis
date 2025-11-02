@@ -189,7 +189,7 @@ public partial class CreateHrDocument
                 })];
             }
 
-            CreateHrDocumentForm.Name = $"CLONE {templateResult.DocumentTemplate.Name}";
+            CreateHrDocumentForm.Name = templateResult.DocumentTemplate.Name;
             CreateHrDocumentForm.Description = templateResult.DocumentTemplate.Description;
         }
         else
@@ -234,7 +234,25 @@ public partial class CreateHrDocument
 
         if (IsErrorMessageVisible)
         {
-            ErrorMsg = ContentEmptyValidationMsg;
+            // Check if validation errors include character limit violations
+            var validationMessages = EditContext.GetValidationMessages();
+            var hasCharacterLimitError = validationMessages.Any(msg => 
+                msg.Contains("maximum character") || 
+                msg.Contains("Document name maximum character is up to 50") ||
+                msg.Contains("Document name maximum character is up to 150"));
+
+            if (hasCharacterLimitError)
+            {
+                ErrorMsg = new ErrorMessage
+                {
+                    Title = "Character limit exceeded",
+                    Message = "Document name or description exceeds the maximum character limit. Please shorten the text to proceed."
+                };
+            }
+            else
+            {
+                ErrorMsg = ContentEmptyValidationMsg;
+            }
             return;
         }
 
@@ -388,11 +406,11 @@ public partial class CreateHrDocument
         public Guid? Id { get; set; } = Guid.Empty;
 
         [Required(ErrorMessage = "Enter the Document Name.")]
-        [MaxLength(50, ErrorMessage = "Document name maximum character is up to 50.")]
+        [MaxLength(50, ErrorMessage = "Document name is limited to 50 characters")]
         public string Name { get; set; } = "Untitled Hedge Relationship Document";
 
         [Required(ErrorMessage = "Enter the Description.")]
-        [MaxLength(150, ErrorMessage = "Document name maximum character is up to 150.")]
+        [MaxLength(150, ErrorMessage = "Document description is limited to 150 characters")]
         public string Description { get; set; } = "";
 
         [ValidateComplexType]

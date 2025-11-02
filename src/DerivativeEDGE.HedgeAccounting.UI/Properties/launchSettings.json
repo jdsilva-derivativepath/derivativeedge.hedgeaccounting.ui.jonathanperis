@@ -18,9 +18,10 @@
         "SPLITIO_API_KEY": "pn1v258iejuul0c49ll525at5b64ids58re6",
         "SPLITIO_CONNECTION_TIMEOUT": "10000",
 
-        "HEDGE_ACCOUNTING_SERVICE_URL": "https://localhost:7173",
-        //"HEDGE_ACCOUNTING_SERVICE_URL": "https://dev-hedgeaccounting.derivativepath.com",
+        "HEDGE_ACCOUNTING_SERVICE_URL": "https://dev-hedgeaccounting.derivativepath.com",
         //"HEDGE_ACCOUNTING_SERVICE_URL": "http://localhost:5127",
+
+        "HEDGE_ACCOUNTING_LEGACY_SERVICE_URL": "https://localhost:7173",
 
         "HEDGE_ACCOUNTING_SERVICE_CLIENTID": "aedb01c4-4683-4458-8321-ea26c8630ef1",
         "HEDGE_ACCOUNTING_SERVICE_CLIENTSECRET": "TDF2ZCtQOHpnRC9yYUVnQlVJUm9kQT09OjA3MWQ4MTFmLWViNDMtNDZmZi1iODNiLWQ3OTUxNWI4MGVjYQ==",

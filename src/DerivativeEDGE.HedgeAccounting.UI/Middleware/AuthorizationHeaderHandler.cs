@@ -1,4 +1,4 @@
-namespace DerivativeEDGE.HedgeAccounting.UI.Middlware;
+namespace DerivativeEDGE.HedgeAccounting.UI.Middleware;
 
 public class AuthorizationHeaderHandler(ApiTokenManager apiTokenManager) : DelegatingHandler
 {

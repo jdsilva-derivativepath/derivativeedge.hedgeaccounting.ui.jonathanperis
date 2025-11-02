@@ -7,7 +7,7 @@ public static class HttpClientRegistrationExtensions
         services.AddHttpClient<IHedgeAccountingApiClient, HedgeAccountingApiClient>()
                 .ConfigureHttpClient(client =>
                 {
-                    client.BaseAddress = new Uri(configuration["HEDGE_ACCOUNTING_SERVICE_URL"]);
+                    client.BaseAddress = new Uri(configuration["HEDGE_ACCOUNTING_LEGACY_SERVICE_URL"]);
                     client.Timeout = new TimeSpan(0, 2, 30);
                 }).ConfigurePrimaryHttpMessageHandler(serviceProvider => serviceProvider.GetRequiredService<JwtTokenForwardHandler>());
 

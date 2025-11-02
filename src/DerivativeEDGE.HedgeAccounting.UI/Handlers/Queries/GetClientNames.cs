@@ -1,4 +1,4 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Handlers.Handler.Queries;
+﻿namespace DerivativeEDGE.HedgeAccounting.UI.Handlers.Queries;
 
 public sealed class GetClientNames
 {

@@ -1,4 +1,5 @@
 ﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Models;
+
 public class InitialApplicationState
 {
     public string AccessToken { get; set; }

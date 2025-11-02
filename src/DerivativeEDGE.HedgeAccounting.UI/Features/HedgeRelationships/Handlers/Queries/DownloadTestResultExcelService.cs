@@ -1,10 +1,5 @@
 namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
 
-/// <summary>
-/// Handler for downloading test results (regression batch) as Excel file.
-/// Legacy: hr_hedgeRelationshipAddEditCtrl.js - selectedItemActionTestChanged() -> 'Download Excel' action
-/// API: POST v1/HedgeRegressionBatch/Export/{ft} (FileType.Xlsx)
-/// </summary>
 public sealed class DownloadTestResultExcelService
 {
     public sealed record Query(

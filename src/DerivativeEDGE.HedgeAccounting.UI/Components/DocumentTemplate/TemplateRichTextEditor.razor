@@ -24,7 +24,7 @@
                                 <RichTextEditorCustomToolbarItems>
                                     <RichTextEditorCustomToolbarItem Name="InsertField">
                                         <Template>
-                                            <SfDropDownButton Items="@Items" 
+                                            <SfDropDownButton Items="@Items" CssClass="keyword-dropdown-menu" 
                                                 Content="Insert Field" style="width: 140px !important;font-size: 0.875rem;">
                                                 <DropDownButtonEvents ItemSelected="((args) =>  
                                                      OnItemSelect(args, _refRichTextEditor[contentDetail.Name]))"></DropDownButtonEvents>
@@ -55,7 +55,8 @@
                                 <RichTextEditorCustomToolbarItems>
                                     <RichTextEditorCustomToolbarItem Name="InsertField">
                                         <Template>
-                                            <SfDropDownButton Items="@Items" Content="Insert Field" style="width: 140px !important;font-size: 0.875rem;">
+                                            <SfDropDownButton Items="@Items" CssClass="keyword-dropdown-menu" 
+                                            Content="Insert Field" style="width: 140px !important;font-size: 0.875rem;">
                                                 <DropDownButtonEvents ItemSelected="((args) =>
                                                 OnItemSelect(args, _refRichTextEditor[contentDetail.Id.ToString()]))"></DropDownButtonEvents>
                                             </SfDropDownButton>
@@ -72,3 +73,9 @@
         </div>
     </div>
 }
+<style>
+    .keyword-dropdown-menu .e-dropdown-menu {
+        max-height: 310px !important;
+        overflow-y: auto !important;
+    }
+</style>

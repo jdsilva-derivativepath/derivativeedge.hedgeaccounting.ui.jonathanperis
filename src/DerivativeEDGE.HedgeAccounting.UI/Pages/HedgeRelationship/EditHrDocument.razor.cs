@@ -230,7 +230,7 @@ public partial class EditHrDocument
             }
 
             IsActive = templateResult.DocumentTemplate.Enabled;
-            EditHrDocumentForm.Name = $"CLONE {templateResult.DocumentTemplate.Name}";
+            EditHrDocumentForm.Name = templateResult.DocumentTemplate.Name;
             EditHrDocumentForm.Description = templateResult.DocumentTemplate.Description;
         }
         else
@@ -274,7 +274,25 @@ public partial class EditHrDocument
 
         if (IsErrorMessageVisible)
         {
-            ErrorMsg = ContentEmptyValidationMsg;
+            // Check if validation errors include character limit violations
+            var validationMessages = EditContext.GetValidationMessages();
+            var hasCharacterLimitError = validationMessages.Any(msg => 
+                msg.Contains("maximum character") || 
+                msg.Contains("Document name is limited to 50 characters") ||
+                msg.Contains("Document description is limited to 150 characters"));
+
+            if (hasCharacterLimitError)
+            {
+                ErrorMsg = new ErrorMessage
+                {
+                    Title = "Character limit exceeded",
+                    Message = "Document name or description exceeds the maximum character limit. Please shorten the text to proceed."
+                };
+            }
+            else
+            {
+                ErrorMsg = ContentEmptyValidationMsg;
+            }
             return;
         }
 
