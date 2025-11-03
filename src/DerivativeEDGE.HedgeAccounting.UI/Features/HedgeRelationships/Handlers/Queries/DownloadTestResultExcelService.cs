@@ -32,6 +32,14 @@ public sealed class DownloadTestResultExcelService
                 // Set the batch ID for export (legacy: model.HedgeRegressionForExport = obj.getSelectedRecords()[0].ID)
                 apiEntity.HedgeRegressionForExport = request.BatchId;
 
+                // Set required date fields to today's date (matching legacy behavior)
+                var now = DateTimeOffset.Now;
+                apiEntity.ValueDate = now;
+                apiEntity.TimeValuesStartDate = now;
+                apiEntity.TimeValuesEndDate = now;
+                apiEntity.TimeValuesFrontRollDate = now;
+                apiEntity.TimeValuesBackRollDate = now;
+
                 // Call the Export API with Xlsx file type (legacy: 'HedgeRegressionBatch/Export/Xlsx')
                 var fileResponse = await hedgeAccountingApiClient.ExportAsync(
                     DerivativeEDGEHAEntityEnumFileType.Xlsx, 
