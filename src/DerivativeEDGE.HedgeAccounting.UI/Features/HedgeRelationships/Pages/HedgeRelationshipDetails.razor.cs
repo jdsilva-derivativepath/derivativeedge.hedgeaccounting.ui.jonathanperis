@@ -587,7 +587,7 @@ public partial class HedgeRelationshipDetails
             IsGeneratingInceptionPackage = true;
             StateHasChanged();
 
-            var query = new InceptionPackageService.Query(HedgeRelationship);
+            var query = new InceptionPackageService.Query(HedgeRelationship, CurveDate);
             var result = await Mediator.Send(query);
 
             // Use DotNetStreamReference for proper binary file download
@@ -628,7 +628,7 @@ public partial class HedgeRelationshipDetails
             IsDownloadingSpecsAndChecks = true;
             StateHasChanged();
 
-            var query = new DownloadSpecsAndChecksService.Query(HedgeRelationship);
+            var query = new DownloadSpecsAndChecksService.Query(HedgeRelationship, CurveDate);
             var result = await Mediator.Send(query);
 
             // Use DotNetStreamReference for proper binary file download
@@ -772,8 +772,8 @@ public partial class HedgeRelationshipDetails
                 }
             }
 
-            // Run the regression analysis
-            var regressionCommand = new RunRegression.Command(HedgeRelationship);
+            // Run the regression analysis (passing CurveDate to match legacy behavior where Model.ValueDate was sent)
+            var regressionCommand = new RunRegression.Command(HedgeRelationship, CurveDate: CurveDate);
             var regressionResponse = await Mediator.Send(regressionCommand);
 
             if (regressionResponse.HasError)
@@ -954,8 +954,8 @@ public partial class HedgeRelationshipDetails
             IsRunningRegression = true;
             StateHasChanged();
 
-            // Run the backload regression analysis
-            var response = await Mediator.Send(new RunRegression.Command(HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Backload));
+            // Run the backload regression analysis (passing CurveDate to match legacy behavior where Model.ValueDate was sent)
+            var response = await Mediator.Send(new RunRegression.Command(HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType.Backload, CurveDate));
 
             if (response.HasError)
             {

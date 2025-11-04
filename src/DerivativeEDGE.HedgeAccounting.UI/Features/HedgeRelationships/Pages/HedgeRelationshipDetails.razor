@@ -137,7 +137,8 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <TestResultsTab @ref="testResultsTabRef"
                                         @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches"
                                         LatestHedgeRegressionBatch="@HedgeRelationship.LatestHedgeRegressionBatch"
-                                        @bind-HedgeRelationship="@HedgeRelationship" />
+                                        @bind-HedgeRelationship="@HedgeRelationship"
+                                        CurveDate="@CurveDate" />
                     </ContentTemplate>
                 </TabItem>
                 <TabItem>

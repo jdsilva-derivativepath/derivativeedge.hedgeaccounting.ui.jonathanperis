@@ -28,6 +28,11 @@ public partial class TestResultsTab
     /// </summary>
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; }
     [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> HedgeRelationshipChanged { get; set; }
+    
+    /// <summary>
+    /// Curve date selected by user for API operations (matching legacy Model.ValueDate)
+    /// </summary>
+    [Parameter] public DateTime? CurveDate { get; set; }
     #endregion
 
     #region Injected Services
@@ -331,7 +336,7 @@ public partial class TestResultsTab
 
             Logger?.LogInformation($"Downloading Excel for batch ID: {data.ID}");
 
-            var query = new DownloadTestResultExcelService.Query(data.ID, HedgeRelationship);
+            var query = new DownloadTestResultExcelService.Query(data.ID, HedgeRelationship, CurveDate);
             var result = await Mediator.Send(query);
 
             // Use DotNetStreamReference for proper binary file download
