@@ -13,6 +13,9 @@ public partial class PreviewHrDocument
     [SupplyParameterFromQuery]
     public long? ClientId { get; set; }
 
+    [SupplyParameterFromQuery]
+    public bool? IsNewHedgeAccounting { get; set; }
+
     private PreviewHrDocumentDialog _previewHrDocumentDialogComponent;
 
     [Inject]
@@ -44,9 +47,16 @@ public partial class PreviewHrDocument
                 var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId, string.Empty, string.Empty, "HAUI", 0);
                 await MediatorService.Send(updateHRCachedData);
 
-
-                NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
-                return;
+                if (IsNewHedgeAccounting.GetValueOrDefault())
+                {
+                    NavigationManager.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId}");
+                    return;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+                    return;
+                }
             }
 
             _previewHrDocumentDialogComponent.FormatContent(ClientId.GetValueOrDefault(),

@@ -12,7 +12,10 @@ public partial class PreviewHrDocumentDialog
     public EventCallback OnClose { get; set; }
 
     [Parameter]
-    public long? HrId { get; set; }
+    public long? HedgeRelationshipId { get; set; }
+
+    [Parameter]
+    public bool? IsNewHedgeAccounting { get; set; }
 
     private string TemplateName { get; set; }
 
@@ -43,13 +46,21 @@ public partial class PreviewHrDocumentDialog
 
     private void EditHrDocument()
     {
-        NavigationManager.NavigateTo($"edit-hrdocument?HedgeRelationshipId={HrId}&ClientId={ClientId}");
+        NavigationManager.NavigateTo($"edit-hrdocument?HedgeRelationshipId={HedgeRelationshipId}&ClientId={ClientId}&IsNewHedgeAccounting={IsNewHedgeAccounting}");
     }
 
     private async Task CancelPreview()
     {
-        var updateHRCachedData = new UpdateHRCachedData.Command(HrId.GetValueOrDefault(), string.Empty, string.Empty, "HAUI", 0);
+        var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId.GetValueOrDefault(), string.Empty, string.Empty, "HAUI", 0);
         await Mediator.Send(updateHRCachedData);
-        NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HrId}");
+
+        if (IsNewHedgeAccounting.GetValueOrDefault())
+        {
+            NavigationManager.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId.GetValueOrDefault()}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId.GetValueOrDefault()}");
+        }
     }
 }

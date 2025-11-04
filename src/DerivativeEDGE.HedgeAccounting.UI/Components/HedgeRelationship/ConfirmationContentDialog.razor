@@ -51,6 +51,9 @@
     [Parameter]
     public int IncompleteSmartTagsCount { get; set; }
 
+    [Parameter]
+    public bool? IsNewHedgeAccounting { get; set; }
+
     private bool Visibility { get; set; } = false;
 
     public void DlgButtonOpen()
@@ -68,6 +71,14 @@
         EditContext.MarkAsUnmodified();
         var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId, string.Empty, string.Empty, "HAUI", 0);
         await MediatorService.Send(updateHRCachedData);
-        NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+
+        if (IsNewHedgeAccounting.GetValueOrDefault())
+        {
+            NavigationManager.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+        }
     }
 }

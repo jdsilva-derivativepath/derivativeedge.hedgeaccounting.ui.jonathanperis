@@ -555,7 +555,7 @@ public partial class HedgeRelationshipDetails
     private Task RedirectToHedgeDocumentService(string pathAndQuery)
     {
         // Append HedgeRelationshipId and ClientId parameters as done in legacy system
-        var url = $"{pathAndQuery}HedgeRelationshipId={HedgeRelationshipId}&ClientId={HedgeRelationship.ClientID}";
+        var url = $"{pathAndQuery}HedgeRelationshipId={HedgeRelationshipId}&ClientId={HedgeRelationship.ClientID}&IsNewHedgeAccounting=true";
         NavManager.NavigateTo(url, forceLoad: true);
         return Task.CompletedTask;
     }

@@ -17,6 +17,9 @@ public partial class HrDocumentGallery
     [SupplyParameterFromQuery]
     public bool? IsChangingTemplate { get; set; }
 
+    [SupplyParameterFromQuery]
+    public bool? IsNewHedgeAccounting { get; set; }
+
     [Inject]
     public IMediator Mediator { get; set; } = default!;
 
@@ -115,12 +118,12 @@ public partial class HrDocumentGallery
             {
                 if (IsChangingTemplate.GetValueOrDefault())
                 {
-                    _navigation.NavigateTo($"edit-hrdocument/{GetSelectedCardId()}?ClientId={ClientId}&HedgeRelationshipId={HedgeRelationshipId}&IsChangingTemplate={IsChangingTemplate}");
+                    _navigation.NavigateTo($"edit-hrdocument/{GetSelectedCardId()}?ClientId={ClientId}&HedgeRelationshipId={HedgeRelationshipId}&IsChangingTemplate={IsChangingTemplate}&IsNewHedgeAccounting={IsNewHedgeAccounting}");
                 }
                 else
                 {
                     await LocalStorage!.SetItemAsync(StringConstants.HedgeDocumentSelectedClientId, ClientId.GetValueOrDefault(0));
-                    _navigation.NavigateTo($"create-hrdocument/{GetSelectedCardId()}?HedgeRelationshipId={HedgeRelationshipId}");
+                    _navigation.NavigateTo($"create-hrdocument/{GetSelectedCardId()}?HedgeRelationshipId={HedgeRelationshipId}&IsNewHedgeAccounting={IsNewHedgeAccounting}");
                 }
             }
         }
@@ -129,7 +132,14 @@ public partial class HrDocumentGallery
             var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId.GetValueOrDefault(), string.Empty, string.Empty, "HAUI", 0);
             await Mediator.Send(updateHRCachedData);
 
-            _navigation.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId.GetValueOrDefault()}");
+            if (IsNewHedgeAccounting.GetValueOrDefault())
+            {
+                _navigation.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId.GetValueOrDefault()}");
+            }
+            else
+            {
+                _navigation.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId.GetValueOrDefault()}");
+            }
         }
     }
 

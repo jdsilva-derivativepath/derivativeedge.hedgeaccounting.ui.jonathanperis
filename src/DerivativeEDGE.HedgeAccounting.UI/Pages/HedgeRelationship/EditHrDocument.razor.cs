@@ -24,6 +24,9 @@ public partial class EditHrDocument
     [SupplyParameterFromQuery]
     public bool? IsChangingTemplate { get; set; }
 
+    [SupplyParameterFromQuery]
+    public bool? IsNewHedgeAccounting { get; set; }
+
     EditContext EditContext;
 
     [Inject]
@@ -134,8 +137,17 @@ public partial class EditHrDocument
                 // Edit Document is disabled when the hedge relationship is de-designated. Redirect to the hedge relationship page.
                 var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId, string.Empty, string.Empty, "HAUI", AllowedBehavior.UserId);
                 await MediatorService.Send(updateHRCachedData);
-                NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
-                return;
+
+                if (IsNewHedgeAccounting.GetValueOrDefault())
+                {
+                    NavigationManager.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId}");
+                    return;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+                    return;
+                }
             }
 
             EditHrDocumentForm.HedgeDocumentContents = [.. result.RelationshipDocumentContents.HedgeRelationshipDocumentContents
@@ -347,7 +359,14 @@ public partial class EditHrDocument
         var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId, string.Empty, string.Empty, "HAUI", AllowedBehavior.UserId);
         await MediatorService.Send(updateHRCachedData);
 
-        NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+        if (IsNewHedgeAccounting.GetValueOrDefault())
+        {
+            NavigationManager.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId}");
+        }
     }
 
     private void DlgRenameOpen()
@@ -404,7 +423,7 @@ public partial class EditHrDocument
         {
             IsChangingTemplate = true;
             EditContext.MarkAsUnmodified();
-            NavigationManager.NavigateTo($"gallery-hrdocument?ClientId={ClientId}&HedgeRelationshipId={HedgeRelationshipId}&IsChangingTemplate={IsChangingTemplate}");
+            NavigationManager.NavigateTo($"gallery-hrdocument?ClientId={ClientId}&HedgeRelationshipId={HedgeRelationshipId}&IsChangingTemplate={IsChangingTemplate}&IsNewHedgeAccounting={IsNewHedgeAccounting}");
         }
     }
 

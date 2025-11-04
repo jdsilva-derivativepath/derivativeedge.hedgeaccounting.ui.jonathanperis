@@ -11,6 +11,9 @@ public partial class CreateHrDocument
     [SupplyParameterFromQuery]
     public long? HedgeRelationshipId { get; set; }
 
+    [SupplyParameterFromQuery]
+    public bool? IsNewHedgeAccounting { get; set; }
+
     [Parameter]
     public Guid? TemplateId { get; set; }
 
@@ -320,7 +323,14 @@ public partial class CreateHrDocument
         var updateHRCachedData = new UpdateHRCachedData.Command(HedgeRelationshipId.GetValueOrDefault(), string.Empty, string.Empty, "HAUI", AllowedBehavior.UserId);
         await MediatorService.Send(updateHRCachedData);
 
-        NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId.GetValueOrDefault()}");
+        if (IsNewHedgeAccounting.GetValueOrDefault())
+        {
+            NavigationManager.NavigateTo($"/hedgeaccountingapp/hedgerelationship?Id={HedgeRelationshipId.GetValueOrDefault()}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/HedgeAccounting/HedgeRelationship?id={HedgeRelationshipId.GetValueOrDefault()}");
+        }
     }
 
     private void DlgRenameOpen()
