@@ -300,7 +300,7 @@ public partial class HedgeRelationshipDetails
         }
     }
 
-    private async Task LoadClientEntitiesAsync(long? clientId)
+    private async Task LoadClientEntitiesAsync(long? clientId, bool isUserInitiated = false)
     {
         try
         {
@@ -330,16 +330,19 @@ public partial class HedgeRelationshipDetails
             })];
 
             // Restore BankEntityID if it exists in the new entities list
+            // Legacy behavior (hr_hedgeRelationshipAddEditCtrl.js line 494): Preserve BankEntityID from server
             if (HedgeRelationship != null)
             {
                 if (currentBankEntityID != 0 && AvailableEntities.Any(e => e.Id == currentBankEntityID))
                 {
                     HedgeRelationship.BankEntityID = currentBankEntityID;
                 }
-                else
+                else if (isUserInitiated)
                 {
+                    // Only reset to 0 when user explicitly changes the client dropdown
                     HedgeRelationship.BankEntityID = 0;
                 }
+                // else: During initialization, preserve the BankEntityID value from server even if not in list
             }
         }
         catch (Exception ex)
@@ -438,7 +441,7 @@ public partial class HedgeRelationshipDetails
     {
         if (HedgeRelationship != null)
         {
-            await LoadClientEntitiesAsync(HedgeRelationship.ClientID);
+            await LoadClientEntitiesAsync(HedgeRelationship.ClientID, isUserInitiated: true);
         }
     }
 
