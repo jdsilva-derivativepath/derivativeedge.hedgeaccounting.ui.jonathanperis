@@ -24,7 +24,7 @@ public partial class OptionAmortizationTab
         StateHasChanged();
     }
 
-    private async Task LoadOptionAmortizationGridList()
+    public async Task LoadOptionAmortizationGridList()
     {
         // Aggregate all option amortizations from all HedgeRelationshipOptionTimeValues
         if (HedgeRelationshipOptionTimeValues?.Any() == true)

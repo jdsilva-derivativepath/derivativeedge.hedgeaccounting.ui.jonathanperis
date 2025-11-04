@@ -24,7 +24,7 @@ public partial class AmortizationTab
         StateHasChanged();
     }
 
-    private async Task LoadAmortizationGridList()
+    public async Task LoadAmortizationGridList()
     {
         // Aggregate all roll schedules from all HedgeRelationshipOptionTimeValueAmorts
         if (HedgeRelationshipOptionTimeValueAmorts?.Any() == true)
