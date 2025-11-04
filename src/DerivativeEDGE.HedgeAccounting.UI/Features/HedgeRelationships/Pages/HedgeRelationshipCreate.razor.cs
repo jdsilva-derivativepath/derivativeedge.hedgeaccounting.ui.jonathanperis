@@ -11,7 +11,8 @@ public partial class HedgeRelationshipCreate
     private List<Client> AvailableClients { get; set; } = [];
     private List<Entity> AvailableEntities { get; set; } = [];
     public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; } = new();
-
+    public DateTime? DesignationDate { get; set; }
+    public DateTime? DedesignationDate { get; set; }
     #region Loading States
     public bool IsLoadingClients { get; set; }
     public bool IsLoadingEntities { get; set; }
@@ -60,6 +61,10 @@ public partial class HedgeRelationshipCreate
     {
         HideFormMessage();
 
+        // Assign the DateTime? values to the string properties in the API model
+        HedgeRelationship.DesignationDate = DesignationDate?.ToString("MM/dd/yyyy");
+        HedgeRelationship.DedesignationDate = DedesignationDate?.ToString("MM/dd/yyyy");
+    
         // Manual validation: Entity selection
         var selectedEntity = AvailableEntities
             .FirstOrDefault(e => e.EntityId == HedgeRelationship.BankEntityID);
