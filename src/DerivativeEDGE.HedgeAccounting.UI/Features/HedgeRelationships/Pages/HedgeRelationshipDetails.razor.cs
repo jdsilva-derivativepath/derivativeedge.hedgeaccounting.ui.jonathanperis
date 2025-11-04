@@ -34,6 +34,8 @@ public partial class HedgeRelationshipDetails
     private SfTab hedgerelationshiptabRef;
     private InstrumentAnalysisTab instrumentAnalysisTabRef;
     private TestResultsTab testResultsTabRef;
+    private AmortizationTab amortizationTabRef;
+    private OptionAmortizationTab optionAmortizationTabRef;
     private List<string> ValidationErrors { get; set; } = [];
     private bool IsDpiUser { get; set; }
     private DateTime? DesignationDate
@@ -1521,6 +1523,9 @@ public partial class HedgeRelationshipDetails
     {
         // Refresh the hedge relationship data after saving amortization
         await GetHedgeRelationship(HedgeRelationshipId);
+        // Refresh the amortization grid list
+        await amortizationTabRef.LoadAmortizationGridList();
+
         StateHasChanged();
     }
 
@@ -1528,6 +1533,9 @@ public partial class HedgeRelationshipDetails
     {
         // Refresh the hedge relationship data after saving option amortization
         await GetHedgeRelationship(HedgeRelationshipId);
+        // Refresh the option amortization grid list
+        await optionAmortizationTabRef.LoadOptionAmortizationGridList();
+
         StateHasChanged();
     }
     #endregion
