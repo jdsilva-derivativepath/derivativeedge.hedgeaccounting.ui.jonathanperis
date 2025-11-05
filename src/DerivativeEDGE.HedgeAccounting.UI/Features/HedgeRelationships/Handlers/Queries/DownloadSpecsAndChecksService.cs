@@ -2,7 +2,7 @@ namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers
 
 public sealed class DownloadSpecsAndChecksService
 {
-    public sealed record Query(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship) : IRequest<Response>;
+    public sealed record Query(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship, DateTime? CurveDate = null) : IRequest<Response>;
     public sealed record Response(Stream ExcelStream, string FileName);
     
     public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, ILogger<DownloadSpecsAndChecksService.Handler> logger, IMapper mapper) : IRequestHandler<Query, Response>
@@ -22,9 +22,11 @@ public sealed class DownloadSpecsAndChecksService
 
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
                 
-                // Set required date fields to today's date (matching legacy behavior)
+                // Set required date fields - use CurveDate if provided, otherwise use today's date (matching legacy behavior)
+                // Legacy: Model.ValueDate was set to today's date by default and could be changed by user in UI
                 var now = DateTimeOffset.Now;
-                apiEntity.ValueDate = now;
+                var valueDate = request.CurveDate.HasValue ? new DateTimeOffset(request.CurveDate.Value) : now;
+                apiEntity.ValueDate = valueDate;
                 apiEntity.TimeValuesStartDate = now;
                 apiEntity.TimeValuesEndDate = now;
                 apiEntity.TimeValuesFrontRollDate = now;

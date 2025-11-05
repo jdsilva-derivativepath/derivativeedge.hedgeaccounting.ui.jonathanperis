@@ -2,7 +2,7 @@
 
 public sealed class InceptionPackageService
 {
-    public sealed record Query(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship) : IRequest<Response>;
+    public sealed record Query(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship, DateTime? CurveDate = null) : IRequest<Response>;
     public sealed record Response(Stream ExcelStream, string FileName);
     public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<InceptionPackageService.Handler> logger, IMapper mapper) : IRequestHandler<Query, Response>
     {
@@ -30,11 +30,12 @@ public sealed class InceptionPackageService
                 // Map to API entity (only mapped fields will be used)
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
                 
-                // Set required date fields to today's date (matching legacy behavior)
-                // Legacy line 489: $scope.Model.ValueDate = valueDate (today's date)
+                // Set required date fields - use CurveDate if provided, otherwise use today's date (matching legacy behavior)
+                // Legacy line 489: $scope.Model.ValueDate = valueDate (today's date by default, but user could change it)
                 // Legacy line 2804-2805: $scope.Model.TimeValuesStartDate/EndDate = moment().format('M/D/YYYY')
                 var now = DateTimeOffset.Now;
-                apiEntity.ValueDate = now;
+                var valueDate = request.CurveDate.HasValue ? new DateTimeOffset(request.CurveDate.Value) : now;
+                apiEntity.ValueDate = valueDate;
                 apiEntity.TimeValuesStartDate = now;
                 apiEntity.TimeValuesEndDate = now;
                 apiEntity.TimeValuesFrontRollDate = now;

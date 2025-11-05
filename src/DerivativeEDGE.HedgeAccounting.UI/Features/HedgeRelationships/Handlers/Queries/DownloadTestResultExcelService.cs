@@ -4,7 +4,8 @@ public sealed class DownloadTestResultExcelService
 {
     public sealed record Query(
         long BatchId,
-        DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship
+        DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship,
+        DateTime? CurveDate = null
     ) : IRequest<Response>;
     
     public sealed record Response(Stream ExcelStream, string FileName);
@@ -32,9 +33,10 @@ public sealed class DownloadTestResultExcelService
                 // Set the batch ID for export (legacy: model.HedgeRegressionForExport = obj.getSelectedRecords()[0].ID)
                 apiEntity.HedgeRegressionForExport = request.BatchId;
 
-                // Set required date fields to today's date (matching legacy behavior)
+                // Set required date fields - use CurveDate if provided, otherwise use today's date (matching legacy behavior)
                 var now = DateTimeOffset.Now;
-                apiEntity.ValueDate = now;
+                var valueDate = request.CurveDate.HasValue ? new DateTimeOffset(request.CurveDate.Value) : now;
+                apiEntity.ValueDate = valueDate;
                 apiEntity.TimeValuesStartDate = now;
                 apiEntity.TimeValuesEndDate = now;
                 apiEntity.TimeValuesFrontRollDate = now;

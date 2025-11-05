@@ -4,7 +4,7 @@ namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers
 
 public sealed class RunRegression
 {
-    public sealed record Command(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType HedgeResultType = DerivativeEDGEHAEntityEnumHedgeResultType.User) : IRequest<Response>;
+    public sealed record Command(DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship, DerivativeEDGEHAEntityEnumHedgeResultType HedgeResultType = DerivativeEDGEHAEntityEnumHedgeResultType.User, DateTime? CurveDate = null) : IRequest<Response>;
 
     public sealed class Response : ResponseBase
     {
@@ -34,9 +34,11 @@ public sealed class RunRegression
                 // The API needs the complete hedge relationship data including hedged items, hedging items, effectiveness methods, etc.
                 var body = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
                 
-                // Set required date fields to today's date (matching legacy behavior)
+                // Set required date fields - use CurveDate if provided, otherwise use today's date (matching legacy behavior)
+                // Legacy: Model.ValueDate was set to today's date by default and could be changed by user in UI
                 var now = DateTimeOffset.Now;
-                body.ValueDate = now;
+                var valueDate = request.CurveDate.HasValue ? new DateTimeOffset(request.CurveDate.Value) : now;
+                body.ValueDate = valueDate;
                 body.TimeValuesStartDate = now;
                 body.TimeValuesEndDate = now;
                 body.TimeValuesFrontRollDate = now;
