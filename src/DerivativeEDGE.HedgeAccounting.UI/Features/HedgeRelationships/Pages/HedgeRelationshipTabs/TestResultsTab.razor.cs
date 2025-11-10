@@ -1,4 +1,6 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
+﻿using Syncfusion.Blazor.Grids;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Pages.HedgeRelationshipTabs;
 
 public partial class TestResultsTab
 {
@@ -22,13 +24,13 @@ public partial class TestResultsTab
 
     // *** ADD THIS NEW PARAMETER ***
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM LatestHedgeRegressionBatch { get; set; }
-    
+
     /// <summary>
     /// Parent hedge relationship for permission checks and API operations
     /// </summary>
     [Parameter] public DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship { get; set; }
     [Parameter] public EventCallback<DerivativeEDGEHAApiViewModelsHedgeRelationshipVM> HedgeRelationshipChanged { get; set; }
-    
+
     /// <summary>
     /// Curve date selected by user for API operations (matching legacy Model.ValueDate)
     /// </summary>
@@ -49,6 +51,7 @@ public partial class TestResultsTab
     private bool _isDownloading = false;
     private bool _showDeleteConfirmation = false;
     private DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM _batchToDelete = null;
+    private DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM _selectedBatch = null;
     #endregion
 
     #region Public Properties
@@ -59,8 +62,9 @@ public partial class TestResultsTab
     #endregion
 
     private DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM LatestBatch =>
-        LatestHedgeRegressionBatch ??
-        HedgeRegressionBatches?.FirstOrDefault(x => x.Enabled);
+        _selectedBatch ??
+    LatestHedgeRegressionBatch ??
+    HedgeRegressionBatches?.FirstOrDefault(x => x.Enabled);
 
     #region Lifecycle Methods
     protected override void OnInitialized()
@@ -294,6 +298,34 @@ public partial class TestResultsTab
     #endregion
 
     #region Event Handlers
+    /// <summary>
+    /// Handles row click/selection in the "All Tests" grid
+    /// </summary>
+    private async Task OnRowSelected(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM selectedBatch)
+    {
+        if (_disposed || selectedBatch == null) return;
+
+        try
+        {
+            Logger?.LogInformation($"Test batch selected: ID={selectedBatch.ID}, RunDate={selectedBatch.RunDate}");
+
+            _selectedBatch = selectedBatch;
+
+            // Regenerate chart data with the selected batch
+            await InvokeAsync(() =>
+                   {
+                       GenerateChartData();
+                       StateHasChanged();
+                   });
+
+            Logger?.LogInformation("Chart and statistics updated with selected batch");
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, $"Error handling row selection for batch {selectedBatch?.ID}");
+        }
+    }
+
     private async Task OnItemSelectedMatrix(MenuEventArgs args, DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM data)
     {
         if (_disposed) return;
@@ -398,10 +430,10 @@ public partial class TestResultsTab
             {
                 // Update the parent hedge relationship with the response (legacy: setModelData(response.data))
                 await HedgeRelationshipChanged.InvokeAsync(result.UpdatedHedgeRelationship);
-                
+
                 // Update the HedgeRegressionBatches parameter to refresh the "All Tests" grid
                 await HedgeRegressionBatchesChanged.InvokeAsync(result.UpdatedHedgeRelationship.HedgeRegressionBatches);
-                
+
                 await AlertService.ShowToast("Test batch deleted successfully!", AlertKind.Success, "Success", showButton: true);
             }
             else
@@ -427,6 +459,43 @@ public partial class TestResultsTab
         _showDeleteConfirmation = false;
         _batchToDelete = null;
         StateHasChanged();
+    }
+
+    private bool IsIntrinsicValues()
+    {
+        return HedgeRelationship?.ProspectiveEffectivenessMethodID == 11
+               && HedgeRelationship?.RetrospectiveEffectivenessMethodID == 11;
+    }
+
+    private bool ShouldShowTimeValueColumns()
+    {
+        // Primary condition: Hide if OffMarket is false
+        if (HedgeRelationship?.OffMarket != true)
+        {
+            return false;
+        }
+
+        // Secondary condition: Hide if all OptionTimeValue entries are zero
+        var results = LatestBatch?.HedgeRegressionBatchResults;
+        if (results == null || !results.Any())
+        {
+            return false;
+        }
+
+        // Check if all OptionTimeValue entries are zero
+        bool allTimeValuesAreZero = results.All(r => r.OptionTimeValue == 0);
+
+        return !allTimeValuesAreZero;
+    }
+
+    private async void OnQueryCellInfoHandler(QueryCellInfoEventArgs<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchResultVM> args)
+    {
+        // Apply background color to Change in Fair Values columns
+        if (args.Column.Field == nameof(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchResultVM.HedgedFairValueChanged) ||
+            args.Column.Field == nameof(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchResultVM.HedgingFairValueChanged))
+        {
+            args.Cell.AddStyle(new string[] { "background-color: rgb(225, 240, 249);" });
+        }
     }
     #endregion
 
@@ -461,7 +530,7 @@ public partial class TestResultsTab
         if (_disposed || LatestBatch == null) return NOT_AVAILABLE;
 
         var tTestValue = Math.Round(LatestBatch.B1tStat, 2).ToString("N2");
-        var analytics = LatestBatch.B1tStatAnalytics ?? "Unknown";
+        var analytics = LatestBatch.B1tStatAnalytics ?? "";
         var statusClass = analytics.Equals("pass", StringComparison.OrdinalIgnoreCase) ? STAT_PASS_CLASS : STAT_FAIL_CLASS;
 
         return $"{tTestValue}/<span class=\"{statusClass}\">{analytics}</span>";
@@ -472,7 +541,7 @@ public partial class TestResultsTab
         if (_disposed || LatestBatch == null) return NOT_AVAILABLE;
 
         var fStatValue = Math.Round(LatestBatch.FStat, 2).ToString("N2");
-        var analytics = LatestBatch.FStatAnalytics ?? "Unknown";
+        var analytics = LatestBatch.FStatAnalytics ?? "";
         var statusClass = analytics.Equals("pass", StringComparison.OrdinalIgnoreCase) ? STAT_PASS_CLASS : STAT_FAIL_CLASS;
 
         return $"{fStatValue}/<span class=\"{statusClass}\">{analytics}</span>";
@@ -496,7 +565,7 @@ public partial class TestResultsTab
             return $"$({Math.Abs(x):F0})K";
         }
     }
-    
+
     /// <summary>
     /// Checks if user has required role for hedge relationship operations.
     /// Legacy: checkUserRole('24') || checkUserRole('17') || checkUserRole('5')
@@ -505,7 +574,7 @@ public partial class TestResultsTab
     {
         return CheckUserRole("24") || CheckUserRole("17") || CheckUserRole("5");
     }
-    
+
     /// <summary>
     /// Checks if user has a specific role.
     /// Legacy: checkUserRole() function in hr_hedgeRelationshipAddEditCtrl.js
@@ -522,7 +591,7 @@ public partial class TestResultsTab
         var edgeRole = (DerivativeEDGE.Authorization.AuthClaims.EdgeRole)roleId;
         return UserAuthData.Roles.Contains(edgeRole);
     }
-    
+
     /// <summary>
     /// Determines if Delete option should be visible in dropdown.
     /// Legacy: data-ng-show="Model.HedgeState === 'Draft' || checkUserRole('24') || checkUserRole('17') || checkUserRole('5')"
@@ -531,7 +600,7 @@ public partial class TestResultsTab
     {
         if (HedgeRelationship == null)
             return false;
-            
+
         return HedgeRelationship.HedgeState == DerivativeEDGEHAEntityEnumHedgeState.Draft || HasRequiredRole();
     }
     #endregion

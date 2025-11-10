@@ -356,6 +356,39 @@ public partial class InstrumentAnalysisTab
         }
     }
 
+    // Specific handler for Period Size changes
+    private async Task OnPeriodSizeChanged(ChangeEventArgs<DerivativeEDGEHAEntityEnumPeriodSize, PeriodSizeDropdownModel> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            HedgeRelationship.PeriodSize = args.Value;
+            await UpdateParentData();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    // Specific handler for Prospective Effectiveness Method changes
+    private async Task OnProspectiveEffectivenessMethodChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<long?, AssessmentMethodDropdownModel> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            HedgeRelationship.ProspectiveEffectivenessMethodID = args.Value;
+            await UpdateParentData();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    // Specific handler for Retrospective Effectiveness Method changes
+    private async Task OnRetrospectiveEffectivenessMethodChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<long?, AssessmentMethodDropdownModel> args)
+    {
+        if (HedgeRelationship != null)
+        {
+            HedgeRelationship.RetrospectiveEffectivenessMethodID = args.Value;
+            await UpdateParentData();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
     private async Task SelectExistingTradeHandler(string hedgeType)
     {
         ExistingTradeModalHeaderText = hedgeType == "HedgeItem" ? "Hedged" : "Hedging";
@@ -483,28 +516,19 @@ public partial class InstrumentAnalysisTab
     #endregion
 
     #region Helper Methods
-    public IEnumerable<DropdownModel> GetDropdownDatasource(string dataSet = "entity")
-    {
-        return dataSet.ToLower() switch
-        {
-            "assessmentmethod" => GetAssessmentMethodOptions(),
-            "periodsize" => GetPeriodSizeOptions(),
-            _ => throw new ArgumentException($"Invalid data set: {dataSet}")
-        };
-    }
 
     /// <summary>
     /// Filters effectiveness methods based on HedgeType and IsAnOptionHedge.
     /// This matches the legacy filtering logic from old/hr_hedgeRelationshipAddEditCtrl.js setDropDownListEffectivenessMethods()
     /// Legacy reference: old/hr_hedgeRelationshipAddEditCtrl.js lines 149-180
     /// </summary>
-    private IEnumerable<DropdownModel> GetAssessmentMethodOptions()
+    private IEnumerable<AssessmentMethodDropdownModel> GetAssessmentMethodOptions()
     {
-        var filteredMethods = new List<DropdownModel>();
-        
+        var filteredMethods = new List<AssessmentMethodDropdownModel>();
+
         // Don't add a hardcoded "None" option - it should come from the API if needed
         // Legacy code doesn't add "None" manually, it just filters the list from API
-        
+
         if (HedgeRelationship == null || AllEffectivenessMethods == null || AllEffectivenessMethods.Count == 0)
         {
             return filteredMethods;
@@ -522,9 +546,9 @@ public partial class InstrumentAnalysisTab
             // Legacy filtering logic:
             // if ($scope != undefined && $scope.Model !== undefined && ((($scope.Model.HedgeType === 'FairValue' && v.IsForFairValue)
             //     || $scope.Model.HedgeType !== 'FairValue')) && !$scope.Model.IsAnOptionHedge)
-            
+
             bool shouldInclude = false;
-            
+
             // Non-option hedge logic
             if (!HedgeRelationship.IsAnOptionHedge)
             {
@@ -554,9 +578,10 @@ public partial class InstrumentAnalysisTab
 
             if (shouldInclude)
             {
-                filteredMethods.Add(new DropdownModel
+                // Create new instance for each item to avoid reference sharing
+                filteredMethods.Add(new AssessmentMethodDropdownModel
                 {
-                    ID = (int)method.ID,
+                    ID = method.ID,
                     Text = method.Name,
                     // In legacy code, all methods except ID=1 were disabled initially
                     // Legacy: "Disabled": v.ID.toString() !== "1"
@@ -565,7 +590,7 @@ public partial class InstrumentAnalysisTab
             }
         }
 
-        return filteredMethods;
+        return filteredMethods.ToList();
     }
 
     /// <summary>
@@ -602,20 +627,20 @@ public partial class InstrumentAnalysisTab
     /// Uses Enum.GetValues to dynamically get all enum values instead of hardcoding them.
     /// This ensures we always have the latest enum values from the domain model.
     /// </summary>
-    private static IEnumerable<DropdownModel> GetPeriodSizeOptions()
+    private static IEnumerable<PeriodSizeDropdownModel> GetPeriodSizeOptions()
     {
-        var options = new List<DropdownModel>();
+        var options = new List<PeriodSizeDropdownModel>();
         
         // Dynamically get all enum values from the PeriodSize enum
         foreach (DerivativeEDGEHAEntityEnumPeriodSize enumValue in Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumPeriodSize)))
         {
-            options.Add(new DropdownModel
+            options.Add(new PeriodSizeDropdownModel
             {
-                Value = enumValue.ToString(),
+                Value = enumValue,
                 Text = enumValue.ToString()
             });
         }
-        
+
         return options;
     }
     #endregion
@@ -658,11 +683,16 @@ public partial class InstrumentAnalysisTab
     #endregion
 
     #region Models
-    public class DropdownModel
+    public class PeriodSizeDropdownModel
     {
-        public int ID { get; set; }
+        public DerivativeEDGEHAEntityEnumPeriodSize? Value { get; set; }
         public string Text { get; set; }
-        public string Value { get; set; }
+    }
+
+    public class AssessmentMethodDropdownModel
+    {
+        public long ID { get; set; }
+        public string Text { get; set; }
     }
 
     public class ReportFrequencyDropdownModel

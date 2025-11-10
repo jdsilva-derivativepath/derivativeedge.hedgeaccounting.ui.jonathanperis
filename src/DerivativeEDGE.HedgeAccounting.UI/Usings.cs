@@ -65,6 +65,7 @@ global using Polly.Extensions.Http;
 global using Syncfusion.Blazor;
 global using Syncfusion.Blazor.Calendars;
 global using Syncfusion.Blazor.DropDowns;
+global using Syncfusion.Blazor.Grids;
 global using Syncfusion.Blazor.Inputs;
 global using Syncfusion.Blazor.Navigations;
 global using Syncfusion.Blazor.Notifications;

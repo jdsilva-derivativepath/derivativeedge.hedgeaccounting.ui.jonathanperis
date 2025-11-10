@@ -60,6 +60,13 @@ public partial class HedgeRelationshipDetails
                 HedgeRelationship.DedesignationDate = value?.ToString("MM/dd/yyyy");
         }
     }
+
+    private DerivativeEDGEHAEntityValueObjectsOptionAmortizationDefaultValues OptionAmortizationDialogDefaultValues { get; set; }
+    private DerivativeEDGEDomainEntitiesEnumsSecurityType? HedgingItemSecurityType =>
+                    HedgeRelationship?.HedgedItems != null && HedgeRelationship.HedgedItems.Count > 0
+                        ? HedgeRelationship.HedgedItems.First().SecurityType
+                        : null;
+
     #endregion
 
     #region Data Collections
@@ -94,6 +101,7 @@ public partial class HedgeRelationshipDetails
     public bool IsDownloadingSpecsAndChecks { get; set; }
     public bool IsSavingHedgeRelationship { get; set; }
     public bool IsRunningRegression { get; set; }
+    public bool IsLoadingOptionAmortizationDefaults { get; set; }
 
     private bool IsInProgress =>
         IsLoadingHedgeRelationship ||
@@ -102,12 +110,13 @@ public partial class HedgeRelationshipDetails
         IsGeneratingInceptionPackage ||
         IsDownloadingSpecsAndChecks ||
         IsSavingHedgeRelationship ||
-        IsRunningRegression;
+        IsRunningRegression ||
+        IsLoadingOptionAmortizationDefaults;
     #endregion
 
     #region UI State Properties
     private bool IsAmortizationModal => OpenModal == MODAL_AMORTIZATION;
-    private bool IsOptionAmortizationModal => OpenModal == MODAL_OPTION_AMORTIZATION;
+    private bool IsOptionAmortizationModal { get; set; }
     private bool IsHedgeDocumentPreviewModal => OpenModal == MODAL_HEDGE_DOCUMENT_PREVIEW;
     private bool IsDeDesignateModal => OpenModal == MODAL_DEDESIGNATE;
     private bool IsReDesignateModal => OpenModal == MODAL_REDESIGNATE;
@@ -368,24 +377,25 @@ public partial class HedgeRelationshipDetails
             var query = new GetGLAccountsForHedging.Query(HedgeRelationship.ClientID, HedgeRelationship.BankEntityID);
             var result = await Mediator.Send(query);
 
-        // Add "None" option as first item in GL Account lists (legacy: amortizationView.cshtml line 51, 69)
-        var noneOption = new DerivativeEDGEHAEntityGLAccount
-        {
-            Id = 0,
-            AccountDescription = "None",
-            AccountNumber = "",
-            ClientId = HedgeRelationship.ClientID,
-            BankEntityId = HedgeRelationship.BankEntityID
-        };
+            // Add "None" option as first item in GL Account lists (legacy: amortizationView.cshtml line 51, 69)
+            var noneOption = new DerivativeEDGEHAEntityGLAccount
+            {
+                Id = 0,
+                AccountDescription = "None",
+                AccountNumber = "",
+                ClientId = HedgeRelationship.ClientID,
+                BankEntityId = HedgeRelationship.BankEntityID
+            };
 
-        AmortizationGLAccounts = [noneOption, .. result.Data];
-        AmortizationContraAccounts = [noneOption, .. result.Data];
+            AmortizationGLAccounts = result.Data != null ? [noneOption, .. result.Data] : [noneOption];
+            AmortizationContraAccounts = result.Data != null ? [noneOption, .. result.Data] : [noneOption];
 
-        OptionAmortizationGLAccounts = [noneOption, .. result.Data];
-        OptionAmortizationContraAccounts = [noneOption, .. result.Data];
+            OptionAmortizationGLAccounts = result.Data != null ? [noneOption, .. result.Data] : [noneOption];
+            OptionAmortizationContraAccounts = result.Data != null ? [noneOption, .. result.Data] : [noneOption];
 
-        IntrinsicAmortizationGLAccounts = [noneOption, .. result.Data];
-        IntrinsicAmortizationContraAccounts = [noneOption, .. result.Data];
+            IntrinsicAmortizationGLAccounts = result.Data != null ? [noneOption, .. result.Data] : [noneOption];
+            IntrinsicAmortizationContraAccounts = result.Data != null ? [noneOption, .. result.Data] : [noneOption];
+
         }
         catch (Exception ex)
         {
@@ -445,7 +455,7 @@ public partial class HedgeRelationshipDetails
         }
     }
 
-    private async void NewMenuOnItemSelected(MenuEventArgs args)
+    private async Task NewMenuOnItemSelected(MenuEventArgs args)
     {
         // Initialize AmortizationModel with defaults when opening new amortization (legacy: InitializeHedgeRelationshipOptionTimeValueAmort)
         if (args.Item.Text == MODAL_AMORTIZATION)
@@ -466,21 +476,47 @@ public partial class HedgeRelationshipDetails
         {
             // Call API to get default values (legacy: hr_hedgeRelationshipAddEditCtrl.js line 3300)
             await InitializeOptionAmortizationModelAsync();
+            if (OptionAmortizationDialogDefaultValues == null)
+            {
+                return;
+            }
+            IsOptionAmortizationModal = true;
         }
-        
+
         OpenModal = args.Item.Text;
+    }
+
+    private async Task OpenOptionAmortizationModal()
+    {
+        await InitializeOptionAmortizationModelAsync();
+        if (OptionAmortizationDialogDefaultValues == null)
+        {
+            return;
+        }
+        IsOptionAmortizationModal = true;
+        OpenModal = MODAL_OPTION_AMORTIZATION;
+    }
+
+    private void OptionAmortizationDialogVisibleChanged(bool isVisible)
+    {
+        IsOptionAmortizationModal = isVisible;
+        OpenModal = isVisible ? MODAL_OPTION_AMORTIZATION : string.Empty;
     }
 
     private async Task InitializeOptionAmortizationModelAsync()
     {
         try
         {
+            IsLoadingOptionAmortizationDefaults = true;
+            StateHasChanged();
+            OptionAmortizationDialogDefaultValues = null;
+
             // Fetch option amortization defaults from API (legacy: openOptionTimeValueAmortDialog)
             var defaultsResult = await Mediator.Send(new GetOptionAmortizationDefaults.Query(HedgeRelationship));
 
             if (defaultsResult.HasError || defaultsResult.Data == null)
             {
-                await AlertService.ShowToast("Failed to load option amortization defaults", AlertKind.Warning, "Warning", showButton: true);
+                await AlertService.ShowToast(defaultsResult.Message, AlertKind.Warning, "Warning", showButton: true);
                 
                 // Initialize with basic defaults if API call fails
                 OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
@@ -497,14 +533,14 @@ public partial class HedgeRelationshipDetails
                 return;
             }
 
-            var defaults = defaultsResult.Data;
+            OptionAmortizationDialogDefaultValues = defaultsResult.Data;
 
             // Initialize OptionAmortizationModel with API defaults (legacy: line 3313-3323)
             OptionAmortizationModel = new DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM
             {
                 ID = 0,
-                GLAccountID = defaults.GlAccountId, // From API (legacy: line 3315)
-                ContraAccountID = defaults.GlContraAcctId, // From API (legacy: line 3316)
+                GLAccountID = OptionAmortizationDialogDefaultValues.GlAccountId, // From API (legacy: line 3315)
+                ContraAccountID = OptionAmortizationDialogDefaultValues.GlContraAcctId, // From API (legacy: line 3316)
                 AmortizationMethod = HedgeRelationship?.AmortizationMethod ?? DerivativeEDGEHAEntityEnumAmortizationMethod.None, // From current HR (legacy: line 3317)
                 FinancialCenters = [DerivativeEDGEDomainEntitiesEnumsFinancialCenter.USGS], // Default to USGS (legacy: line 3318)
                 PaymentFrequency = DerivativeEDGEDomainEntitiesEnumsPaymentFrequency.Monthly, // Default (legacy: line 3319)
@@ -512,15 +548,22 @@ public partial class HedgeRelationshipDetails
                 PayBusDayConv = DerivativeEDGEDomainEntitiesEnumsPayBusDayConv.ModFollowing, // Default (legacy: line 3321)
                 Straightline = HedgeRelationship?.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.Straightline, // From current HR (legacy: line 3322)
                 OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue, // Default (legacy: line 3323)
-                TotalAmount = defaults.TimeValue, // From API (legacy: line 3328)
-                HedgeRelationshipID = HedgeRelationship?.ID ?? 0, // Current HR ID (legacy: line 3329)
-                AdjDates = true // Default to checked
+                TotalAmount = OptionAmortizationDialogDefaultValues.TimeValue, // From API (legacy: line 3328)
+                HedgeRelationshipID = HedgeRelationship?.ID ?? 0 // Current HR ID (legacy: line 3329)
             };
-
+            
             // Set start/end dates from HedgingItems if available (legacy: line 3332-3335)
             if (HedgeRelationship?.HedgingItems?.Any() == true)
             {
-                OptionAmortizationModel.StartDate = HedgeRelationship.DesignationDate; // Match to designation date (legacy: line 3333)
+                // Match to designation date (legacy: line 3333)
+                if (!string.IsNullOrEmpty(HedgeRelationship.DesignationDate) && DateTime.TryParse(HedgeRelationship.DesignationDate, out var designationDate))
+                {
+                    OptionAmortizationModel.StartDate = designationDate.ToString("MM/dd/yyyy"); // Date only without time component
+                }
+                else
+                {
+                    OptionAmortizationModel.StartDate = HedgeRelationship.DesignationDate; // Fallback to original value
+                }
                 OptionAmortizationModel.EndDate = HedgeRelationship.HedgingItems.First().MaturityDate; // From first hedging item (legacy: line 3334)
             }
         }
@@ -541,14 +584,29 @@ public partial class HedgeRelationshipDetails
                 AdjDates = true
             };
         }
+        finally
+        {
+            IsLoadingOptionAmortizationDefaults = false;
+            StateHasChanged();
+        }
     }
 
-    public async void OnSelectedTab(SelectEventArgs args)
+    public async Task OnSelectedTab(SelectEventArgs args)
     {
+        var selectedTabItem = hedgerelationshiptabRef.GetTabItemByIndex(args.SelectedIndex);
+        if (selectedTabItem == null)
+        {
+            return;
+        }
+
         // Refresh grid data when switching to the "Instruments and Analysis" tab
-        if (args.SelectedIndex == 0 && instrumentAnalysisTabRef != null)
+        if (selectedTabItem.ID == "InstrumentsandAnalysis" && instrumentAnalysisTabRef != null)
         {
             await instrumentAnalysisTabRef.RefreshGridData();
+        }
+        else if (selectedTabItem.ID == "OptionAmortization" && optionAmortizationTabRef != null && optionAmortizationTabRef.HedgeRelationshipOptionTimeValues.Count == 0)
+        {
+            await OpenOptionAmortizationModal();
         }
     }
 

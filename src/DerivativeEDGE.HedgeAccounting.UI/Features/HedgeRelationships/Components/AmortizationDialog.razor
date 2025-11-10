@@ -1,5 +1,5 @@
 <SfDialog Width="33rem" 
-          Height="auto" 
+          Height="45rem" 
           CssClass="dp-dialog" 
           IsModal="true" 
           AllowDragging="true" 
@@ -8,7 +8,7 @@
     <DialogTemplates>
         <Header>Add/Edit Amortization</Header>
         <Content>
-            <EditForm Model="AmortizationModel" OnSubmit="OnSubmitAmortization" Context="amortizationFormContext">
+            <EditForm Model="AmortizationModel" Context="amortizationFormContext">
                 <DataAnnotationsValidator />
                 <ValidationMessage For="@(() => AmortizationModel.GLAccountID)" />
                 <ValidationMessage For="@(() => AmortizationModel.ContraAccountID)" />
@@ -98,10 +98,11 @@
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker" 
                                       Enabled="true" 
-                                      Format="MM/dd/yyyy" 
-                                      Placeholder="mm/dd/yyyy" 
+                                      Format="@ComponentLibraryConstants.DateFormat"
+                                      Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationStartDate">
+                                      @bind-Value="AmortizationStartDate"
+                                      InputFormats="ComponentLibraryConstants.DateInputFormats">
                         </SfDatePicker>
                     </div>
                     <div class="dp-inputs">
@@ -109,10 +110,11 @@
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker" 
                                       Enabled="true" 
-                                      Format="MM/dd/yyyy" 
-                                      Placeholder="mm/dd/yyyy" 
+                                      Format="@ComponentLibraryConstants.DateFormat"
+                                      Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationEndDate">
+                                      @bind-Value="AmortizationEndDate"
+                                      InputFormats="ComponentLibraryConstants.DateInputFormats">
                         </SfDatePicker>
                     </div>
                 </div>
@@ -122,10 +124,11 @@
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker" 
                                       Enabled="true" 
-                                      Format="MM/dd/yyyy" 
-                                      Placeholder="mm/dd/yyyy" 
+                                      Format="@ComponentLibraryConstants.DateFormat"
+                                      Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationFrontRollDate">
+                                      @bind-Value="AmortizationFrontRollDate"
+                                      InputFormats="ComponentLibraryConstants.DateInputFormats">
                         </SfDatePicker>
                     </div>
                     <div class="dp-inputs">
@@ -133,10 +136,11 @@
                         <SfDatePicker TValue="DateTime?"
                                       CssClass="calendar-datepicker" 
                                       Enabled="true"
-                                      Format="MM/dd/yyyy" 
-                                      Placeholder="mm/dd/yyyy" 
+                                      Format="@ComponentLibraryConstants.DateFormat"
+                                      Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                       ShowClearButton="true"
-                                      @bind-Value="AmortizationBackRollDate">
+                                      @bind-Value="AmortizationBackRollDate"
+                                      InputFormats="ComponentLibraryConstants.DateInputFormats">
                         </SfDatePicker>
                     </div>
                 </div>
@@ -144,7 +148,8 @@
                     <span class="input-label">Total Amount</span>
                     <NumericHotKeys>
                         <SfNumericTextBox TValue="double"
-                                          CssClass="input-numeric" 
+                                          CssClass="input-numeric text-right" 
+                                          ShowSpinButton="false"
                                           Placeholder="Total Amount" 
                                           Enabled="true"
                                           @bind-Value="AmortizationModel.TotalAmount" />
@@ -161,14 +166,17 @@
                         <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.IncludeInRegression" Label="Include In Regression" />
                     </div>
                 </div>
-                <div class="custom-action-container ">
-                    <div class="dp-buttons">
-                        <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
-                        <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" Disabled="@IsSaveDisabled" />
-                    </div>
-                </div>
             </EditForm>
         </Content>
+        <FooterTemplate>
+            <div class="flex flex-row justify-end pt-[25px]">
+                <div class="dp-buttons">
+                    <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
+                    <SfButton CssClass="button-primary button-default" Content="Save" IsPrimary="true" Disabled="@IsSaveDisabled" OnClick="OnSubmitAmortization" />
+                </div>
+            </div>
+        </FooterTemplate>
     </DialogTemplates>
+    
     <DialogPositionData X="center" Y="center" />
 </SfDialog>

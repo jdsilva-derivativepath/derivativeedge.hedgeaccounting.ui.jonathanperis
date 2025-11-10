@@ -175,11 +175,11 @@
                     <SfDropDownList TValue="long?"
                                     CssClass="dropdown-input"
                                     Enabled="@IsEffectivenessMethodEnabled"
-                                    TItem="DropdownModel"
+                                    TItem="AssessmentMethodDropdownModel"
                                     Placeholder="Select"
-                                    @bind-Value="HedgeRelationship.ProspectiveEffectivenessMethodID"
-                                    DataSource="@GetDropdownDatasource("assessmentmethod")">
-                        <DropDownListEvents TValue="long?" TItem="DropdownModel" ValueChange="@OnEffectivenessSettingsChanged" />
+                                    Value="HedgeRelationship.ProspectiveEffectivenessMethodID"
+                                    DataSource="@(GetAssessmentMethodOptions().ToList())">
+                        <DropDownListEvents TValue="long?" TItem="AssessmentMethodDropdownModel" ValueChange="@OnProspectiveEffectivenessMethodChanged" />
                         <DropDownListFieldSettings Text="Text" Value="ID" />
                     </SfDropDownList>
                 </div>
@@ -188,11 +188,11 @@
                     <SfDropDownList TValue="long?"
                                     CssClass="dropdown-input"
                                     Enabled="@IsEffectivenessMethodEnabled"
-                                    TItem="DropdownModel"
+                                    TItem="AssessmentMethodDropdownModel"
                                     Placeholder="Retrospective Assessment Method"
-                                    @bind-Value="HedgeRelationship.RetrospectiveEffectivenessMethodID"
-                                    DataSource="@GetDropdownDatasource("assessmentmethod")">
-                        <DropDownListEvents TValue="long?" TItem="DropdownModel" ValueChange="@OnEffectivenessSettingsChanged" />
+                                    Value="HedgeRelationship.RetrospectiveEffectivenessMethodID"
+                                    DataSource="@(GetAssessmentMethodOptions().ToList())">
+                        <DropDownListEvents TValue="long?" TItem="AssessmentMethodDropdownModel" ValueChange="@OnRetrospectiveEffectivenessMethodChanged" />
                         <DropDownListFieldSettings Text="Text" Value="ID" />
                     </SfDropDownList>
                 </div>
@@ -234,18 +234,18 @@
                     <div class="dropdown-row">
                         <div class="custom-small-dropdown dp-inputs">
                             <span class="input-label">Period Count</span>
-                            <SfNumericTextBox CssClass="input-textbox" Placeholder="Period Count" TValue="int" Enabled="@IsEffectivenessMethodEnabled" @bind-Value="HedgeRelationship.Observation" />
+                            <SfNumericTextBox CssClass="input-textbox text-right" ShowSpinButton="false" Placeholder="Period Count" TValue="int" Enabled="@IsEffectivenessMethodEnabled" @bind-Value="HedgeRelationship.Observation" />
                         </div>
                         <div class="form-group custom-small-dropdown dp-inputs">
-                            <span class="input-label">@HedgeRelationship.PeriodSize</span>
+                            <span class="input-label">Period Size</span>
                             <SfDropDownList TValue="DerivativeEDGEHAEntityEnumPeriodSize"
                                             CssClass="dropdown-input"
                                             Enabled="@IsEffectivenessMethodEnabled"
-                                            TItem="DropdownModel"
+                                            TItem="PeriodSizeDropdownModel"
                                             Placeholder="Select"
-                                            @bind-Value="HedgeRelationship.PeriodSize"
-                                            DataSource="@GetDropdownDatasource("periodsize")">
-                                <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumPeriodSize" TItem="DropdownModel" ValueChange="@OnEffectivenessSettingsChanged" />
+                                            Value="HedgeRelationship.PeriodSize"
+                                            DataSource="@GetPeriodSizeOptions()">
+                                <DropDownListEvents TValue="DerivativeEDGEHAEntityEnumPeriodSize" TItem="PeriodSizeDropdownModel" ValueChange="@OnPeriodSizeChanged" />
                                 <DropDownListFieldSettings Text="Text" Value="Value" />
                             </SfDropDownList>
                         </div>

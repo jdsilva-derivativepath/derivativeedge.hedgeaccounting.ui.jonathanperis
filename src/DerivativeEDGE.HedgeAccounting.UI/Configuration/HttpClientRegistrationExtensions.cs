@@ -8,7 +8,7 @@ public static class HttpClientRegistrationExtensions
                 .ConfigureHttpClient(client =>
                 {
                     client.BaseAddress = new Uri(configuration["HEDGE_ACCOUNTING_LEGACY_SERVICE_URL"]);
-                    client.Timeout = new TimeSpan(0, 2, 30);
+                    client.Timeout = TimeSpan.FromMinutes(5);
                 }).ConfigurePrimaryHttpMessageHandler(serviceProvider => serviceProvider.GetRequiredService<JwtTokenForwardHandler>());
 
         // Read value from appsettings.json using the full section key

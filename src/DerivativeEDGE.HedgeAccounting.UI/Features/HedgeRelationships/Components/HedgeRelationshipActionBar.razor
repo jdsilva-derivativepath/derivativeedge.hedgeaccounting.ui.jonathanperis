@@ -40,9 +40,10 @@
             TValue="DateTime?"
             @bind-Value="@CurveDate"
             Enabled="true"
-            Format="MM/dd/yyyy"
-            Placeholder="mm/dd/yyyy"
-            ShowClearButton="true" />
+            Format="@ComponentLibraryConstants.DateFormat"
+            Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
+            ShowClearButton="true"
+            InputFormats="ComponentLibraryConstants.DateInputFormats" />
         </div>
         @if (ShowHrSpecAndChecksButton)
         {

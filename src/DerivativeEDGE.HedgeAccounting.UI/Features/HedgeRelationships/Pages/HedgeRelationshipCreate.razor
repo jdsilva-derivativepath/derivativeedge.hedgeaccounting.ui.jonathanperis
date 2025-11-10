@@ -56,13 +56,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group dp-inputs">
-                                    <span class="input-label">Hedge Risk *</span>
+                                    <span class="input-label">Hedged Risk *</span>
                                     <SfComboBox TValue="DerivativeEDGEHAEntityEnumHedgeRiskType"
                                         CssClass="dropdown-input"
                                         Enabled="true"
                                         TItem="DropdownModel"
                                         @bind-Value="HedgeRelationship.HedgeRiskType"
-                                        Placeholder="Hedge Risk"
+                                        Placeholder="Hedged Risk"
                                         DataSource="@GetDropdownDatasource("hedgerisktype")">
                                             <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumHedgeRiskType" TItem="DropdownModel" />
                                             <ComboBoxFieldSettings Value="Value" Text="Text" />
@@ -83,10 +83,11 @@
                                             @bind-Value="@DesignationDate"
                                             CssClass="calendar-datepicker"
                                             Enabled="true"
-                                            Format="MM/dd/yyyy"
-                                            Placeholder="mm/dd/yyyy"
+                                            Format="@ComponentLibraryConstants.DateFormat"
+                                            Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                             ShowClearButton="true"
-                                            Max="@DateTime.Today">
+                                            Max="@DateTime.Today"
+                                            InputFormats="ComponentLibraryConstants.DateInputFormats">
                                         <DatePickerEvents TValue="DateTime?" />
                                     </SfDatePicker>
                                     <ValidationMessage For="@(() => DesignationDate)" />
@@ -96,21 +97,23 @@
                                     <SfDatePicker TValue="DateTime?"
                                             @bind-Value="@DedesignationDate"
                                             CssClass="calendar-datepicker"
-                                            Enabled="true" Format="MM/dd/yyyy"
-                                            Placeholder="mm/dd/yyyy"
-                                            ShowClearButton="true">
+                                            Enabled="true"
+                                            Format="@ComponentLibraryConstants.DateFormat"
+                                            Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
+                                            ShowClearButton="true"
+                                            InputFormats="ComponentLibraryConstants.DateInputFormats">
                                         <DatePickerEvents TValue="DateTime?" />
                                     </SfDatePicker>
                                 </div
                                 <div class="form-group dp-inputs">
-                                    <span class="input-label">Hedge Item Type</span>
+                                    <span class="input-label">Hedged Item Type</span>
                                     <SfComboBox TValue="DerivativeEDGEHAEntityEnumHedgedItemType" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" @bind-Value="HedgeRelationship.HedgedItemType" Placeholder="Hedge Item Type" DataSource="@GetDropdownDatasource("hedgeditemtype")">
                                         <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumHedgedItemType" TItem="DropdownModel" />
                                         <ComboBoxFieldSettings Value="Value" Text="Text" />
                                     </SfComboBox>
                                 </div>
                                 <div class="form-group dp-inputs">
-                                    <span class="input-label">Hedge Item</span>
+                                    <span class="input-label">Hedged Item</span>
                                     <SfComboBox TValue="DerivativeEDGEHAEntityEnumAssetLiability" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" @bind-Value="HedgeRelationship.AssetLiability" Placeholder="Hedge Item" DataSource="@GetDropdownDatasource("assetliability")">
                                         <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAssetLiability" TItem="DropdownModel" />
                                         <ComboBoxFieldSettings Value="Value" Text="Text" />
@@ -128,7 +131,7 @@
                             <div class="">
                                 <div class="form-group dp-inputs">
                                     <span class="input-label">Standard</span>
-                                    <SfComboBox TValue="DerivativeEDGEHAEntityEnumStandard" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" @bind-Value="HedgeRelationship.Standard" Placeholder="Standard" DataSource="@GetDropdownDatasource("standard")">
+                                    <SfComboBox TValue="DerivativeEDGEHAEntityEnumStandard" CssClass="dropdown-input" Enabled="true" TItem="DropdownModel" @bind-Value="HedgeRelationship.Standard" Placeholder="ASC815" DataSource="@GetDropdownDatasource("standard")">
                                         <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumStandard" TItem="DropdownModel" />
                                         <ComboBoxFieldSettings Value="Value" Text="Text" />
                                     </SfComboBox>
@@ -164,7 +167,7 @@
                                     <div class="form-group">
                                         <div class="dp-inputs">
                                             <span class="input-label">Option Premium</span>
-                                            <SfNumericTextBox CssClass="input-textbox" Placeholder="Option Premium" @bind-Value="HedgeRelationship.OptionPremium" />
+                                            <SfNumericTextBox CssClass="input-textbox text-right" ShowSpinButton="false"Placeholder="Option Premium" @bind-Value="HedgeRelationship.OptionPremium" />
                                         </div>
                                     </div>
                                 }

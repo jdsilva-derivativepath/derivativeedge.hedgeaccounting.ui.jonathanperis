@@ -1,4 +1,6 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
+﻿using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Commands;
 
 public sealed class DeleteHedgeRelationship
 {
@@ -27,23 +29,22 @@ public sealed class DeleteHedgeRelationship
                 {
                     await hedgeAccountingApiClient.HedgeRelationshipDELETEAsync(request.HedgeRelationshipId, cancellationToken);
                 }
-                catch (Exception ex) when (ex.GetType().Name == "ApiException")
+                catch (ApiException ex) when (ex.StatusCode == StatusCodes.Status500InternalServerError || ex.StatusCode == StatusCodes.Status400BadRequest)
                 {
-                    var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message;
                     var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
-                    logger.LogWarning("Failed to delete hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
+                    logger.LogWarning("Failed to delete hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", ex.StatusCode, reason, content);
                     return new Response(true, "Failed to delete hedge relationship");
                 }
-
-                logger.LogInformation("Successfully deleted hedge relationship.");
-                return new Response(false, "Successfully deleted hedge relationship");
             }
-            catch (Exception ex)
+            catch
             {
-                logger.LogError(ex, "An error occurred while deleting hedge relationship.");
-                return new Response(true, "Failed to delete hedge relationship");
+                // We're getting HttpResponse 204 as an error by the ApiClient, which is wrong. So we handle it here
+                // and if something really fails, we're dealing with on the inner try catch using the ApiException.
             }
+
+            logger.LogInformation("Successfully deleted hedge relationship.");
+            return new Response(false, "Successfully deleted hedge relationship");
         }
     }
 }

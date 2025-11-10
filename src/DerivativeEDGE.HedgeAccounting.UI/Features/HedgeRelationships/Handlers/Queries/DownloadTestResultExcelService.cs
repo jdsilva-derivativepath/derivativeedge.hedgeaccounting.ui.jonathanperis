@@ -7,12 +7,12 @@ public sealed class DownloadTestResultExcelService
         DerivativeEDGEHAApiViewModelsHedgeRelationshipVM HedgeRelationship,
         DateTime? CurveDate = null
     ) : IRequest<Response>;
-    
+
     public sealed record Response(Stream ExcelStream, string FileName);
-    
+
     public sealed class Handler(
-        IHedgeAccountingApiClient hedgeAccountingApiClient, 
-        ILogger<DownloadTestResultExcelService.Handler> logger, 
+        IHedgeAccountingApiClient hedgeAccountingApiClient,
+        ILogger<DownloadTestResultExcelService.Handler> logger,
         IMapper mapper) : IRequestHandler<Query, Response>
     {
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ public sealed class DownloadTestResultExcelService
 
                 // Map to API entity for the export request
                 var apiEntity = mapper.Map<DerivativeEDGEHAEntityHedgeRelationship>(request.HedgeRelationship);
-                
+
                 // Set the batch ID for export (legacy: model.HedgeRegressionForExport = obj.getSelectedRecords()[0].ID)
                 apiEntity.HedgeRegressionForExport = request.BatchId;
 
@@ -44,10 +44,10 @@ public sealed class DownloadTestResultExcelService
 
                 // Call the Export API with Xlsx file type (legacy: 'HedgeRegressionBatch/Export/Xlsx')
                 var fileResponse = await hedgeAccountingApiClient.ExportAsync(
-                    DerivativeEDGEHAEntityEnumFileType.Xlsx, 
-                    apiEntity, 
+                    DerivativeEDGEHAEntityEnumFileType.Xlsx,
+                    apiEntity,
                     cancellationToken);
-                
+
                 if (fileResponse == null)
                 {
                     throw new InvalidOperationException("File response was null");
@@ -55,14 +55,14 @@ public sealed class DownloadTestResultExcelService
 
                 var fileName = GenerateDefaultFileName(request.BatchId);
 
-                var stream = fileResponse.Stream;
-                if (stream.CanSeek)
-                {
-                    stream.Position = 0;
-                }
+               
+                var memoryStream = new MemoryStream();
+                await fileResponse.Stream.CopyToAsync(memoryStream, cancellationToken);
+                memoryStream.Position = 0;
 
-                logger.LogInformation("Successfully downloaded test result Excel: {FileName}", fileName);
-                return new Response(stream, fileName);
+                logger.LogInformation("Successfully downloaded test result Excel: {FileName}, Size: {Size} bytes", fileName, memoryStream.Length);
+
+                return new Response(memoryStream, fileName);
             }
             catch (Exception ex)
             {

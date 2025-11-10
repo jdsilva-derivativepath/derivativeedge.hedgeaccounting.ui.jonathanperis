@@ -18,7 +18,7 @@ public sealed class GetOptionAmortizationDefaults
 
     public sealed class Handler(IHedgeAccountingApiClient hedgeAccountingApiClient, TokenProvider tokenProvider, ILogger<GetOptionAmortizationDefaults.Handler> logger, IMapper mapper) : IRequestHandler<Query, Response>
     {
-        private const string ErrorMessage = "There was a system error while fetching option amortization defaults. Please try again, or contact support if the problem continues.";
+        private const string ErrorMessage = "Failed to load option amortization defaults";
 
         public async Task<Response> Handle(Query query, CancellationToken cancellationToken)
         {
@@ -51,6 +51,15 @@ public sealed class GetOptionAmortizationDefaults
                 {
                     // Attempt to get StatusCode property via reflection to preserve original log message format
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
+
+                    // Check for specific "Hedging Item does not exist!" error message
+                    if (ex.InnerException?.Message?.Contains("Hedging Item does not exist") == true)
+                    {
+                        logger.LogWarning("Failed to fetch option amortization defaults - Hedging Item does not exist for HedgeRelationship ID: {HedgeRelationshipId}. StatusCode: {StatusCode}",
+                            query.HedgeRelationship?.ID, statusCode);
+                        return new Response(true, "The Hedging Item does not exist!");
+                    }
+
                     logger.LogWarning("Failed to fetch option amortization defaults. StatusCode: {StatusCode}", statusCode);
                     return new Response(true, ErrorMessage);
                 }

@@ -10,7 +10,7 @@ public sealed class GetEffectivenessMethodList
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             // Call generated API client to get all effectiveness methods
-            var apiEffectivenessMethods = await hedgeAccountingApiClient.EffectivenessMethodAllAsync(cancellationToken);
+            var apiEffectivenessMethods = await hedgeAccountingApiClient.GetactiveAsync(cancellationToken);
 
             var data = apiEffectivenessMethods?.ToList() ?? [];
 

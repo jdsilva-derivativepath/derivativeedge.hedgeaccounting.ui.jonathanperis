@@ -42,7 +42,18 @@ public partial class HedgeRelationshipInfoSection
     [Parameter] public EventCallback OnPreviewDocumentNewClick { get; set; }
     [Parameter] public EventCallback OnEditDocumentClick { get; set; }
     #endregion
-    
+
+    private string GetTruncatedObjective()
+    {
+        if (string.IsNullOrEmpty(HedgeRelationship?.Objective))
+            return string.Empty;
+
+        if (HedgeRelationship.Objective.Length <= 200)
+            return HedgeRelationship.Objective;
+
+        return HedgeRelationship.Objective[..200];
+    }
+
     #region Event Handlers
     /// <summary>
     /// Handles HedgeType dropdown value changes.

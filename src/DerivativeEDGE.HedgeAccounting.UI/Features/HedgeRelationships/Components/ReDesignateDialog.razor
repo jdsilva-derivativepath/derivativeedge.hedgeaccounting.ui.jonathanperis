@@ -13,10 +13,11 @@
                 <SfDatePicker TValue="DateTime?"
                               CssClass="calendar-datepicker" 
                               Enabled="true" 
-                              Format="MM/dd/yyyy" 
-                              Placeholder="mm/dd/yyyy" 
+                              Format="@ComponentLibraryConstants.DateFormat"
+                              Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                               ShowClearButton="true"
-                              @bind-Value="RedesignationDate">
+                              @bind-Value="RedesignationDate"
+                              InputFormats="ComponentLibraryConstants.DateInputFormats">
                 </SfDatePicker>
             </div>
 
@@ -26,10 +27,11 @@
                     <SfDatePicker TValue="DateTime?"
                                   CssClass="calendar-datepicker" 
                                   Enabled="true" 
-                                  Format="MM/dd/yyyy" 
-                                  Placeholder="mm/dd/yyyy" 
+                                  Format="@ComponentLibraryConstants.DateFormat"
+                                  Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                   ShowClearButton="true"
-                                  @bind-Value="TimeValuesStartDate">
+                                  @bind-Value="TimeValuesStartDate"
+                                  InputFormats="ComponentLibraryConstants.DateInputFormats">
                     </SfDatePicker>
                 </div>
                 <div class="dp-inputs">
@@ -37,10 +39,11 @@
                     <SfDatePicker TValue="DateTime?"
                                   CssClass="calendar-datepicker" 
                                   Enabled="true"
-                                  Format="MM/dd/yyyy" 
-                                  Placeholder="mm/dd/yyyy" 
+                                  Format="@ComponentLibraryConstants.DateFormat"
+                                  Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                   ShowClearButton="true"
-                                  @bind-Value="TimeValuesEndDate">
+                                  @bind-Value="TimeValuesEndDate"
+                                  InputFormats="ComponentLibraryConstants.DateInputFormats">
                     </SfDatePicker>
                 </div>
             </div>
@@ -48,7 +51,8 @@
             <div class="form-group dp-inputs">
                 <span class="input-label">Payment <span style="color: #dc2626;">*</span></span>
                 <SfNumericTextBox TValue="decimal?"
-                                  CssClass="input-numeric" 
+                                  CssClass="input-numeric text-right" 
+                                  ShowSpinButton="false"
                                   Placeholder="0.00" 
                                   Enabled="true"
                                   Format="C2"
@@ -111,14 +115,15 @@
                     </SfMessage>
                 </div>
             }
-
-            <div class="custom-action-container">
+        </Content>
+        <FooterTemplate>
+            <div class="flex flex-row justify-end pt-[25px]">
                 <div class="dp-buttons">
                     <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
                     <SfButton CssClass="button-primary button-default" Content="Re-Designate" IsPrimary="true" Disabled="@(!IsValid)" OnClick="@HandleReDesignate" />
                 </div>
             </div>
-        </Content>
+        </FooterTemplate>
     </DialogTemplates>
     <DialogPositionData X="center" Y="center" />
 </SfDialog>

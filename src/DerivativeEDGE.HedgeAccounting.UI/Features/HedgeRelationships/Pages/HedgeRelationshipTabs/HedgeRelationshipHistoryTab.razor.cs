@@ -30,6 +30,34 @@ public partial class HedgeRelationshipHistoryTab
             .OrderByDescending(activity => activity.CreatedOn)];
     }
 
+    private string GetActivityTypeDisplayText(DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM activity)
+    {
+        // First try to use ActivityTypeText if it's available and not null/empty
+        if (!string.IsNullOrEmpty(activity.ActivityTypeText))
+        {
+            return activity.ActivityTypeText;
+        }
+
+        // Fallback to enum conversion with proper formatting based on your actual enum values
+        return activity.ActivityType switch
+        {
+            DerivativeEDGEHAEntityEnumActivityType.None => "None",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipCreated => "Relationship Created",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipDrafted => "Relationship Drafted",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipRedrafted => "Relationship Re-drafted",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipDesignated => "Relationship Designated",
+            DerivativeEDGEHAEntityEnumActivityType.UserRegression => "User Regression",
+            DerivativeEDGEHAEntityEnumActivityType.GeneratedInceptionPackage => "Generated Inception Package",
+            DerivativeEDGEHAEntityEnumActivityType.BackloadRegression => "Backload Regression",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipDedesignated => "Relationship De-designated",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipUpdated => "Relationship Updated",
+            DerivativeEDGEHAEntityEnumActivityType.PeriodicRegression => "Periodic Regression",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipRedesignated => "Relationship Re-designated",
+            DerivativeEDGEHAEntityEnumActivityType.RelationshipLinkTrade => "Relationship Link Trade",
+            _ => activity.ActivityType.ToString()
+        };
+    }
+
     private string GetDisplayDate(DerivativeEDGEHAApiViewModelsHedgeRelationshipActivityVM activity)
     {
         // Legacy: {{a.CreatedOn | date: 'MMMM dd, yyyy'}} at {{a.CreatedOn | date: 'h:mm a'}}

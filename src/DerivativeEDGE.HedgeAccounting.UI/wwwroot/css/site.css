@@ -122,3 +122,16 @@ ul.breadcrumb li a:hover {
 .header-icon.fa-solid.fa-xmark {
     cursor: pointer;
 }
+
+.dp-inputs .input-radiobutton .e-radio:disabled:checked + label::after {
+    border-color: #111827 !important;
+    background-color: #111827 !important;
+}
+
+.positive-numbers {
+    color: #3b943a;
+}
+
+.negative-numbers {
+    color: #d84e48;
+}

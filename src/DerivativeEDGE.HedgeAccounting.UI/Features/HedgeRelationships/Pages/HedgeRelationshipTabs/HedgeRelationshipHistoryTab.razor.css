@@ -1,0 +1,10 @@
+﻿.hedge-relation-logs-body {
+    width: 100%;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+.text-anotation {
+    font-family: 'proximanova-regular';
+    color: #8c8b8b;
+    font-size: 12px;
+}

@@ -28,9 +28,9 @@
         </GridSortSettings>
     </GridSortSettingsFragment>
     <GridColumns>
-        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.EntityName)" HeaderText="Entity" Width="130" />
-        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.ID)" HeaderText="HR Id" Width="130" />
-        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.HedgeTypeText)" HeaderText="Hedge Type" Width="160" />
+        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.EntityName)" HeaderText="Entity" Width="130" Freeze="FreezeDirection.Left" IsFrozen="true" />
+        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.ID)" HeaderText="HR Id" Width="130" Freeze="FreezeDirection.Left" IsFrozen="true" />
+        <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.HedgeTypeText)" HeaderText="Hedge Type" Width="160" Freeze="FreezeDirection.Left" IsFrozen="true" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.ClientID)" HeaderText="ClientID" Visible="false" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.Description)" HeaderText="Description" Width="160" />
         <GridColumn Field="@nameof(HedgeRelationshipRecordViewModel.Notional)" Format="@ComponentLibraryConstants.NumberFormat" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="160" />

@@ -12,6 +12,12 @@ else if (IsSavingHedgeRelationship)
         <SfSpinner @bind-Visible="@IsSavingHedgeRelationship" Size="40" Type="SpinnerType.Tailwind" Label="Saving Hedge Relationship..." />
     </div>
 }
+else if (IsLoadingOptionAmortizationDefaults)
+{
+    <div class="d-flex justify-content-center align-items-center h-[400px]">
+        <SfSpinner @bind-Visible="@IsLoadingOptionAmortizationDefaults" Size="40" Type="SpinnerType.Tailwind" Label="Loading Option Amortization Defaults..." />
+    </div>
+}
 else if (HedgeRelationship == null)
 {
     <div class="flex items-start m-6">
@@ -115,13 +121,12 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
 
         <SfTab @ref="hedgerelationshiptabRef" CssClass="dp-tabs default-tab">
             <TabAnimationSettings>
-                <TabEvents></TabEvents>
                 <TabAnimationPrevious Effect="@AnimationEffect.None" />
                 <TabAnimationNext Effect="@AnimationEffect.None" />
             </TabAnimationSettings>
             <TabEvents Selected="OnSelectedTab"></TabEvents>
             <TabItems>
-                <TabItem>
+                <TabItem ID="InstrumentsandAnalysis">
                     <ChildContent>
                         <TabHeader Text="Instruments and Analysis"></TabHeader>
                     </ChildContent>
@@ -129,7 +134,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <InstrumentAnalysisTab @ref="instrumentAnalysisTabRef" @bind-HedgeRelationship="@HedgeRelationship" IsDpiUser="@IsDpiUser" />
                     </ContentTemplate>
                 </TabItem>
-                <TabItem>
+                <TabItem ID="TestResults">
                     <ChildContent>
                         <TabHeader Text="Test Results"></TabHeader>
                     </ChildContent>
@@ -141,7 +146,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                         CurveDate="@CurveDate" />
                     </ContentTemplate>
                 </TabItem>
-                <TabItem>
+                <TabItem ID="AccountingDetails">
                     <ChildContent>
                         <TabHeader Text="Accounting Details"></TabHeader>
                     </ChildContent>
@@ -149,7 +154,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <AccountingDetailsTab @bind-HedgeRelationship="@HedgeRelationship" />
                     </ContentTemplate>
                 </TabItem>
-                <TabItem>
+                <TabItem ID="Amortization">
                     <ChildContent>
                         <TabHeader Text="Amortization"></TabHeader>
                     </ChildContent>
@@ -161,7 +166,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                         OnDownloadExcelAmortization="@HandleDownloadExcelAmortization" />
                     </ContentTemplate>
                 </TabItem>
-                <TabItem>
+                <TabItem ID="History">
                     <ChildContent>
                         <TabHeader Text="History"></TabHeader>
                     </ChildContent>
@@ -169,7 +174,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <HedgeRelationshipHistoryTab @bind-HedgeRelationshipActivities="@HedgeRelationship.HedgeRelationshipActivities" />
                     </ContentTemplate>
                 </TabItem>
-                <TabItem>
+                <TabItem ID="Log">
                     <ChildContent>
                         <TabHeader Text="Log"></TabHeader>
                     </ChildContent>
@@ -177,7 +182,7 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                         <HedgeRelationshipLogsTab @bind-HedgeRegressionBatches="@HedgeRelationship.HedgeRegressionBatches" />
                     </ContentTemplate>
                 </TabItem>
-                <TabItem Visible="@(HedgeRelationship.IsAnOptionHedge && HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)">
+                <TabItem ID="OptionAmortization" Visible="@(HedgeRelationship.IsAnOptionHedge && HedgeRelationship.HedgeState != DerivativeEDGEHAEntityEnumHedgeState.Dedesignated)">
                     <ChildContent>
                         <TabHeader Text="Option Amortization"></TabHeader>
                     </ChildContent>
@@ -186,7 +191,8 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                                               @bind-HedgeRelationshipOptionTimeValues="@HedgeRelationship.HedgeRelationshipOptionTimeValues"
                                               OnEditOptionAmortization="@HandleEditOptionAmortization"
                                               OnDeleteOptionAmortization="@HandleDeleteOptionAmortization"
-                                              OnDownloadExcelOptionAmortization="@HandleDownloadExcelOptionAmortization" />
+                                              OnDownloadExcelOptionAmortization="@HandleDownloadExcelOptionAmortization"
+                                              HedgingItemSecurityType="@HedgingItemSecurityType" />
                     </ContentTemplate>
                 </TabItem>
             </TabItems>
@@ -205,14 +211,15 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
                             OnAmortizationSaved="@OnAmortizationSaved" />
 
         <OptionAmortizationDialog Visible="@IsOptionAmortizationModal"
-                                  VisibleChanged="@((value) => OpenModal = value ? MODAL_OPTION_AMORTIZATION : string.Empty)"
+                                  VisibleChanged="@OptionAmortizationDialogVisibleChanged"
                                   OptionAmortizationModel="@OptionAmortizationModel"
                                   HedgeRelationship="@HedgeRelationship"
                                   IsAnOptionHedge="@HedgeRelationship.IsAnOptionHedge"
                                   AmortizationGLAccounts="@AmortizationGLAccounts"
                                   AmortizationContraAccounts="@AmortizationContraAccounts"
                                   AmortizationMethodOptions="@HedgeRelationshipDataHelper.GetAmortizationMethodOptions()"
-                                  OnOptionAmortizationSaved="@OnOptionAmortizationSaved" />
+                                  OnOptionAmortizationSaved="@OnOptionAmortizationSaved" 
+                                  DefaultValues="@OptionAmortizationDialogDefaultValues"/>
 
         <HedgeDocumentPreviewDialog Visible="@IsHedgeDocumentPreviewModal"
                                     VisibleChanged="@((value) => OpenModal = value ? MODAL_HEDGE_DOCUMENT_PREVIEW : string.Empty)"

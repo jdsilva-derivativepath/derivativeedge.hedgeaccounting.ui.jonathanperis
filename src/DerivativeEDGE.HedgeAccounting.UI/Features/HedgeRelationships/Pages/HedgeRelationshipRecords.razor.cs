@@ -21,6 +21,13 @@ public partial class HedgeRelationshipRecords
     private bool IsRequestByClient;
 
     private long? SelectedClientId { get; set; }
+    private Client SelectedClient
+    {
+        get
+        {
+            return AvailableClients.FirstOrDefault(c => c.ClientId == SelectedClientId) ?? new Client { ClientId = 0, ClientName = "All" };
+        }
+    }
     private DateTime? CurveDate { get; set; }
     private bool IsDeleteModalVisible { get; set; }
     private long SelectedHedgeRelationshipId { get; set; }
@@ -35,7 +42,7 @@ public partial class HedgeRelationshipRecords
 
     private readonly List<string> actionItems =
     [
-        "Regression Summary", "Regression Summary All Clients",
+        "Download Regression Summary", "Download Regression Summary All Clients",
         "Upload Regression Summary", "Upload Regression Summary All Clients"
     ];
     private string DeleteMessage => $"Are you sure you want to delete {SelectedHedgeRelationshipId}?";
@@ -58,8 +65,8 @@ public partial class HedgeRelationshipRecords
 
         _actionMap = new()
         {
-            { "Regression Summary", OpenModalDownloadByClient },
-            { "Regression Summary All Clients", OpenModalDownloadAllClients },
+            { "Download Regression Summary", OpenModalDownloadByClient },
+            { "Download Regression Summary All Clients", OpenModalDownloadAllClients },
             { "Upload Regression Summary", OpenModalUploadByClient },
             { "Upload Regression Summary All Clients", OpenModalUploadAllClients }
         };
@@ -159,7 +166,7 @@ public partial class HedgeRelationshipRecords
                 }
                 catch
                 {
-                    await AlertService.ShowToast($"Failed to download regression summary: {SelectedClientId}", AlertKind.Error, "Download Error", showButton: true);
+                    await AlertService.ShowToast($"Failed to download regression summary for {SelectedClient.ClientName}", AlertKind.Error, "Download Error", showButton: true);
                 }
             }
             else

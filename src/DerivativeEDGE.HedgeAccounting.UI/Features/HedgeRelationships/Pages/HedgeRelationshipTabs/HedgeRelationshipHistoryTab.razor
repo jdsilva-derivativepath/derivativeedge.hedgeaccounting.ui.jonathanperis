@@ -1,29 +1,20 @@
-﻿<div class="w-full max-h-[35vh] overflow-y-auto">
+﻿<div class="hedge-relation-logs-body">
     @if (HistoryActivities?.Any() == true)
     {
         @foreach (var activity in HistoryActivities)
         {
-            @* Legacy: <div class="row form-group" data-ng-repeat="a in Model.HedgeRelationshipActivities"> *@
-            <div class="flex items-start gap-2 bg-gray-50 border-b-2 border-gray-300 p-2.5 mb-3.5 max-w-[28.125rem]">
-                @* Legacy: <div class="col-xs-2 annotationListRowFirstColumn"> with icon based on ActivityTypeEnum *@
-                <div class="flex-shrink-0 w-8 flex items-start justify-start pt-1">
-                    <i class="fa @GetActivityIcon(activity.ActivityType)" aria-hidden="true"></i>
+            var displayDate = GetDisplayDate(activity);
+            <div class="flex flex-col bg-gray-50 border-b border-gray-300 p-2.5">
+                <div class="flex items-center gap-2 w-full">
+                    <div class="flex-shrink-0 w-6 text-gray-700">
+                        <i class="fa @GetActivityIcon(activity.ActivityType)" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="history-title">@GetActivityTypeDisplayText(activity)</h3>
                 </div>
-                @* Legacy: <div class="col-xs-10 annotationListRowMainColumn"> *@
-                <div class="flex-grow flex flex-col gap-1">
-                    @* Legacy: <div class="col-xs-12 annotationNotes">{{a.ActivityTypeText}}. *@
-                    <div class="text-sm text-gray-800">
-                        @activity.ActivityTypeText.
-                    </div>
-                    @* Legacy: Date and user display *@
-                    <div class="flex items-center gap-2">
-                        @{
-                            var displayDate = GetDisplayDate(activity);
-                        }
-                        <span class="text-sm text-gray-800 font-medium">@displayDate</span>
-                        <span class="text-gray-600 font-bold">|</span>
-                        <span class="text-sm text-gray-500">@(activity.CreatedByUser?.Person?.FullName ?? "Unknown User")</span>
-                    </div>
+                <div class="flex items-center flex-wrap gap-2 ml-8 text-anotation">
+                    <span>@displayDate</span>
+                    <span>|</span>
+                    <span>@(activity.CreatedByUser?.Person?.FullName ?? "Unknown User")</span>
                 </div>
             </div>
         }

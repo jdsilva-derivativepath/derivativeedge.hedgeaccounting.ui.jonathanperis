@@ -1,5 +1,5 @@
-<SfDialog Width="41rem" 
-          Height="auto" 
+<SfDialog Width="90%"
+          Height="90%"
           CssClass="dp-dialog" 
           IsModal="true" 
           AllowDragging="true" 
@@ -22,16 +22,17 @@
                     </div>
                 }
             </div>
-
-            <div class="flex float-right gap-2 pt-4 border-t border-gray-200 mt-3">
+        </Content>
+        <FooterTemplate>
+            <div class="flex flex-row justify-end pt-[25px]">
                 <div class="dp-buttons">
-                    <SfButton CssClass="button-secondary button-default" 
+                    <SfButton CssClass="button-secondary button-default"
                               Content="Close"
-                              OnClick="@HandleClose" 
+                              OnClick="@HandleClose"
                               IsPrimary="false" />
                 </div>
             </div>
-        </Content>
+        </FooterTemplate>
     </DialogTemplates>
     <DialogPositionData X="center" Y="center"></DialogPositionData>
 </SfDialog>

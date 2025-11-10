@@ -120,7 +120,8 @@ public static class DropdownDataHelper
     private static List<DropdownModel> GetFairValueMethodOptions() =>
     [
         new() { Value = "None", Text = "None" },
-        new() { Value = "BenchmarkOnly", Text = "Benchmark Only" },
-        new() { Value = "AllCashFlows", Text = "All Cash Flows" }
+        new() { Value = "BenchmarkOnly", Text = "Benchmark Only: Re-Coupon" },
+        new() { Value = "AllCashFlows", Text = "All Cash Flows" },
+        new() { Value = "BenchmarkOnlyStraightCoupon", Text = "Benchmark Only: Straight-Coupon" }
     ];
 }

@@ -53,6 +53,7 @@
         border-right: none;
     }
 }
+
 /* regression statistic details - start */
 .custom-stats-container {
     display: flex;
@@ -91,7 +92,13 @@
 
 .stat-pass {
     color: green;
+  font-weight: bold;
+}
+
+.stat-fail {
+    color: red;
     font-weight: bold;
 }
+
 /* regression statistic details - end */
 

@@ -18,7 +18,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="DerivativeEdge.Blazor.ComponentLibrary" Version="1.0.2259" />
+    <PackageReference Include="DerivativeEdge.Blazor.ComponentLibrary" Version="1.0.2298" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">

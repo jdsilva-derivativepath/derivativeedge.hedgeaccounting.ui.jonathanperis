@@ -17,9 +17,39 @@
                  ShowExcelExportButton="false"
                  ShowColumnPickerButton="false">
         <GridColumns>
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.StartDate)" HeaderText="Start Date" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.EndDate)" HeaderText="End Date" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.PaymentDate)" HeaderText="Payment Date" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.StartDate)" HeaderText="Start Date">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM)context;
+                    }
+                    @{
+                        var dateValue = DateHelpers.FormatDateOrOriginal(model.StartDate, "MM/dd/yyyy");
+                    }
+                    @dateValue
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.EndDate)" HeaderText="End Date">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM)context;
+                    }
+                    @{
+                        var dateValue = DateHelpers.FormatDateOrOriginal(model.EndDate, "MM/dd/yyyy");
+                    }
+                    @dateValue
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.PaymentDate)" HeaderText="Payment Date">
+                <Template>
+                    @{
+                        var model = (DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM)context;
+                    }
+                    @{
+                        var dateValue = DateHelpers.FormatDateOrOriginal(model.PaymentDate, "MM/dd/yyyy");
+                    }
+                    @dateValue
+                </Template>
+            </GridColumn>
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM.DCF)" HeaderText="DFC" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
                 <Template>
                     @{
@@ -68,27 +98,71 @@
              ShowExcelExportButton="false"
              ShowColumnPickerButton="false">
     <GridColumns>
-        <GridColumn HeaderText="GL Account">
+        <GridColumn Width="280" HeaderText="GL Account">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
                 }
-                <span>@(model.GLAccount?.AccountDescription ?? "N/A")</span>
+                <span class="whitespace-normal break-words break-all">
+                    @(model.GLAccount?.AccountDescription ?? "N/A")
+                </span>
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Contra">
+        <GridColumn Width="280" HeaderText="Contra">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
                 }
-                <span>@(model.ContraAccount?.AccountDescription ?? "N/A")</span>
+                <span class="whitespace-normal break-words break-all">
+                    @(model.ContraAccount?.AccountDescription ?? "N/A")
+                </span>
             </Template>
         </GridColumn>
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.StartDate)" HeaderText="Start Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.FrontRollDate)" HeaderText="Front Roll Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.BackRollDate)" HeaderText="Back Roll Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.EndDate)" HeaderText="End Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+        <GridColumn Width="120" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.StartDate)" HeaderText="Start Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.StartDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="160" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.FrontRollDate)" HeaderText="Front Roll Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.FrontRollDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="160" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.BackRollDate)" HeaderText="Back Roll Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.BackRollDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="120" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.EndDate)" HeaderText="End Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.EndDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
@@ -98,7 +172,7 @@
                 </span>
             </Template>
         </GridColumn>
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalDCF)" HeaderText="Total DCF" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+        <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalDCF)" HeaderText="Total DCF" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
@@ -108,7 +182,7 @@
                 </span>
             </Template>
         </GridColumn>
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.AmortizationMethod)" HeaderText="Method" />
+        <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.AmortizationMethod)" HeaderText="Method" />
         <GridColumn HeaderText="Action" TextAlign="TextAlign.Center" Width="80" Freeze="FreezeDirection.Right" IsFrozen="true">
             <Template>
                 @{

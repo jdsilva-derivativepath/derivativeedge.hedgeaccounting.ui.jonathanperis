@@ -1,69 +1,305 @@
-﻿<div class="col-xs-12 amortization-header">
-    <h5>Option Time Value Amortizations</h5>
-</div>
-<div style="height: calc(100vh - 45rem)">
-    <DefaultGrid DataSource="@OptionAmortizations"
-                 TRowItem="DerivativeEDGEHAApiViewModelsOptionAmortizationVM"
-                 Height="100%"
-                 AllowPaging="false"
-                 AllowSorting="true"
-                 AllowGrouping="false"
-                 AllowFiltering="false"
-                 AllowSelection="false"
-                 EnableVirtualization="false"
-                 EnableGlobalSearch="true"
-                 ShowColumnMenu="false"
-                 ShowToolBar="false"
-                 ShowExcelExportButton="false"
-                 ShowColumnPickerButton="false">
-        <GridColumns>
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.StartDate)" HeaderText="Start Date" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.EndDate)" HeaderText="End Date" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.FixingDate)" HeaderText="Fixing Date" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.PaymentDate)" HeaderText="Amortization Date" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Weight)" HeaderText="Weight" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
-                <Template>
-                    @{
-                        var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
-                    }
-                    <span>
-                        @string.Format("{0:0.00000}", model.Weight)
-                    </span>
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Amount1)" HeaderText="Opt 1 Premium" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
-                <Template>
-                    @{
-                        var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
-                    }
-                    <span class="@(model.Amount1 > 0 ? "" : "negative-numbers")">
-                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Amount1)
-                    </span>
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Amount2)" HeaderText="Opt 2 Premium" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
-                <Template>
-                    @{
-                        var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
-                    }
-                    <span class="@(model.Amount2 > 0 ? "" : "negative-numbers")">
-                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Amount2)
-                    </span>
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
-                <Template>
-                    @{
-                        var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
-                    }
-                    <span class="@(model.TotalAmount > 0 ? "" : "negative-numbers")">
-                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.TotalAmount)
-                    </span>
-                </Template>
-            </GridColumn>
-        </GridColumns>
-    </DefaultGrid>
-</div>
+﻿@if (SelectedOptionAmortization?.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet &&
+        SelectedOptionAmortization?.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionIntrinsicValue)
+{
+    <div class="col-xs-12 amortization-header">
+        <h5>Option Intrinsic Value Amortizations</h5>
+    </div>
+    <div style="height: calc(100vh - 45rem)">
+        @* OptionSwapletAmortizations Grid *@
+        <DefaultGrid DataSource="@OptionSwapletAmortizations"
+                     TRowItem="DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM"
+                     Height="100%"
+                     AllowPaging="false"
+                     AllowSorting="true"
+                     AllowGrouping="false"
+                     AllowFiltering="false"
+                     AllowSelection="false"
+                     EnableVirtualization="false"
+                     EnableGlobalSearch="true"
+                     ShowColumnMenu="false"
+                     ShowToolBar="false"
+                     ShowExcelExportButton="false"
+                     ShowColumnPickerButton="false">
+            <GridColumns>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.StartDate)" HeaderText="Start Date" Width="150" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Left">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                            var dateValue = model.StartDate.HasValue ? model.StartDate.Value.ToString("MM/dd/yyyy") : string.Empty;
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.EndDate)" HeaderText="End Date" Width="150" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Left">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                            var dateValue = model.EndDate.HasValue ? model.EndDate.Value.ToString("MM/dd/yyyy") : string.Empty;
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.Days)" HeaderText="Days" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @model.Days
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.PaymentDate)" HeaderText="Payment Date" Width="150" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Left">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                            var dateValue = model.PaymentDate.HasValue ? model.PaymentDate.Value.ToString("MM/dd/yyyy") : string.Empty;
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.ResetDate)" HeaderText="Reset Date" Width="150" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Left">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                            var dateValue = model.ResetDate.HasValue ? model.ResetDate.Value.ToString("MM/dd/yyyy") : string.Empty;
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.Strike)" HeaderText="Strike" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right" Visible="@(HedgingItemSecurityType != DerivativeEDGEDomainEntitiesEnumsSecurityType.Collar)">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:N3}%", model.Strike)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.DayCountFraction)" HeaderText="DCF" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:N5}", model.DayCountFraction)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.DiscFactor)" HeaderText="Disc Factor" Width="120" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:N5}", model.DiscFactor)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.Notional)" HeaderText="Notional" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.Notional)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.Rate)" HeaderText="Imp Forward" Width="130" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:N5}%", model.Rate)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.Spread)" HeaderText="Spread" Width="100" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:N2}", model.Spread)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.OptValue)" HeaderText="Option Value" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.OptValue)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.OptIntrinsicValue)" HeaderText="Intrinsic Value" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.OptIntrinsicValue)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.OptTimeValue)" HeaderText="Time Value" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.OptTimeValue)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.MonthEnding)" HeaderText="Month Ending" Width="150" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Left">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                            var dateValue = model.MonthEnding.HasValue ? model.MonthEnding.Value.ToString("MM/dd/yyyy") : string.Empty; 
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.CycleIncluded)" HeaderText="Cycle Included" Width="140" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @model.CycleIncluded
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.CycleExcluded)" HeaderText="Cycle Excluded" Width="150" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @model.CycleExcluded
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.CycleIncludedAmount)" HeaderText="Cycle Included $" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.CycleIncludedAmount)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.CycleAdjustedAmount)" HeaderText="Cycle Adjusted $" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.CycleAdjustedAmount)
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM.OptIntrinsicValueAccrued)" HeaderText="Intrinsic Value Accrued" Width="200" HeaderTextAlign="TextAlign.Center" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionSwapletAmortizationVM)context;
+                        }
+                        @string.Format("{0:C2}", model.OptIntrinsicValueAccrued)
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </DefaultGrid>
+    </div>
+}
+else
+{
+    <div class="col-xs-12 amortization-header">
+        <h5>Option Time Value Amortizations</h5>
+    </div>
+    <div style="height: calc(100vh - 45rem)">
+        <DefaultGrid DataSource="@OptionAmortizations"
+                     TRowItem="DerivativeEDGEHAApiViewModelsOptionAmortizationVM"
+                     Height="100%"
+                     AllowPaging="false"
+                     AllowSorting="true"
+                     AllowGrouping="false"
+                     AllowFiltering="false"
+                     AllowSelection="false"
+                     EnableVirtualization="false"
+                     EnableGlobalSearch="true"
+                     ShowColumnMenu="false"
+                     ShowToolBar="false"
+                     ShowExcelExportButton="false"
+                     ShowColumnPickerButton="false">
+            <GridColumns>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.StartDate)" HeaderText="Start Date">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        @{
+                            var dateValue = DateHelpers.FormatDateOrOriginal(model.StartDate, "MM/dd/yyyy");
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.EndDate)" HeaderText="End Date">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        @{
+                            var dateValue = DateHelpers.FormatDateOrOriginal(model.EndDate, "MM/dd/yyyy");
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.FixingDate)" HeaderText="Fixing Date">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        @{
+                            var dateValue = DateHelpers.FormatDateOrOriginal(model.FixingDate, "MM/dd/yyyy");
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.PaymentDate)" HeaderText="Amortization Date">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        @{
+                            var dateValue = DateHelpers.FormatDateOrOriginal(model.PaymentDate, "MM/dd/yyyy");
+                        }
+                        @dateValue
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Weight)" HeaderText="Weight" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        <span>
+                            @string.Format("{0:0.00}", model.Weight)
+                        </span>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Amount1)" HeaderText="Opt 1 Premium" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        <span class="@(model.Amount1 > 0 ? "" : "negative-numbers")">
+                            @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Amount1)
+                        </span>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.Amount2)" HeaderText="Opt 2 Premium" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        <span class="@(model.Amount2 > 0 ? "" : "negative-numbers")">
+                            @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Amount2)
+                        </span>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsOptionAmortizationVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+                    <Template>
+                        @{
+                            var model = (DerivativeEDGEHAApiViewModelsOptionAmortizationVM)context;
+                        }
+                        <span class="@(model.TotalAmount > 0 ? "" : "negative-numbers")">
+                            @string.Format("{0:$#,##0.00;($#,##0.00)}", model.TotalAmount)
+                        </span>
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </DefaultGrid>
+    </div>
+}
+
 <DefaultGrid DataSource="@HedgeRelationshipOptionTimeValues"
              TRowItem="DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM"
              Height="100%"
@@ -77,29 +313,74 @@
              ShowColumnMenu="false"
              ShowToolBar="false"
              ShowExcelExportButton="false"
-             ShowColumnPickerButton="false">
+             ShowColumnPickerButton="false"
+             OnRowClicked="OnHedgeRelationshipOptionTimeValueRowClicked">
     <GridColumns>
-        <GridColumn HeaderText="GL Account">
+        <GridColumn Width="280" HeaderText="GL Account">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
                 }
-                <span>@(model.GLAccount?.AccountDescription ?? "N/A")</span>
+                <span class="whitespace-normal break-words break-all">
+                    @(model.GLAccount?.AccountDescription ?? "N/A")
+                </span>
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Contra">
+        <GridColumn Width="280" HeaderText="Contra">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
                 }
-                <span>@(model.ContraAccount?.AccountDescription ?? "N/A")</span>
+                <span class="whitespace-normal break-words break-all">
+                    @(model.ContraAccount?.AccountDescription ?? "N/A")
+                </span>
             </Template>
         </GridColumn>
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.StartDate)" HeaderText="Start Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.FrontRollDate)" HeaderText="Front Roll Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.BackRollDate)" HeaderText="Back Roll Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.EndDate)" HeaderText="End Date" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
+        <GridColumn Width="120" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.StartDate)" HeaderText="Start Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.StartDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="160" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.FrontRollDate)" HeaderText="Front Roll Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.FrontRollDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="160" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.BackRollDate)" HeaderText="Back Roll Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.BackRollDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="120" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.EndDate)" HeaderText="End Date">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                @{
+                    var dateValue = DateHelpers.FormatDateOrOriginal(model.EndDate, "MM/dd/yyyy");
+                }
+                @dateValue
+            </Template>
+        </GridColumn>
+        <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalAmount)" HeaderText="Total Amount" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">
             <Template>
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
@@ -109,8 +390,22 @@
                 </span>
             </Template>
         </GridColumn>
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.AmortizationMethod)" HeaderText="Method" />
-        <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.OptionTimeValueAmortType)" HeaderText="Value Type" />
+        <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.AmortizationMethod)" HeaderText="Method">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                <span>@StringHelpers.FormatWithSpaces(model.AmortizationMethod)</span>
+            </Template>
+        </GridColumn>
+        <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.OptionTimeValueAmortType)" HeaderText="Value Type">
+            <Template>
+                @{
+                    var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
+                }
+                <span>@StringHelpers.FormatWithSpaces(model.OptionTimeValueAmortType)</span>
+            </Template>
+        </GridColumn>
         <GridColumn HeaderText="Action" TextAlign="TextAlign.Center" Width="80" Freeze="FreezeDirection.Right" IsFrozen="true">
             <Template>
                 @{

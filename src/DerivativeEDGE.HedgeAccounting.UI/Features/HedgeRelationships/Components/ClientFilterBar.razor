@@ -16,10 +16,11 @@
         <label class="text-default clear-both block text-sm">Curve Date</label>
         <SfDatePicker TValue="DateTime?" CssClass="calendar-datepicker"
                       Value="@CurveDate"
-                      Format="MM/dd/yyyy"
-                      Placeholder="mm/dd/yyyy"
+                      Format="@ComponentLibraryConstants.DateFormat"
+                      Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                       ShowClearButton="true"
-                      Width="200px">
+                      Width="200px"
+                      InputFormats="ComponentLibraryConstants.DateInputFormats">
             <DatePickerEvents TValue="DateTime?" ValueChange="OnCurveDateChanged" />
         </SfDatePicker>
     </div>

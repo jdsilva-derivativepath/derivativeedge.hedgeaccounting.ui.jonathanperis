@@ -192,7 +192,7 @@ public partial class HedgeRelationshipCreate
         HedgeRelationship.HedgeType = (DerivativeEDGEHAEntityEnumHRHedgeType)Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumHRHedgeType)).GetValue(0);
         HedgeRelationship.HedgedItemType = (DerivativeEDGEHAEntityEnumHedgedItemType)Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumHedgedItemType)).GetValue(0);
         HedgeRelationship.AssetLiability = (DerivativeEDGEHAEntityEnumAssetLiability)Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumAssetLiability)).GetValue(0);
-        HedgeRelationship.Standard = (DerivativeEDGEHAEntityEnumStandard)Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumStandard)).GetValue(0);
+        HedgeRelationship.Standard = DerivativeEDGEHAEntityEnumStandard.ASC815;
         HedgeRelationship.HedgingInstrumentStructure = (DerivativeEDGEHAEntityEnumHedgingInstrumentStructure)Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumHedgingInstrumentStructure)).GetValue(0);
         HedgeRelationship.AmortizationMethod = (DerivativeEDGEHAEntityEnumAmortizationMethod)Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumAmortizationMethod)).GetValue(0);
         HedgeRelationship.OptionPremium = 0;
@@ -216,6 +216,8 @@ public partial class HedgeRelationshipCreate
             case "hedgerisktype":
                 return Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumHedgeRiskType))
                     .Cast<DerivativeEDGEHAEntityEnumHedgeRiskType>()
+                    .Where(x => !x.Equals(DerivativeEDGEHAEntityEnumHedgeRiskType.MarketPrice) && 
+                        !x.Equals(DerivativeEDGEHAEntityEnumHedgeRiskType.Credit))
                     .Select(value => new DropdownModel
                     {
                         Value = value.ToString(),
@@ -252,6 +254,7 @@ public partial class HedgeRelationshipCreate
             case "standard":
                 return Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumStandard))
                     .Cast<DerivativeEDGEHAEntityEnumStandard>()
+                    .Where(x=> !x.Equals(DerivativeEDGEHAEntityEnumStandard.None))
                     .Select(value => new DropdownModel
                     {
                         Value = value.ToString(),
@@ -261,6 +264,7 @@ public partial class HedgeRelationshipCreate
             case "hedginginstrumentstructure":
                 return Enum.GetValues(typeof(DerivativeEDGEHAEntityEnumHedgingInstrumentStructure))
                     .Cast<DerivativeEDGEHAEntityEnumHedgingInstrumentStructure>()
+                    .Where(x => !x.Equals(DerivativeEDGEHAEntityEnumHedgingInstrumentStructure.MultipleInstruments))
                     .Select(value => new DropdownModel
                     {
                         Value = value.ToString(),
@@ -281,15 +285,23 @@ public partial class HedgeRelationshipCreate
         }
     }
 
+    // Updated GetEnumDescription to avoid adding spaces in all-uppercase or capital-sequence words (e.g., ASC18)
     private string GetEnumDescription<TEnum>(TEnum value) where TEnum : Enum
     {
-        // Get attribute description if available, otherwise use the enum value name
         var field = value.GetType().GetField(value.ToString());
         var attributes = (EnumDescriptionAttribute[])field.GetCustomAttributes(typeof(EnumDescriptionAttribute), false);
 
-        return attributes.Length > 0
-            ? attributes[0].Description
-            : value.ToString();
+        if (attributes.Length > 0)
+            return attributes[0].Description;
+
+        var name = value.ToString();
+
+        // If the name contains a sequence of 2+ uppercase letters (e.g., ASC18), do not add spaces
+        if (System.Text.RegularExpressions.Regex.IsMatch(name, "[A-Z]{2,}"))
+            return name;
+
+        // Insert spaces before capital letters (except the first letter)
+        return System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
     }
 
     public class DropdownModel

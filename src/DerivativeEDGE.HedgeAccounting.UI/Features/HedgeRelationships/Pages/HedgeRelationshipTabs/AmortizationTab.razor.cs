@@ -32,7 +32,12 @@ public partial class AmortizationTab
             OptionTimeValueAmortRollSchedules = [.. HedgeRelationshipOptionTimeValueAmorts
                 .Where(amort => amort.OptionTimeValueAmortRollSchedules?.Any() == true)
                 .SelectMany(amort => amort.OptionTimeValueAmortRollSchedules)
-                .OrderBy(schedule => schedule.PaymentDate)];
+                .OrderBy(schedule =>
+                {
+                    // Parse StartDate as DateTime for correct ordering
+                    _ = DateTime.TryParse(schedule.StartDate, out DateTime parsedDate);
+                    return parsedDate;
+                })];
         }
         else
         {

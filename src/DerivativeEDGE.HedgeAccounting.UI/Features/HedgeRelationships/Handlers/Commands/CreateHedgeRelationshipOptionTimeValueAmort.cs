@@ -56,7 +56,8 @@ public sealed class CreateHedgeRelationshipOptionTimeValueAmort
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message; // no direct ReasonPhrase in generated exception
                     var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
-                    logger.LogWarning("Failed to create hedge relationship amortization. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
+                    
+                    logger.LogError("Failed to create hedge relationship amortization. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
                     throw;
                 }
 
@@ -66,7 +67,7 @@ public sealed class CreateHedgeRelationshipOptionTimeValueAmort
             catch (Exception ex)
             {
                 logger.LogError(ex, "An error occurred while creating hedge relationship.");
-                return new Response(true, "Failed to create hedge relationship amortization");
+                throw;
             }
         }
     }

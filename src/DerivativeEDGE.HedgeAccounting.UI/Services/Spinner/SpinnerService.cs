@@ -1,9 +1,11 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Services.Spinner;
+﻿using SystemAction = System.Action;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Services.Spinner;
 
 public class SpinnerService
 {
-    public event Action OnShow;
-    public event Action OnHide;
+    public event SystemAction OnShow;
+    public event SystemAction OnHide;
 
     public void Hide()
     {

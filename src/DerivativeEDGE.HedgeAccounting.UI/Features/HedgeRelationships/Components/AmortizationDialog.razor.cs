@@ -109,7 +109,7 @@ public partial class AmortizationDialog
         await VisibleChanged.InvokeAsync(false);
     }
 
-    private async Task OnSubmitAmortization(EditContext context)
+    private async Task OnSubmitAmortization()
     {
         try
         {
@@ -139,7 +139,7 @@ public partial class AmortizationDialog
         }
         catch (Exception ex)
         {
-            await AlertService.ShowToast($"Error saving Amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+            await AlertService.ShowToast($"Error saving Amortization: {ex.InnerException.Message}", AlertKind.Error, "Error", showButton: true);
         }
     }
 

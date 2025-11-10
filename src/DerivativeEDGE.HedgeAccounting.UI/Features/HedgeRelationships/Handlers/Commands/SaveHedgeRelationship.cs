@@ -39,10 +39,13 @@ public sealed class SaveHedgeRelationship
                 apiEntity.TimeValuesEndDate = now;
                 apiEntity.TimeValuesFrontRollDate = now;
                 apiEntity.TimeValuesBackRollDate = now;
+                apiEntity.CreatedOn = now;
+                apiEntity.ModifiedOn = now;
+                DerivativeEDGEHAApiViewModelsHedgeRelationshipVM createdVm = null;
 
                 try
                 {
-                    await hedgeAccountingApiClient.HedgeRelationshipPOSTAsync(apiEntity, cancellationToken);
+                    createdVm = await hedgeAccountingApiClient.HedgeRelationshipPOSTAsync(apiEntity, cancellationToken);
                 }
                 catch (Exception ex) when (ex.GetType().Name == "ApiException")
                 {
@@ -52,14 +55,6 @@ public sealed class SaveHedgeRelationship
                     var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
                     logger.LogWarning("Failed to create hedge relationship. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
                     return new Response(true, "Failed to create hedge relationship");
-                }
-
-                DerivativeEDGEHAApiViewModelsHedgeRelationshipVM createdVm = null;
-
-                // If the client assigns an ID we can fetch (updating Hedge Relationship goes by here too).
-                if (request.HedgeRelationship.ID > 0)
-                {
-                    createdVm = await hedgeAccountingApiClient.HedgeRelationshipGETAsync(request.HedgeRelationship.ID, cancellationToken);
                 }
 
                 logger.LogInformation("Successfully saved hedge relationship.");

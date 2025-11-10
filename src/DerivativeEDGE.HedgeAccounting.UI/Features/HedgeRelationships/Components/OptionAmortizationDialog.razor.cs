@@ -14,6 +14,7 @@ public partial class OptionAmortizationDialog
     [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationGLAccounts { get; set; } = [];
     [Parameter] public List<DerivativeEDGEHAEntityGLAccount> AmortizationContraAccounts { get; set; } = [];
     [Parameter] public List<AmortizationMethodOption> AmortizationMethodOptions { get; set; } = [];
+    [Parameter] public DerivativeEDGEHAEntityValueObjectsOptionAmortizationDefaultValues DefaultValues { get; set; }
     #endregion
 
     #region Injected Services
@@ -27,10 +28,14 @@ public partial class OptionAmortizationDialog
     // Legacy: hr_hedgeRelationshipAddEditCtrl.js lines 1032, 3325 and optionTimeValue.cshtml line 149
     private bool AmortizeOptionPremium { get; set; } = true;
     
+    // Loading state for save operation
+    private bool IsSavingOptionAmortization { get; set; } = false;
+    
     // Legacy behavior: Generate/Update button is disabled when validation fails
     // Required fields: AmortizeOptionPremium checked, AmortizationMethod not None, GLAccountID, StartDate, EndDate
     // Legacy: optionTimeValue.cshtml lines 148-151
     private bool IsGenerateDisabled => 
+        IsSavingOptionAmortization ||
         !AmortizeOptionPremium ||
         OptionAmortizationModel.AmortizationMethod == DerivativeEDGEHAEntityEnumAmortizationMethod.None ||
         OptionAmortizationModel.GLAccountID == 0 ||
@@ -90,10 +95,13 @@ public partial class OptionAmortizationDialog
             AmortizeOptionPremium = true;
             
             // Reset intrinsic value fields for new entry
-            IVGLAccountID = 0;
-            IVContraAccountID = 0;
-            IVAmortizationMethod = DerivativeEDGEHAEntityEnumAmortizationMethod.None;
-            IntrinsicValue = 0;
+            if (DefaultValues != null)
+            {
+                IVGLAccountID = DefaultValues.GlAccountId2;
+                IVContraAccountID = DefaultValues.GlContraAcctId2;
+                IVAmortizationMethod = DefaultValues.IVAmortizationMethod;
+                IntrinsicValue = DefaultValues.IntrinsicValue;
+            }
         }
     }
     #endregion
@@ -121,10 +129,13 @@ public partial class OptionAmortizationDialog
         await VisibleChanged.InvokeAsync(false);
     }
 
-    private async Task OnSubmitOptionAmortization(EditContext context)
+    private async Task OnSubmitOptionAmortization()
     {
         try
         {
+            IsSavingOptionAmortization = true;
+            StateHasChanged();
+
             OptionAmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
             OptionAmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue;
             // NOTE: AmortizeOptionPremium is a UI-only property and is not persisted to the database
@@ -155,6 +166,11 @@ public partial class OptionAmortizationDialog
         catch (Exception ex)
         {
             await AlertService.ShowToast($"Error saving Option Amortization: {ex.Message}", AlertKind.Error, "Error", showButton: true);
+        }
+        finally
+        {
+            IsSavingOptionAmortization = false;
+            StateHasChanged();
         }
     }
     #endregion

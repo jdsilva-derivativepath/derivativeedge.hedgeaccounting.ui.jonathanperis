@@ -1,4 +1,4 @@
-<SfDialog Width="@(IsAnOptionHedge && OptionAmortizationModel.ID == 0 ? "41rem" : "30rem")" 
+<SfDialog Width="@(IsAnOptionHedge && OptionAmortizationModel.ID == 0 ? "60rem" : "30rem")" 
           Height="auto" 
           CssClass="dp-dialog" 
           IsModal="true" 
@@ -8,153 +8,174 @@
     <DialogTemplates>
         <Header>Option Amortization</Header>
         <Content>
-            <EditForm Model="Model" OnSubmit="OnSubmitOptionAmortization" Context="optionAmortizationFormContext">
-                <div class="dp-inputs">
-                    <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizeOptionPremium" Label="Amortize Option Premium" />
+            @if (IsSavingOptionAmortization)
+            {
+                <div class="d-flex justify-content-center align-items-center position-relative" style="height: 300px;">
+                    <SfSpinner @bind-Visible="@IsSavingOptionAmortization" Size="40" Type="SpinnerType.Tailwind" Label="Saving Option Amortization..." />
                 </div>
-                <div class="flex-1 min-w-[18.75rem] flex flex-col p-0">
-                    <div class="flex-grow">
-                        <div class="flex gap-4 justify-between">
-                            <div class="flex-1">
-                                <div class="form-group dp-inputs">
-                                    <span class="input-label">GL Account</span>
-                                    <SfComboBox TValue="long"
-                                                CssClass="dropdown-input"
-                                                Enabled="true"
-                                                TItem="DerivativeEDGEHAEntityGLAccount"
-                                                Placeholder="GL Account"
-                                                @bind-Value="OptionAmortizationModel.GLAccountID"
-                                                DataSource="AmortizationGLAccounts">
-                                        <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
-                                    </SfComboBox>
-                                </div>
-                                <div class="form-group dp-inputs">
-                                    <span class="input-label">Contra</span>
-                                    <SfComboBox TValue="long"
-                                                CssClass="dropdown-input"
-                                                Enabled="true"
-                                                TItem="DerivativeEDGEHAEntityGLAccount"
-                                                Placeholder="Contra"
-                                                @bind-Value="OptionAmortizationModel.ContraAccountID"
-                                                DataSource="AmortizationContraAccounts">
-                                        <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
-                                    </SfComboBox>
-                                </div>
-                                <div class="form-group dp-inputs">
-                                    <span class="input-label">Amortization Method</span>
-                                    @* Legacy: optionTimeValue.cshtml line 93 - Disabled when !Model.IsAnOptionHedge *@
-                                    <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
-                                                CssClass="dropdown-input"
-                                                Enabled="@IsAnOptionHedge"
-                                                TItem="AmortizationMethodOption"
-                                                Placeholder="Amortization Method"
-                                                @bind-Value="OptionAmortizationModel.AmortizationMethod"
-                                                DataSource="@GetFilteredAmortizationMethodOptions()">
-                                        <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
-                                        <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
-                                    </SfComboBox>
-                                </div>
-                                <div class="form-group dp-inputs">
-                                    <span class="input-label">Total Amount</span>
-                                    <NumericHotKeys>
-                                        <SfNumericTextBox TValue="double"
-                                                          CssClass="input-numeric"
-                                                          Placeholder="Total Amount"
-                                                          Enabled="true"
-                                                          @bind-Value="OptionAmortizationModel.TotalAmount" />
-                                    </NumericHotKeys>
-                                </div>
-                            </div>
-                            @if (IsAnOptionHedge && OptionAmortizationModel.ID == 0)
-                            {
+            }
+            else
+            {
+                <EditForm Model="Model" Context="optionAmortizationFormContext">
+                    <div class="dp-inputs">
+                        <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizeOptionPremium" Label="Amortize Option Premium" />
+                    </div>
+                    <div class="flex-1 min-w-[18.75rem] flex flex-col p-0">
+                        <div class="flex-grow">
+                            <div class="flex gap-4 justify-between">
                                 <div class="flex-1">
                                     <div class="form-group dp-inputs">
-                                        <span class="input-label">Intrinsic Value GL Account</span>
+                                        <span class="input-label">GL Account</span>
                                         <SfComboBox TValue="long"
                                                     CssClass="dropdown-input"
                                                     Enabled="true"
                                                     TItem="DerivativeEDGEHAEntityGLAccount"
-                                                    Placeholder="Intrinsic Value GL Account"
-                                                    @bind-Value="IVGLAccountID"
+                                                    Placeholder="GL Account"
+                                                    @bind-Value="OptionAmortizationModel.GLAccountID"
                                                     DataSource="AmortizationGLAccounts">
                                             <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                         </SfComboBox>
                                     </div>
                                     <div class="form-group dp-inputs">
-                                        <span class="input-label">Intrinsic Value Contra</span>
+                                        <span class="input-label">Contra</span>
                                         <SfComboBox TValue="long"
                                                     CssClass="dropdown-input"
                                                     Enabled="true"
                                                     TItem="DerivativeEDGEHAEntityGLAccount"
-                                                    Placeholder="Intrinsic Value Contra"
-                                                    @bind-Value="IVContraAccountID"
+                                                    Placeholder="Contra"
+                                                    @bind-Value="OptionAmortizationModel.ContraAccountID"
                                                     DataSource="AmortizationContraAccounts">
                                             <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                                         </SfComboBox>
                                     </div>
                                     <div class="form-group dp-inputs">
-                                        <span class="input-label">Intrinsic Value Amortization Method</span>
+                                        <span class="input-label">Amortization Method</span>
+                                        @* Legacy: optionTimeValue.cshtml line 93 - Disabled when !Model.IsAnOptionHedge *@
                                         <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
                                                     CssClass="dropdown-input"
-                                                    Enabled="true"
+                                                    Enabled="@IsAnOptionHedge"
                                                     TItem="AmortizationMethodOption"
-                                                    Placeholder="Intrinsic Value Amortization Method"
-                                                    @bind-Value="IVAmortizationMethod"
-                                                    DataSource="AmortizationMethodOptions">
+                                                    Placeholder="Amortization Method"
+                                                    @bind-Value="OptionAmortizationModel.AmortizationMethod"
+                                                    DataSource="@GetFilteredAmortizationMethodOptions()">
                                             <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
                                             <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                         </SfComboBox>
                                     </div>
                                     <div class="form-group dp-inputs">
-                                        <span class="input-label">Intrinsic Value</span>
+                                        <span class="input-label">Total Amount</span>
                                         <NumericHotKeys>
                                             <SfNumericTextBox TValue="double"
-                                                              CssClass="input-numeric"
-                                                              Placeholder="Intrinsic Value"
+                                                              CssClass="input-numeric text-right"
+                                                              ShowSpinButton="false"
+                                                              Placeholder="Total Amount"
                                                               Enabled="true"
-                                                              @bind-Value="IntrinsicValue" />
+                                                              @bind-Value="OptionAmortizationModel.TotalAmount" />
                                         </NumericHotKeys>
                                     </div>
                                 </div>
-                            }
+                                @if (IsAnOptionHedge && OptionAmortizationModel.ID == 0)
+                                {
+                                    <div class="flex-1">
+                                        <div class="form-group dp-inputs">
+                                            <span class="input-label">Intrinsic Value GL Account</span>
+                                            <SfComboBox TValue="long"
+                                                        CssClass="dropdown-input"
+                                                        Enabled="true"
+                                                        TItem="DerivativeEDGEHAEntityGLAccount"
+                                                        Placeholder="Intrinsic Value GL Account"
+                                                        @bind-Value="IVGLAccountID"
+                                                        DataSource="AmortizationGLAccounts">
+                                                <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                            </SfComboBox>
+                                        </div>
+                                        <div class="form-group dp-inputs">
+                                            <span class="input-label">Intrinsic Value Contra</span>
+                                            <SfComboBox TValue="long"
+                                                        CssClass="dropdown-input"
+                                                        Enabled="true"
+                                                        TItem="DerivativeEDGEHAEntityGLAccount"
+                                                        Placeholder="Intrinsic Value Contra"
+                                                        @bind-Value="IVContraAccountID"
+                                                        DataSource="AmortizationContraAccounts">
+                                                <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
+                                            </SfComboBox>
+                                        </div>
+                                        <div class="form-group dp-inputs">
+                                            <span class="input-label">Intrinsic Value Amortization Method</span>
+                                            <SfComboBox TValue="DerivativeEDGEHAEntityEnumAmortizationMethod"
+                                                        CssClass="dropdown-input"
+                                                        Enabled="true"
+                                                        TItem="AmortizationMethodOption"
+                                                        Placeholder="Intrinsic Value Amortization Method"
+                                                        @bind-Value="IVAmortizationMethod"
+                                                        DataSource="AmortizationMethodOptions">
+                                                <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
+                                                <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
+                                            </SfComboBox>
+                                        </div>
+                                        <div class="form-group dp-inputs">
+                                            <span class="input-label">Intrinsic Value</span>
+                                            <NumericHotKeys>
+                                                <SfNumericTextBox TValue="double"
+                                                                  CssClass="input-numeric text-right"
+                                                                  ShowSpinButton="false"
+                                                                  Placeholder="Intrinsic Value"
+                                                                  Enabled="true"
+                                                                  @bind-Value="IntrinsicValue" />
+                                            </NumericHotKeys>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="custom-datepicker-container">
-                    <div class="dp-inputs">
-                        <label class="input-label">Start Date</label>
-                        <SfDatePicker TValue="DateTime?"
-                                      CssClass="calendar-datepicker"
-                                      Enabled="true"
-                                      Format="MM/dd/yyyy"
-                                      Placeholder="mm/dd/yyyy"
-                                      ShowClearButton="true"
-                                      @bind-Value="OptionAmortizationStartDate">
-                        </SfDatePicker>
+                    <div class="custom-datepicker-container">
+                        <div class="dp-inputs">
+                            <label class="input-label">Start Date</label>
+                            <SfDatePicker TValue="DateTime?"
+                                          CssClass="calendar-datepicker"
+                                          Enabled="true"
+                                          Format="@ComponentLibraryConstants.DateFormat"
+                                          Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
+                                          ShowClearButton="true"
+                                          @bind-Value="OptionAmortizationStartDate"
+                                          InputFormats="ComponentLibraryConstants.DateInputFormats">
+                            </SfDatePicker>
+                        </div>
+                        <div class="dp-inputs">
+                            <label class="input-label">End Date</label>
+                            <SfDatePicker TValue="DateTime?"
+                                          CssClass="calendar-datepicker"
+                                          Enabled="true"
+                                          Format="@ComponentLibraryConstants.DateFormat"
+                                          Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
+                                          ShowClearButton="true"
+                                          @bind-Value="OptionAmortizationEndDate"
+                                          InputFormats="ComponentLibraryConstants.DateInputFormats">
+                            </SfDatePicker>
+                        </div>
                     </div>
-                    <div class="dp-inputs">
-                        <label class="input-label">End Date</label>
-                        <SfDatePicker TValue="DateTime?"
-                                      CssClass="calendar-datepicker"
-                                      Enabled="true"
-                                      Format="MM/dd/yyyy"
-                                      Placeholder="mm/dd/yyyy"
-                                      ShowClearButton="true"
-                                      @bind-Value="OptionAmortizationEndDate">
-                        </SfDatePicker>
-                    </div>
-                </div>
-                <div class="custom-action-container ">
-                    <div class="dp-buttons">
-                        <SfButton CssClass="button-secondary button-default" Content="Cancel" Type="button" OnClick="@HandleClose" IsPrimary="false" />
-                        <SfButton CssClass="button-primary button-default" 
-                                  Content="@(OptionAmortizationModel.ID > 0 ? "Update" : "Generate")" 
-                                  Disabled="@IsGenerateDisabled" 
-                                  IsPrimary="true" />
-                    </div>
-                </div>
-            </EditForm>
+                </EditForm>
+            }
         </Content>
+        <FooterTemplate>
+            <div class="flex flex-row justify-end pt-[25px]">
+                <div class="dp-buttons">
+                    <SfButton CssClass="button-secondary button-default" 
+                              Content="Cancel" 
+                              Type="button" 
+                              OnClick="@HandleClose" 
+                              IsPrimary="false" 
+                              Disabled="@IsSavingOptionAmortization" />
+                    <SfButton CssClass="button-primary button-default"
+                              Content="@(IsSavingOptionAmortization ? "Saving..." : (OptionAmortizationModel.ID > 0 ? "Update" : "Generate"))"
+                              Disabled="@IsGenerateDisabled"
+                              IsPrimary="true" 
+                              OnClick="@OnSubmitOptionAmortization" />
+                </div>
+            </div>
+        </FooterTemplate>
     </DialogTemplates>
     <DialogPositionData X="center" Y="center"></DialogPositionData>
 </SfDialog>

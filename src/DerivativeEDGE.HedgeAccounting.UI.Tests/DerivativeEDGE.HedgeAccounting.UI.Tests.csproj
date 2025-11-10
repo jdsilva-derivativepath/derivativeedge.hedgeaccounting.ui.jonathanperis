@@ -19,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="DerivativeEdge.Blazor.ComponentLibrary" Version="1.0.2259" />
+    <PackageReference Include="DerivativeEdge.Blazor.ComponentLibrary" Version="1.0.2298" />
     <PackageReference Include="DerivativeEDGE.Domain.Entities" Version="1.0.1499" />
     <PackageReference Include="DerivativeEDGE.FeatureFlag" Version="1.0.37" />
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
