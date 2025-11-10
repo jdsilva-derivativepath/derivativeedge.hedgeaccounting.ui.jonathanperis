@@ -37,6 +37,7 @@ public partial class HedgeRelationshipDetails
     private AmortizationTab amortizationTabRef;
     private OptionAmortizationTab optionAmortizationTabRef;
     private List<string> ValidationErrors { get; set; } = [];
+    private List<string> ValidationWarnings { get; set; } = [];
     private bool IsDpiUser { get; set; }
     private DateTime? DesignationDate
     {
@@ -644,6 +645,7 @@ public partial class HedgeRelationshipDetails
         {
             IsGeneratingInceptionPackage = true;
             ValidationErrors.Clear();
+            ValidationWarnings.Clear();
             StateHasChanged();
 
             // Check for document template keywords that cannot be replaced (legacy: checkDocumentTemplateKeywords)
@@ -660,7 +662,7 @@ public partial class HedgeRelationshipDetails
             // Display warning if there are smart tags that cannot be replaced (legacy behavior from line 2264)
             if (keywordsCheckResult.HasEmptyKeyword)
             {
-                ValidationErrors.Add("There are Smart Tags defined in the Hedge Documentation that cannot be replaced with a value. " +
+                ValidationWarnings.Add("There are Smart Tags defined in the Hedge Documentation that cannot be replaced with a value. " +
                     "Within the Hedge Memorandum, the Smart Tag(s) will be replaced with '_________________'.");
                 StateHasChanged();
             }
