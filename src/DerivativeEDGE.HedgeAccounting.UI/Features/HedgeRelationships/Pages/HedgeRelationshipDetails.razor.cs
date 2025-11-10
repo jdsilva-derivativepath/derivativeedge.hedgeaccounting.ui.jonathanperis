@@ -739,6 +739,7 @@ public partial class HedgeRelationshipDetails
     private async Task SaveHedgeRelationshipAsync()
     {
         ValidationErrors.Clear();
+        ValidationWarnings.Clear();
         if (HedgeRelationship == null)
         {
             await AlertService.ShowToast("No hedge relationship data available", AlertKind.Warning, "Warning", showButton: true);
@@ -814,6 +815,7 @@ public partial class HedgeRelationshipDetails
         }
 
         ValidationErrors = RegressionRequirementsValidator.Validate(HedgeRelationship);
+        ValidationWarnings.Clear();
         if (ValidationErrors.Count > 0)
         {
             StateHasChanged();
@@ -1130,6 +1132,7 @@ public partial class HedgeRelationshipDetails
     {
         // Validate designation requirements
         ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
+        ValidationWarnings.Clear();
         if (ValidationErrors.Count > 0)
         {
             StateHasChanged();
