@@ -643,7 +643,12 @@ public partial class HedgeRelationshipDetails
         try
         {
             IsGeneratingInceptionPackage = true;
+            ValidationErrors.Clear();
             StateHasChanged();
+
+            // Check for document template keywords that cannot be replaced (legacy: checkDocumentTemplateKeywords)
+            var keywordsCheckQuery = new CheckDocumentTemplateKeywords.Query(HedgeRelationship.ID);
+            var keywordsCheckResult = await Mediator.Send(keywordsCheckQuery);
 
             var query = new InceptionPackageService.Query(HedgeRelationship, CurveDate);
             var result = await Mediator.Send(query);
@@ -652,7 +657,17 @@ public partial class HedgeRelationshipDetails
             using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
 
-            await AlertService.ShowToast("Inception package generated successfully!", AlertKind.Success, "Success", showButton: true);
+            // Display warning if there are smart tags that cannot be replaced (legacy behavior from line 2264)
+            if (keywordsCheckResult.HasEmptyKeyword)
+            {
+                ValidationErrors.Add("There are Smart Tags defined in the Hedge Documentation that cannot be replaced with a value. " +
+                    "Within the Hedge Memorandum, the Smart Tag(s) will be replaced with '_________________'.");
+                StateHasChanged();
+            }
+            else
+            {
+                await AlertService.ShowToast("Inception package generated successfully!", AlertKind.Success, "Success", showButton: true);
+            }
         }
         catch (ArgumentNullException)
         {
