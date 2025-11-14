@@ -11,6 +11,7 @@ public class HedgeRelationshipMappingProfile : Profile
             .ForMember(dest => dest.HedgedItems, opt => opt.MapFrom(src => src.HedgedItems))
             .ForMember(dest => dest.HedgingItems, opt => opt.MapFrom(src => src.HedgingItems))
             .ForMember(dest => dest.HedgeRegressionBatches, opt => opt.Ignore())
+            .ForMember(dest => dest.LatestHedgeRegressionBatch, opt => opt.Ignore())
             .ForMember(dest => dest.HedgeRelationshipActivities, opt => opt.MapFrom(src => src.HedgeRelationshipActivities))
             .ForMember(dest => dest.HedgeRelationshipOptionTimeValues, opt => opt.MapFrom(src => src.HedgeRelationshipOptionTimeValues));
 
