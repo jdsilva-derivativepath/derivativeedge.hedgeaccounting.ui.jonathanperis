@@ -73,6 +73,12 @@ public partial class OptionAmortizationDialog
                 OptionAmortizationModel.EndDate = value?.ToString("MM/dd/yyyy");
         }
     }
+
+    private string Title => 
+        OptionAmortizationModel?.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue ? "Option Time Value Amortization" : 
+        OptionAmortizationModel?.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionIntrinsicValue ? "Option Intrinsic Value Amortization" : 
+        string.Empty;
+
     #endregion
 
     #region Lifecycle Methods
@@ -107,17 +113,22 @@ public partial class OptionAmortizationDialog
     #endregion
     
     #region Helper Methods
-    private List<AmortizationMethodOption> GetFilteredAmortizationMethodOptions()
+    private List<AmortizationMethodOption> GetFilteredAmortizationMethodOptions(DerivativeEDGEHAEntityEnumOptionTimeValueAmortType amortType)
     {
-        // Legacy: filterByOptionAmortType (hr_hedgeRelationshipAddEditCtrl.js line 1104-1106)
-        // Exclude "Swaplet" when OptionTimeValueAmortType === "OptionTimeValue"
-        if (OptionAmortizationModel?.OptionTimeValueAmortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue)
+        if (AmortizationMethodOptions == null || AmortizationMethodOptions.Count == 0)
         {
-            return AmortizationMethodOptions
-                .Where(option => option.Value != AmortizationMethod.Swaplet)
-                .ToList();
+            return [];
         }
-        
+
+        // Filter based on OptionTimeValueAmortType
+        if (amortType == DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue)
+        {
+            return [.. AmortizationMethodOptions
+                .Where(option => option.Value == DerivativeEDGEHAEntityEnumAmortizationMethod.None ||
+                                option.Value == DerivativeEDGEHAEntityEnumAmortizationMethod.Straightline ||
+                                option.Value == DerivativeEDGEHAEntityEnumAmortizationMethod.TotalCashFlowMethod)];
+        }
+
         return AmortizationMethodOptions;
     }
     #endregion
@@ -137,7 +148,6 @@ public partial class OptionAmortizationDialog
             StateHasChanged();
 
             OptionAmortizationModel.HedgeRelationshipID = HedgeRelationship.ID;
-            OptionAmortizationModel.OptionTimeValueAmortType = DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionTimeValue;
             // NOTE: AmortizeOptionPremium is a UI-only property and is not persisted to the database
 
             var isUpdate = OptionAmortizationModel.ID > 0;

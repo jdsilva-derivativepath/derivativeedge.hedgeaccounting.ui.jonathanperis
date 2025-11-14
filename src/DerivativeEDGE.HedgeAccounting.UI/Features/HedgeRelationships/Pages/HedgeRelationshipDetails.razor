@@ -40,6 +40,19 @@ else if (HedgeRelationship != null && !IsLoadingHedgeRelationship)
             </SfMessage>
         </div>
     }
+    @if (ValidationWarnings != null && ValidationWarnings.Any())
+    {
+        <div class="px-2.5 py-0">
+            <SfMessage Severity="MessageSeverity.Warning">
+                <ul>
+                    @foreach (var warning in ValidationWarnings)
+                    {
+                        <li>@warning</li>
+                    }
+                </ul>
+            </SfMessage>
+        </div>
+    }
     <EditForm Model="HedgeRelationship" Context="mainFormContext">
         <DataAnnotationsValidator />
         <ValidationSummary />

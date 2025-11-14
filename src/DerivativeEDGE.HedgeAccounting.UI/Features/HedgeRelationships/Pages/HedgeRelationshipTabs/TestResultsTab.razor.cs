@@ -298,6 +298,32 @@ public partial class TestResultsTab
     #endregion
 
     #region Event Handlers
+    private void UpdateTable(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM selectedBatch)
+    {
+        try
+        {
+            if (selectedBatch.HedgeRegressionBatchResults.Count != null || selectedBatch.HedgeRegressionBatchResults.Count != 0)
+            {
+                var result = HedgeRegressionBatches.Where(x => x.ID == selectedBatch.ID).FirstOrDefault();
+                if (result != null)
+                {
+                    LatestBatch.HedgeRegressionBatchResults = result.HedgeRegressionBatchResults;
+                }
+                else
+                {
+                    Logger.LogInformation($"No matching batch results found for batch ID: {selectedBatch.ID}");
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, $"Error occurred while handling UpdateTable row selection for batch {selectedBatch?.ID}");
+        }
+    }
+    #endregion
+
+    #region Event Handlers
     /// <summary>
     /// Handles row click/selection in the "All Tests" grid
     /// </summary>
@@ -315,6 +341,7 @@ public partial class TestResultsTab
             await InvokeAsync(() =>
                    {
                        GenerateChartData();
+                       UpdateTable(selectedBatch);
                        StateHasChanged();
                    });
 

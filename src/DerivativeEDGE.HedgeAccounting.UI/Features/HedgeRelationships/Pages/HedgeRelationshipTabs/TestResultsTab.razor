@@ -200,7 +200,7 @@
                                                     @(model.HedgingFairValueChanged == 0 ? "-" : string.Format("{0:$#,##0.00;($#,##0.00)}", model.HedgingFairValueChanged))
                                                 </span>
                                             </Template>
-                                        </GridColumn>  
+                                        </GridColumn>
                                     </GridColumns>
                                 </GridColumn>
                                 <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchResultVM.OptionTimeValue)" HeaderText="Time Value" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Visible="@ShouldShowTimeValueColumns()">
@@ -238,23 +238,23 @@
             @if (HedgeRegressionBatches != null && HedgeRegressionBatches.Any())
             {
                 <div style="height: calc(100vh - 40rem)">
-            <DefaultGrid DataSource="@(HedgeRegressionBatches ?? new List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>())"
- TRowItem="DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM"
-               ID="all-tests-grid"
-         Height="100%"
-        AllowPaging="false"
-          AllowSorting="true"
- AllowGrouping="false"
-       AllowFiltering="false"
-  AllowSelection="false"
-     EnableVirtualization="false"
-   EnableGlobalSearch="true"
-        ShowColumnMenu="false"
-        ShowToolBar="false"
- ShowExcelExportButton="false"
-  ShowColumnPickerButton="false"
-OnRowClicked="OnRowSelected">
-            <GridColumns>
+                    <DefaultGrid DataSource="@(HedgeRegressionBatches ?? new List<DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM>())"
+                                 TRowItem="DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM"
+                                 ID="all-tests-grid"
+                                 Height="100%"
+                                 AllowPaging="false"
+                                 AllowSorting="true"
+                                 AllowGrouping="false"
+                                 AllowFiltering="false"
+                                 AllowSelection="false"
+                                 EnableVirtualization="false"
+                                 EnableGlobalSearch="true"
+                                 ShowColumnMenu="false"
+                                 ShowToolBar="false"
+                                 ShowExcelExportButton="false"
+                                 ShowColumnPickerButton="false"
+                                 OnRowClicked="@OnRowSelected">
+                        <GridColumns>
                             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRegressionBatchVM.RunDate)" HeaderText="Run Date">
                                 <Template>
                                     @{
@@ -335,90 +335,10 @@ OnRowClicked="OnRowSelected">
 
 @* Delete Confirmation Modal - Legacy: confirm('Are you sure to delete the selected test?') *@
 <DpConfirmationModal Visible="@_showDeleteConfirmation"
-    VisibleChanged="@((bool v) => _showDeleteConfirmation = v)"
-      Title="Confirm Delete"
-   Message="Are you sure to delete the selected test?"
-          ConfirmText="Delete"
-  CancelText="Cancel"
-         OnConfirmed="@HandleDeleteConfirmed"
-     OnCancelled="@HandleDeleteCancelled" />
-
-<style>
-    /* Global styles to override Syncfusion grid - NOT scoped */
-    
-    /* Hide ALL checkbox-related elements */
-    #all-tests-grid .e-selectioncheckbox,
-    #all-tests-grid .e-checkselectall,
-    #all-tests-grid .e-headerchkcelldiv,
-    #all-tests-grid .e-checkbox-wrapper,
-    #all-tests-grid .e-frame,
-    #all-tests-grid .e-icons.e-check {
-        display: none !important;
-   visibility: hidden !important;
-    }
-    
-    /* Hide checkbox column header - MORE SPECIFIC selectors */
-    #all-tests-grid th.e-selectionheadercell {
-     display: none !important;
- width: 0 !important;
-  max-width: 0 !important;
-padding: 0 !important;
-        margin: 0 !important;
-   border: none !important;
-    }
-    
-    /* Hide checkbox column data cells - MORE SPECIFIC selectors */
-    #all-tests-grid td.e-gridchkbox {
-   display: none !important;
-     width: 0 !important;
-  max-width: 0 !important;
- padding: 0 !important;
-     margin: 0 !important;
-     border: none !important;
-    }
-    
-    /* REMOVE nth-child(1) - was hiding Run Date column by mistake */
-    /* Instead, disable AllowSelection in the grid markup or accept the column */
-    
-    /* Match header background to ALL TESTS section - EXACTLY #66666e */
-    #all-tests-grid .e-gridheader {
-      background-color: #66666e !important;
-    }
-    
-    #all-tests-grid .e-gridheader th,
- #all-tests-grid .e-gridheader .e-headercell,
-    #all-tests-grid .e-gridheader .e-headercelldiv {
-     background-color: #66666e !important;
-        color: white !important;
-font-weight: normal !important;
-    }
-    
- /* Force ALL rows to white background - NO alternating colors */
- #all-tests-grid .e-row,
-    #all-tests-grid .e-altrow,
-    #all-tests-grid tbody tr {
-    background-color: #ffffff !important;
-    }
-  
-    #all-tests-grid .e-row td,
-    #all-tests-grid .e-altrow td,
-    #all-tests-grid tbody tr td {
-    background-color: #ffffff !important;
-    }
-    
-    /* Keep selected rows WHITE and VISIBLE - NO visual selection indicator */
-    #all-tests-grid .e-row.e-selectionbackground,
-    #all-tests-grid tr.e-selectionbackground {
-   background-color: #ffffff !important;
-    }
-    
-    #all-tests-grid .e-row.e-selectionbackground td,
-  #all-tests-grid tr.e-selectionbackground td {
-        background-color: #ffffff !important;
-    }
-    
-    /* Subtle hover effect for better UX */
-    #all-tests-grid .e-row:hover td {
-      background-color: #f5f5f5 !important;
-    }
-</style>
+                     VisibleChanged="@((bool v) => _showDeleteConfirmation = v)"
+                     Title="Confirm Delete"
+                     Message="Are you sure to delete the selected test?"
+                     ConfirmText="Delete"
+                     CancelText="Cancel"
+                     OnConfirmed="@HandleDeleteConfirmed"
+                     OnCancelled="@HandleDeleteCancelled" />

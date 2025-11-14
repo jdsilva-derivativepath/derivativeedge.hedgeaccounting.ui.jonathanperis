@@ -1,5 +1,5 @@
 <SfDialog Width="33rem" 
-          Height="45rem" 
+          Height="49rem" 
           CssClass="dp-dialog" 
           IsModal="true" 
           AllowDragging="true" 
@@ -8,6 +8,7 @@
     <DialogTemplates>
         <Header>Add/Edit Amortization</Header>
         <Content>
+            <div style="max-height: calc(90vh - 200px); overflow-y: auto; padding-right: 30px;">
             <EditForm Model="AmortizationModel" Context="amortizationFormContext">
                 <DataAnnotationsValidator />
                 <ValidationMessage For="@(() => AmortizationModel.GLAccountID)" />
@@ -39,8 +40,8 @@
                         <ComboBoxFieldSettings Value="@nameof(DerivativeEDGEHAEntityGLAccount.Id)" Text="@nameof(DerivativeEDGEHAEntityGLAccount.AccountDescription)" />
                     </SfComboBox>
                 </div>
-                <div class="form-group dp-inputs">
-                    <span class="input-label">Financial Centers</span>
+                <div class="dp-inputs">
+                    <span class="form-group input-label">Financial Centers</span>
                     <SfMultiSelect TValue="List<string>"
                                    CssClass="dropdown-input"
                                    Enabled="true"
@@ -51,8 +52,8 @@
                         <MultiSelectFieldSettings Value="@nameof(FinancialCenterOption.Value)" Text="@nameof(FinancialCenterOption.Text)" />
                     </SfMultiSelect>
                 </div>
-                <div class="form-group dp-inputs">
-                    <span class="input-label">Payment Frequency</span>
+                <div class="dp-inputs">
+                    <span class="form-group input-label">Payment Frequency</span>
                     <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPaymentFrequency"
                                 CssClass="dropdown-input"
                                 Enabled="true"
@@ -64,8 +65,8 @@
                         <ComboBoxFieldSettings Value="@nameof(PaymentFrequencyOption.Value)" Text="@nameof(PaymentFrequencyOption.Text)" />
                     </SfComboBox>
                 </div>
-                <div class="custom-datepicker-container">
-                    <div class="form-group dp-inputs">
+                <div class="flex flex-row gap-4">
+                    <div class="dp-inputs">
                         <span class="input-label">Day Count Convention</span>
                         <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsDayCountConv"
                                     CssClass="dropdown-input"
@@ -78,7 +79,7 @@
                             <ComboBoxFieldSettings Value="@nameof(DayCountConvOption.Value)" Text="@nameof(DayCountConvOption.Text)" />
                         </SfComboBox>
                     </div>
-                    <div class="form-group dp-inputs">
+                    <div class="dp-inputs">
                         <span class="input-label">Payment Convention</span>
                         <SfComboBox TValue="DerivativeEDGEDomainEntitiesEnumsPayBusDayConv"
                                     CssClass="dropdown-input"
@@ -92,7 +93,7 @@
                         </SfComboBox>
                     </div>
                 </div>
-                <div class="custom-datepicker-container">
+                <div class="flex flex-row gap-4">
                     <div class="dp-inputs">
                         <label class="input-label">Start Date</label>
                         <SfDatePicker TValue="DateTime?"
@@ -118,7 +119,7 @@
                         </SfDatePicker>
                     </div>
                 </div>
-                <div class="custom-datepicker-container">
+                <div class="flex flex-row gap-4">
                     <div class="dp-inputs">
                         <label class="input-label">Front Roll Date</label>
                         <SfDatePicker TValue="DateTime?"
@@ -155,7 +156,7 @@
                                           @bind-Value="AmortizationModel.TotalAmount" />
                     </NumericHotKeys>
                 </div>
-                <div class="custom-checkbox-container">
+                <div class="flex flex-row gap-4">
                     <div class="dp-inputs">
                         <SfCheckBox CssClass="input-checkbox" @bind-Checked="AmortizationModel.AdjDates" Label="Adj Dates" />
                     </div>
@@ -167,6 +168,7 @@
                     </div>
                 </div>
             </EditForm>
+            </div>
         </Content>
         <FooterTemplate>
             <div class="flex flex-row justify-end pt-[25px]">

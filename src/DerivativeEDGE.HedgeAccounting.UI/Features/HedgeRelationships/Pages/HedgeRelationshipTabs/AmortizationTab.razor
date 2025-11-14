@@ -75,9 +75,7 @@
                     @{
                         var model = (DerivativeEDGEHAApiViewModelsOptionTimeValueAmortRollScheduleVM)context;
                     }
-                    <span class="@(model.Periodic > 0 ? "" : "negative-numbers")">
-                        @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Periodic)
-                    </span>
+                    @string.Format("{0:$#,##0.00;($#,##0.00)}", model.Periodic)
                 </Template>
             </GridColumn>
         </GridColumns>
@@ -167,9 +165,7 @@
                 @{
                     var model = (DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM)context;
                 }
-                <span class="@(model.TotalAmount > 0 ? "" : "negative-numbers")">
-                    @string.Format("{0:$#,##0.00;($#,##0.00)}", model.TotalAmount)
-                </span>
+                @string.Format("{0:$#,##0.00;($#,##0.00)}", model.TotalAmount)
             </Template>
         </GridColumn>
         <GridColumn Width="200" Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipOptionTimeValueAmortVM.TotalDCF)" HeaderText="Total DCF" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right">

@@ -1,4 +1,6 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums;
+﻿using EnumDescriptionAttribute = DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Attributes.EnumDescriptionAttribute;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Enums;
 
 [Flags]
 public enum AmortizationMethod : int
@@ -6,7 +8,7 @@ public enum AmortizationMethod : int
     [EnumDescription("None")]
     None = 0,
 
-    [EnumDescription("Total CashFlow Method")]
+    [EnumDescription("Total Cash Flow Method")]
     TotalCashFlowMethod = 1,
 
     [EnumDescription("Straightline")]

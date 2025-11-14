@@ -37,6 +37,7 @@ public partial class HedgeRelationshipDetails
     private AmortizationTab amortizationTabRef;
     private OptionAmortizationTab optionAmortizationTabRef;
     private List<string> ValidationErrors { get; set; } = [];
+    private List<string> ValidationWarnings { get; set; } = [];
     private bool IsDpiUser { get; set; }
     private DateTime? DesignationDate
     {
@@ -643,7 +644,13 @@ public partial class HedgeRelationshipDetails
         try
         {
             IsGeneratingInceptionPackage = true;
+            ValidationErrors.Clear();
+            ValidationWarnings.Clear();
             StateHasChanged();
+
+            // Check for document template keywords that cannot be replaced (legacy: checkDocumentTemplateKeywords)
+            var keywordsCheckQuery = new CheckDocumentTemplateKeywords.Query(HedgeRelationship.ID);
+            var keywordsCheckResult = await Mediator.Send(keywordsCheckQuery);
 
             var query = new InceptionPackageService.Query(HedgeRelationship, CurveDate);
             var result = await Mediator.Send(query);
@@ -652,7 +659,17 @@ public partial class HedgeRelationshipDetails
             using var streamRef = new DotNetStreamReference(stream: result.ExcelStream);
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", result.FileName, streamRef);
 
-            await AlertService.ShowToast("Inception package generated successfully!", AlertKind.Success, "Success", showButton: true);
+            // Display warning if there are smart tags that cannot be replaced (legacy behavior from line 2264)
+            if (keywordsCheckResult.HasEmptyKeyword)
+            {
+                ValidationWarnings.Add("There are Smart Tags defined in the Hedge Documentation that cannot be replaced with a value. " +
+                    "Within the Hedge Memorandum, the Smart Tag(s) will be replaced with '_________________'.");
+                StateHasChanged();
+            }
+            else
+            {
+                await AlertService.ShowToast("Inception package generated successfully!", AlertKind.Success, "Success", showButton: true);
+            }
         }
         catch (ArgumentNullException)
         {
@@ -722,6 +739,7 @@ public partial class HedgeRelationshipDetails
     private async Task SaveHedgeRelationshipAsync()
     {
         ValidationErrors.Clear();
+        ValidationWarnings.Clear();
         if (HedgeRelationship == null)
         {
             await AlertService.ShowToast("No hedge relationship data available", AlertKind.Warning, "Warning", showButton: true);
@@ -797,6 +815,7 @@ public partial class HedgeRelationshipDetails
         }
 
         ValidationErrors = RegressionRequirementsValidator.Validate(HedgeRelationship);
+        ValidationWarnings.Clear();
         if (ValidationErrors.Count > 0)
         {
             StateHasChanged();
@@ -1113,6 +1132,7 @@ public partial class HedgeRelationshipDetails
     {
         // Validate designation requirements
         ValidationErrors = DesignationRequirementsValidator.Validate(HedgeRelationship);
+        ValidationWarnings.Clear();
         if (ValidationErrors.Count > 0)
         {
             StateHasChanged();
@@ -1510,7 +1530,7 @@ public partial class HedgeRelationshipDetails
         
         // Open the option amortization modal
         OpenModal = MODAL_OPTION_AMORTIZATION;
-        StateHasChanged();
+        IsOptionAmortizationModal = true;
         await Task.CompletedTask;
     }
     

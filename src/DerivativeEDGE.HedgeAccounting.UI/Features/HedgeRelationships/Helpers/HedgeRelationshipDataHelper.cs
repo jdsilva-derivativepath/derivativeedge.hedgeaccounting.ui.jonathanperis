@@ -180,13 +180,12 @@ public static class HedgeRelationshipDataHelper
 
     public static List<AmortizationMethodOption> GetAmortizationMethodOptions() =>
     [
-        new() { Value = AmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },
-        new() { Value = AmortizationMethod.TotalCashFlowMethod, Text = AmortizationMethod.TotalCashFlowMethod.GetDescription() },
-        new() { Value = AmortizationMethod.Straightline, Text = AmortizationMethod.Straightline.GetDescription() },
-        new() { Value = AmortizationMethod.IntrinsicValueMethod, Text = AmortizationMethod.IntrinsicValueMethod.GetDescription() },
-        new() { Value = AmortizationMethod.Swaplet, Text = AmortizationMethod.Swaplet.GetDescription() }
+        new() { Value = DerivativeEDGEHAEntityEnumAmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },
+        new() { Value = DerivativeEDGEHAEntityEnumAmortizationMethod.Straightline, Text = AmortizationMethod.Straightline.GetDescription() },
+        new() { Value = DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet, Text = AmortizationMethod.Swaplet.GetDescription() },
+        new() { Value = DerivativeEDGEHAEntityEnumAmortizationMethod.TotalCashFlowMethod, Text = AmortizationMethod.TotalCashFlowMethod.GetDescription() }
     ];
-
+    
     public static List<IntrinsicAmortizationMethodOption> GetIntrinsicAmortizationMethodOptions() =>
     [
         new() { Value = AmortizationMethod.None, Text = AmortizationMethod.None.GetDescription() },

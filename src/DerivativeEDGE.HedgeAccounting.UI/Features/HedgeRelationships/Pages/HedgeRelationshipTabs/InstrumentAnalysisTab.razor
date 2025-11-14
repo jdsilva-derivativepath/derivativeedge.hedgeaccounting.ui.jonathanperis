@@ -34,7 +34,7 @@
                  OnRowDataBound="@OnHedgedItemChanged">
         <GridColumns>
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.ItemID)" HeaderText="Hedged Item ID" Width="160" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" Width="260" />
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Notional)" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="200">
                 <Template>
                     @{
@@ -116,7 +116,7 @@
                  OnRowDataBound="@OnHedgingItemChanged">
         <GridColumns>
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.ItemID)" HeaderText="Hedging Item ID" Width="160" />
-            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" />
+            <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Description)" HeaderText="Description" ClipMode="ClipMode.EllipsisWithTooltip" Width="260"/>
             <GridColumn Field="@nameof(DerivativeEDGEHAApiViewModelsHedgeRelationshipItemVM.Notional)" HeaderText="Notional" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Right" Width="200">
                 <Template>
                     @{

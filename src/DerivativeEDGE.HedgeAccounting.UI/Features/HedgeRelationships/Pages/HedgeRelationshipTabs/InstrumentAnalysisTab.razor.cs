@@ -129,7 +129,34 @@ public partial class InstrumentAnalysisTab
     {
         await LoadCurrency();
         await LoadEffectivenessMethods();
+        await LoadClientConfig();
         // Don't load instrument data here as HedgeRelationship parameter might not be set yet
+    }
+
+    private async Task LoadClientConfig()
+    {
+        var response = await Mediator.Send(new GetClientConfigSettings.Query(HedgeRelationship.ClientID));
+
+        if (!response.HasError && response.Result != null)
+        {
+
+            if (HedgeRelationship.ProspectiveEffectivenessMethodID is null && 
+                HedgeRelationship.RetrospectiveEffectivenessMethodID is null && 
+                HedgeRelationship.Observation == 0 && 
+                HedgeRelationship.PeriodSize == DerivativeEDGEHAEntityEnumPeriodSize.None && 
+                HedgeRelationship.ReportingFrequency == DerivativeEDGEHAEntityEnumReportingFrequency.None && 
+                string.IsNullOrWhiteSpace(HedgeRelationship.ReportCurrency))
+            {
+                // Assign Default config
+                HedgeRelationship.ProspectiveEffectivenessMethodID = response.Result.ProspectiveEffectivenessMethodID;
+                HedgeRelationship.RetrospectiveEffectivenessMethodID = response.Result.RetrospectiveEffectivenessMethodID;
+                HedgeRelationship.PeriodSize = response.Result.PeriodSize;
+                HedgeRelationship.Observation = response.Result.Observation;
+                HedgeRelationship.ReportingFrequency = response.Result.ReportingFrequency;
+                HedgeRelationship.ReportCurrency = response.Result.ReportCurrency;
+            }
+
+        }
     }
 
     // Commented for causing infinite loop issues

@@ -30,10 +30,15 @@ public sealed class DeleteHedgeRelationshipOptionTimeValueAmort
                 catch (Exception ex) when (ex.GetType().Name == "ApiException")
                 {
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
-                    var reason = ex.Message;
-                    var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
-                    logger.LogWarning("Failed to delete hedge relationship option time value amortization. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
-                    return new Response(true, "Failed to delete amortization schedule");
+                    
+                    // Treat HTTP 204 (No Content) as successful for DELETE operations
+                    if (statusCode?.ToString() != "204")
+                    {
+                        var reason = ex.Message;
+                        var content = ex.GetType().GetProperty("Response")?.GetValue(ex, null);
+                        logger.LogWarning("Failed to delete hedge relationship option time value amortization. StatusCode: {StatusCode}, Reason: {ReasonPhrase}, Content: {Content}", statusCode, reason, content);
+                        return new Response(true, "Failed to delete amortization schedule");
+                    }
                 }
 
                 logger.LogInformation("Successfully deleted hedge relationship option time value amortization.");

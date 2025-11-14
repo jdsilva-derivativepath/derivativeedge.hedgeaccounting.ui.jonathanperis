@@ -18,14 +18,8 @@ public partial class OptionAmortizationTab
     protected override async Task OnInitializedAsync()
     {
         await LoadOptionAmortizationGridList();
-        StateHasChanged();
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        await LoadOptionAmortizationGridList();
-        StateHasChanged();
-    }
 
     public async Task LoadOptionAmortizationGridList()
     {

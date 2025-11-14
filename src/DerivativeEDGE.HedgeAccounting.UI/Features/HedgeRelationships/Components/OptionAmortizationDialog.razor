@@ -6,7 +6,7 @@
           EnableResize="false"
           @bind-Visible="Visible">
     <DialogTemplates>
-        <Header>Option Amortization</Header>
+        <Header>@Title</Header>
         <Content>
             @if (IsSavingOptionAmortization)
             {
@@ -57,7 +57,7 @@
                                                     TItem="AmortizationMethodOption"
                                                     Placeholder="Amortization Method"
                                                     @bind-Value="OptionAmortizationModel.AmortizationMethod"
-                                                    DataSource="@GetFilteredAmortizationMethodOptions()">
+                                                    DataSource="@GetFilteredAmortizationMethodOptions(OptionAmortizationModel.OptionTimeValueAmortType)">
                                             <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
                                             <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                         </SfComboBox>
@@ -109,7 +109,7 @@
                                                         TItem="AmortizationMethodOption"
                                                         Placeholder="Intrinsic Value Amortization Method"
                                                         @bind-Value="IVAmortizationMethod"
-                                                        DataSource="AmortizationMethodOptions">
+                                                        DataSource="@GetFilteredAmortizationMethodOptions(DerivativeEDGEHAEntityEnumOptionTimeValueAmortType.OptionIntrinsicValue)">
                                                 <ComboBoxEvents TValue="DerivativeEDGEHAEntityEnumAmortizationMethod" TItem="AmortizationMethodOption" />
                                                 <ComboBoxFieldSettings Value="@nameof(AmortizationMethodOption.Value)" Text="@nameof(AmortizationMethodOption.Text)" />
                                             </SfComboBox>
@@ -130,12 +130,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="custom-datepicker-container">
+                    <div class="flex flex-row gap-4">
                         <div class="dp-inputs">
                             <label class="input-label">Start Date</label>
                             <SfDatePicker TValue="DateTime?"
                                           CssClass="calendar-datepicker"
-                                          Enabled="true"
+                                          Enabled="@(OptionAmortizationModel.AmortizationMethod != DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet)"
                                           Format="@ComponentLibraryConstants.DateFormat"
                                           Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                           ShowClearButton="true"
@@ -147,7 +147,7 @@
                             <label class="input-label">End Date</label>
                             <SfDatePicker TValue="DateTime?"
                                           CssClass="calendar-datepicker"
-                                          Enabled="true"
+                                          Enabled="@(OptionAmortizationModel.AmortizationMethod != DerivativeEDGEHAEntityEnumAmortizationMethod.Swaplet)"
                                           Format="@ComponentLibraryConstants.DateFormat"
                                           Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                           ShowClearButton="true"
@@ -169,7 +169,7 @@
                               IsPrimary="false" 
                               Disabled="@IsSavingOptionAmortization" />
                     <SfButton CssClass="button-primary button-default"
-                              Content="@(IsSavingOptionAmortization ? "Saving..." : (OptionAmortizationModel.ID > 0 ? "Update" : "Generate"))"
+                              Content="@(IsSavingOptionAmortization ? "Saving..." : (OptionAmortizationModel.ID > 0 ? "Save" : "Save"))"
                               Disabled="@IsGenerateDisabled"
                               IsPrimary="true" 
                               OnClick="@OnSubmitOptionAmortization" />

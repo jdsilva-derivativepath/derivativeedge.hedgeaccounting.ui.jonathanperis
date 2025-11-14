@@ -75,8 +75,18 @@ public sealed class DownloadRegressionSummaryAllClient
             {
                 return fallback;
             }
-            var remainder = contentDisposition[(idx + token.Length)..].Trim().Trim('"');
-            return string.IsNullOrWhiteSpace(remainder) ? fallback : remainder;
+
+            // Find the first filename= occurrence and extract up to the next semicolon or end of string
+            var startIdx = idx + token.Length;
+            var endIdx = contentDisposition.IndexOf(';', startIdx);
+            var fileNamePart = endIdx >= 0
+                ? contentDisposition[startIdx..endIdx]
+                : contentDisposition[startIdx..];
+
+            var fileName = fileNamePart.Trim().Trim('"');
+
+            // If filename is empty, fallback
+            return string.IsNullOrWhiteSpace(fileName) ? fallback : fileName;
         }
     }
 }
