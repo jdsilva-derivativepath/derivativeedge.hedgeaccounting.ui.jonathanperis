@@ -63,21 +63,25 @@
                                         <label class="input-label">Designation Date</label>
                                         <SfDatePicker CssClass="calendar-datepicker"
                                                       TValue="DateTime?"
-                                                      @bind-Value="DesignationDate"
+                                                      Value="@DesignationDate"
                                                       Format="@ComponentLibraryConstants.DateFormat"
                                                       Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                                       ShowClearButton="true"
-                                                      InputFormats="ComponentLibraryConstants.DateInputFormats" />
+                                                      InputFormats="ComponentLibraryConstants.DateInputFormats">
+                                            <DatePickerEvents TValue="DateTime?" ValueChange="@OnDesignationDateChanged" />
+                                        </SfDatePicker>
                                     </div>
                                     <div class="form-group dp-inputs min-w-100">
                                         <label class="input-label">De-designation Date</label>
                                         <SfDatePicker CssClass="calendar-datepicker"
                                                       TValue="DateTime?"
-                                                      @bind-Value="DeDesignationDate"
+                                                      Value="@DeDesignationDate"
                                                       Format="@ComponentLibraryConstants.DateFormat"
                                                       Placeholder="@ComponentLibraryConstants.DateFormat.ToLowerInvariant()"
                                                       ShowClearButton="true"
-                                                      InputFormats="ComponentLibraryConstants.DateInputFormats" />
+                                                      InputFormats="ComponentLibraryConstants.DateInputFormats">
+                                            <DatePickerEvents TValue="DateTime?" ValueChange="@OnDeDesignationDateChanged" />
+                                        </SfDatePicker>
                                     </div>
                                 </div>
                             </div>
