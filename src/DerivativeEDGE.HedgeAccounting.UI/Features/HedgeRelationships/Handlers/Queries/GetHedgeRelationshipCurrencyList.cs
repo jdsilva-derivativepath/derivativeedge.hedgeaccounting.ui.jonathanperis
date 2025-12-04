@@ -20,7 +20,6 @@ public sealed class GetHedgeRelationshipCurrencyList
                     ShortName = c.ShortName ?? c.Label ?? string.Empty
                 })
                 .Where(c => !string.IsNullOrWhiteSpace(c.ShortName))
-                .OrderBy(c => c.ShortName)
                 .ToList();
 
             if (data == null)

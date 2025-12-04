@@ -209,7 +209,7 @@ public partial class InstrumentAnalysisTab
     private async Task LoadCurrency()
     {
         var response = await Mediator.Send(new GetHedgeRelationshipCurrencyList.Query());
-        response.Currency.Insert(0, new HedgeCurrencyDropdownItem { LongName = "None", ShortName = "" }); // Add the "None" option
+
         Currency = response.Currency;
 
         // Check if current ReportCurrency exists in the response, if not set to "None"

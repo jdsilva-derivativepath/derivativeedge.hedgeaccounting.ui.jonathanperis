@@ -1,4 +1,6 @@
-﻿namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
+﻿using ApiException = DerivativeEdge.HedgeAccounting.Api.Client.ApiException;
+
+namespace DerivativeEDGE.HedgeAccounting.UI.Features.HedgeRelationships.Handlers.Queries;
 
 public sealed class UploadRegressionSummaryAllClient
 {
@@ -31,25 +33,21 @@ public sealed class UploadRegressionSummaryAllClient
                     var valueDate = request.ValueDate.HasValue ? new DateTimeOffset(request.ValueDate.Value) : (DateTimeOffset?)null;
                     await hedgeAccountingApiClient.ProcessSummaryAllClientsAsync(valueDate, cancellationToken);
                 }
-                catch (Exception ex) when (ex.GetType().Name == "ApiException")
+                catch (ApiException ex) when (ex.StatusCode == StatusCodes.Status500InternalServerError || ex.StatusCode == StatusCodes.Status400BadRequest)
                 {
                     var statusCode = ex.GetType().GetProperty("StatusCode")?.GetValue(ex, null);
                     var reason = ex.Message;
                     logger.LogWarning("{Client}.{Method} failed. StatusCode: {StatusCode}, Reason: {Reason}", clientTypeName, methodName, statusCode, reason);
-                    throw; // maintain original semantics
+                    throw; // preserve semantics
                 }
-
-                logger.LogInformation("{Client}.{Method} succeeded (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
-                return new Response(false, "Successfully uploaded regression summary");
             }
-            catch (Exception ex)
+            catch
             {
-                var baseUrl = hedgeAccountingApiClient.GetType()
-                    .GetProperty("BaseUrl", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?
-                    .GetValue(hedgeAccountingApiClient) as string ?? string.Empty;
-                logger.LogError(ex, "Error executing {Client}.{Method} (BaseUrl: {BaseUrl}, valueDate: {ValueDate})", clientTypeName, methodName, baseUrl, request.ValueDate);
-                return new Response(true, "Failed to upload regression summary");
+                // Handling incorrect 200 interpretation by ApiClient; real failures handled in inner ApiException block.
             }
+
+            logger.LogInformation("{Client}.{Method} succeeded (valueDate: {ValueDate})", clientTypeName, methodName, request.ValueDate);
+            return new Response(false, "Successfully uploaded regression summary");
         }
     }
 }
