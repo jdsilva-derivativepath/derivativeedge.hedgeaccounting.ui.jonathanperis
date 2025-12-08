@@ -70,5 +70,23 @@ public partial class HedgeRelationshipInfoSection
             await HedgeRelationshipChanged.InvokeAsync(HedgeRelationship);
         }
     }
+
+    /// <summary>
+    /// Handles DesignationDate date picker value changes.
+    /// Invokes the EventCallback to notify the parent component.
+    /// </summary>
+    private async Task OnDesignationDateChanged(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        await DesignationDateChanged.InvokeAsync(args.Value);
+    }
+
+    /// <summary>
+    /// Handles DeDesignationDate date picker value changes.
+    /// Invokes the EventCallback to notify the parent component.
+    /// </summary>
+    private async Task OnDeDesignationDateChanged(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        await DeDesignationDateChanged.InvokeAsync(args.Value);
+    }
     #endregion
 }
